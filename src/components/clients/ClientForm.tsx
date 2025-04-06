@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+// Make sure the schema matches all required Client fields
 const formSchema = z.object({
   companyName: z.string().min(2, { message: "Company name is required" }),
   gstNumber: z.string().min(15, { message: "Valid GST number required" }),
@@ -32,6 +33,9 @@ const formSchema = z.object({
   bankDetails: z.string().min(1, { message: "Bank details required" }),
   address: z.string().min(1, { message: "Address is required" }),
 });
+
+// This ensures the form values will match the expected Client type (minus the id)
+type FormValues = z.infer<typeof formSchema>;
 
 interface ClientFormProps {
   open: boolean;
@@ -48,7 +52,7 @@ const ClientForm = ({
 }: ClientFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       companyName: "",
@@ -61,9 +65,10 @@ const ClientForm = ({
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
+      // Now values is guaranteed to contain all required fields
       onSubmit(values);
       form.reset();
       onClose();
