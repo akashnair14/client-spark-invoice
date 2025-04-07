@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ClientTable from "@/components/clients/ClientTable";
 import ClientForm from "@/components/clients/ClientForm";
@@ -17,21 +17,8 @@ const Clients = () => {
 
   // In a real app, this would be replaced with API calls and React Query
   const [clients, setClients] = useState<Client[]>(mockClients);
-  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client | undefined>(undefined);
-
-  const handleAddClient = (client: Omit<Client, "id">) => {
-    const newClient = {
-      ...client,
-      id: uuidv4(),
-    };
-    setClients([...clients, newClient]);
-    toast({
-      title: "Client Added",
-      description: `${client.companyName} has been added successfully.`,
-    });
-  };
 
   const handleEditClient = (client: Omit<Client, "id">) => {
     if (!currentClient) return;
@@ -66,9 +53,11 @@ const Clients = () => {
           <h1 className="page-title">Clients</h1>
           <p className="page-description">Manage your client information</p>
         </div>
-        <Button onClick={() => setIsAddClientOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" /> Add Client
-        </Button>
+        <Link to="/clients/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" /> Add Client
+          </Button>
+        </Link>
       </div>
 
       <ClientTable
@@ -79,12 +68,6 @@ const Clients = () => {
         }}
         onDelete={handleDeleteClient}
         onCreateInvoice={handleCreateInvoice}
-      />
-
-      <ClientForm
-        open={isAddClientOpen}
-        onClose={() => setIsAddClientOpen(false)}
-        onSubmit={handleAddClient}
       />
 
       <ClientForm
