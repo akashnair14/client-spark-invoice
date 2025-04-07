@@ -37,9 +37,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     },
   ];
 
-  const handleNavigation = (e: React.MouseEvent) => {
-    // Ensure the sheet closes on navigation
-    onClose();
+  // Force close the sidebar when navigating
+  const handleNavigation = () => {
+    if (open) {
+      onClose();
+    }
   };
 
   const SidebarContent = (

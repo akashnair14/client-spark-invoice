@@ -53,8 +53,19 @@ const ClientForm = ({
           form.setValue(key as keyof ClientFormValues, initialData[key as keyof Client]);
         }
       });
+    } else {
+      // Reset form when not editing
+      form.reset({
+        companyName: "",
+        gstNumber: "",
+        phoneNumber: "",
+        email: "",
+        bankAccountNumber: "",
+        bankDetails: "",
+        address: "",
+      });
     }
-  }, [initialData, form]);
+  }, [initialData, form, open]);
 
   const handleSubmit = async (values: ClientFormValues) => {
     try {
@@ -72,7 +83,7 @@ const ClientForm = ({
   // Safe close handler that ensures form state is properly reset
   const handleClose = () => {
     onClose();
-    // Add a small delay before resetting to avoid UI flickering
+    // Reset form on close with a delay to prevent UI flicker
     setTimeout(() => {
       if (!initialData) {
         form.reset();
