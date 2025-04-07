@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,18 @@ const ClientForm = ({
       address: "",
     },
   });
+
+  // Update form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      Object.keys(initialData).forEach((key) => {
+        // Skip the 'id' field since it's not part of the form
+        if (key !== 'id') {
+          form.setValue(key as keyof ClientFormValues, initialData[key as keyof Client]);
+        }
+      });
+    }
+  }, [initialData, form]);
 
   const handleSubmit = async (values: ClientFormValues) => {
     try {
