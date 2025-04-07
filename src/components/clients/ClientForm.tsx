@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { ClientFormValues, clientFormSchema } from "@/schemas/clientSchema";
 import ClientFormFields from "./ClientFormFields";
@@ -61,7 +62,6 @@ const ClientForm = ({
       // Now values is guaranteed to contain all required fields for the Client type
       onSubmit(values as Omit<Client, "id">);
       form.reset();
-      onClose();
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
@@ -69,13 +69,27 @@ const ClientForm = ({
     }
   };
 
+  // Safe close handler that ensures form state is properly reset
+  const handleClose = () => {
+    onClose();
+    // Add a small delay before resetting to avoid UI flickering
+    setTimeout(() => {
+      if (!initialData) {
+        form.reset();
+      }
+    }, 100);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {initialData ? "Edit Client" : "Add New Client"}
           </DialogTitle>
+          <DialogDescription>
+            {initialData ? "Update client information" : "Add a new client to your list"}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -87,7 +101,7 @@ const ClientForm = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isLoading}
               >
                 Cancel

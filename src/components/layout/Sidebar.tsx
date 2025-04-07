@@ -37,6 +37,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     },
   ];
 
+  const handleNavigation = (e: React.MouseEvent) => {
+    // Ensure the sheet closes on navigation
+    onClose();
+  };
+
   const SidebarContent = (
     <div className="space-y-4 py-4 h-full flex flex-col">
       <div className="px-3 flex-1">
@@ -50,7 +55,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
             <Link
               key={route.href}
               to={route.href}
-              onClick={onClose}
+              onClick={handleNavigation}
             >
               <Button
                 variant={pathname === route.href ? "secondary" : "ghost"}

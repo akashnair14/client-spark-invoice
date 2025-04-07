@@ -32,6 +32,10 @@ const Clients = () => {
       title: "Client Updated",
       description: `${client.companyName} has been updated successfully.`,
     });
+    
+    // Clean up edit state
+    setIsEditClientOpen(false);
+    setCurrentClient(undefined);
   };
 
   const handleDeleteClient = (client: Client) => {
