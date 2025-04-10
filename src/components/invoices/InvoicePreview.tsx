@@ -1,10 +1,13 @@
 
+import React, { useRef } from "react";
 import { Client, Invoice, InvoiceItem } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Download, Printer, Share2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 interface InvoicePreviewProps {
   invoice: {
@@ -22,6 +25,7 @@ interface InvoicePreviewProps {
 
 const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: InvoicePreviewProps) => {
   const { toast } = useToast();
+  const invoiceRef = useRef<HTMLDivElement>(null);
 
   if (!client) {
     return <div className="text-center py-8">Please select a client to preview invoice</div>;
@@ -31,18 +35,93 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
     window.print();
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
+    if (!invoiceRef.current) return;
+    
     toast({
-      title: "PDF Download",
-      description: "Your invoice PDF is being generated and will download shortly.",
+      title: "Generating PDF",
+      description: "Please wait while we generate your invoice PDF...",
     });
+
+    try {
+      // Add a temporary class for better PDF generation
+      invoiceRef.current.classList.add("pdf-generation");
+      
+      const canvas = await html2canvas(invoiceRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+      
+      // Remove temporary class
+      invoiceRef.current.classList.remove("pdf-generation");
+      
+      const imgData = canvas.toDataURL("image/png");
+      
+      // Calculate PDF dimensions based on canvas
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      
+      // If the content is longer than one page, add new pages
+      if (imgHeight > pageHeight) {
+        let heightLeft = imgHeight - pageHeight;
+        let position = -pageHeight;
+        
+        while (heightLeft > 0) {
+          position -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+      }
+      
+      pdf.save(`Invoice-${invoice.invoiceNumber}.pdf`);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: `Invoice ${invoice.invoiceNumber} has been successfully downloaded.`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "PDF Generation Failed",
+        description: "There was a problem generating your PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleShareWhatsApp = () => {
-    toast({
-      title: "Share to WhatsApp",
-      description: `Invoice ${invoice.invoiceNumber} would be shared with ${client.companyName} via WhatsApp.`,
-    });
+    try {
+      // Format the message for WhatsApp
+      const message = `Invoice ${invoice.invoiceNumber} from Your Company Name to ${client.companyName}.\nAmount: ₹${total.toFixed(2)}\nDue Date: ${format(invoice.dueDate, "dd/MM/yyyy")}`;
+      
+      // Encode the message for the URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Generate WhatsApp link
+      const whatsappUrl = `https://wa.me/${client.phoneNumber?.replace(/\D/g, '')}?text=${encodedMessage}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
+      
+      toast({
+        title: "WhatsApp Opened",
+        description: `Sharing invoice ${invoice.invoiceNumber} with ${client.companyName} via WhatsApp.`,
+      });
+    } catch (error) {
+      console.error("WhatsApp sharing error:", error);
+      toast({
+        title: "Sharing Failed",
+        description: "There was a problem opening WhatsApp. Please check the client's phone number.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -63,7 +142,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
       </div>
 
       <Card className="border border-gray-200 print:border-0 print:shadow-none animate-fade-in">
-        <CardContent className="p-6 md:p-8">
+        <CardContent className="p-6 md:p-8" ref={invoiceRef}>
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between mb-10">
             <div>
