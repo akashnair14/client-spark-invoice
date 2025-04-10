@@ -9,6 +9,8 @@ import { Client, Invoice, InvoiceItem } from "@/types";
 import { mockClients, mockInvoices } from "@/data/mockData";
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Eye } from "lucide-react";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -79,6 +81,10 @@ const NewInvoice = () => {
     });
   };
 
+  const handleBackToEdit = () => {
+    setActiveTab("edit");
+  };
+
   return (
     <Layout>
       <div className="page-header">
@@ -86,22 +92,22 @@ const NewInvoice = () => {
         <p className="page-description">Create and preview a new invoice</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="edit">Edit</TabsTrigger>
-          <TabsTrigger value="preview" disabled={!invoiceData}>
-            Preview
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="edit" className="space-y-4">
+      {activeTab === "edit" ? (
+        <div className="space-y-4">
           <InvoiceForm
             clients={mockClients}
             onSubmit={handleInvoiceSubmit}
           />
-        </TabsContent>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <Button variant="outline" onClick={handleBackToEdit}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Edit
+            </Button>
+            {invoiceData && <span className="text-muted-foreground">Preview of invoice #{invoiceData.invoiceNumber}</span>}
+          </div>
 
-        <TabsContent value="preview" className="space-y-4">
           {invoiceData ? (
             <InvoicePreview
               invoice={invoiceData}
@@ -111,12 +117,14 @@ const NewInvoice = () => {
               total={total}
             />
           ) : (
-            <div className="text-center py-10">
-              Please create an invoice first
+            <div className="text-center py-10 border rounded-lg bg-muted/20">
+              <Eye className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium">No Preview Available</h3>
+              <p className="text-muted-foreground mt-2">Please create an invoice first</p>
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </Layout>
   );
 };

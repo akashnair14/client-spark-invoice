@@ -110,6 +110,11 @@
   .print:hidden {
     display: none !important;
   }
+
+  /* Hide status markers in print version */
+  .print-hide {
+    display: none !important;
+  }
 }
 
 /* PDF generation specific styles */
@@ -127,4 +132,67 @@
     left: -9999px;
     top: -9999px;
   }
+}
+
+/* Invoice Professional Styling */
+.invoice-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.invoice-table th {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.invoice-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.invoice-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #9b87f5;
+}
+
+.invoice-company {
+  text-align: right;
+}
+
+.invoice-billing {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.invoice-totals {
+  margin-left: auto;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 1.5rem;
+}
+
+.invoice-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.invoice-total-row.final {
+  border-top: 1px solid #e5e7eb;
+  font-weight: 700;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
 }
