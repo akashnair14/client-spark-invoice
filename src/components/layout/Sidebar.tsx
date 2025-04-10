@@ -2,7 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { X, LayoutDashboard, Users, FileText, PlusCircle } from "lucide-react";
+import { X, LayoutDashboard, Users, FileText, PlusCircle, UserCog } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface SidebarProps {
@@ -24,6 +24,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       label: "Clients",
       href: "/clients",
       icon: <Users className="h-5 w-5 mr-2" />,
+    },
+    {
+      label: "Client Details",
+      href: "/client-details",
+      icon: <UserCog className="h-5 w-5 mr-2" />,
     },
     {
       label: "Invoices",
@@ -60,9 +65,9 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
               onClick={handleNavigation}
             >
               <Button
-                variant={pathname === route.href ? "secondary" : "ghost"}
+                variant={pathname === route.href || pathname.startsWith(route.href + '/') ? "secondary" : "ghost"}
                 className={cn("w-full justify-start", 
-                  pathname === route.href ? "bg-accent text-accent-foreground" : ""
+                  pathname === route.href || pathname.startsWith(route.href + '/') ? "bg-accent text-accent-foreground" : ""
                 )}
               >
                 {route.icon}
