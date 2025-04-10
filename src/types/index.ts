@@ -2,12 +2,18 @@
 export interface Client {
   id: string;
   companyName: string;
+  contactName?: string;
   gstNumber: string;
   phoneNumber: string;
+  phone?: string;
   email: string;
   bankAccountNumber: string;
   bankDetails: string;
   address: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  website?: string;
 }
 
 export interface InvoiceItem {
@@ -30,7 +36,7 @@ export interface Invoice {
   subtotal: number;
   gstAmount: number;
   total: number;
-  status: 'draft' | 'sent' | 'paid';
+  status: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   notes?: string;
 }
 

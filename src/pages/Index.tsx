@@ -31,7 +31,7 @@ const Index = () => {
   const clientCount = mockClients.length;
   const invoiceCount = mockInvoices.length;
   const totalRevenue = mockInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
-  const pendingInvoices = mockInvoices.filter(invoice => invoice.status !== 'paid').length;
+  const pendingInvoices = mockInvoices.filter(invoice => invoice.status === 'pending' || invoice.status === 'draft').length;
   
   // Calculate month-wise revenue for line chart
   const currentYear = new Date().getFullYear();
@@ -136,7 +136,7 @@ const Index = () => {
             <CardTitle className="text-md">Monthly Revenue</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ChartContainer config={{ amount: { theme: { light: 'hsl(var(--primary))' } } }}>
+            <ChartContainer>
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 
@@ -197,7 +197,7 @@ const Index = () => {
             <CardTitle className="text-md">Top Clients by Revenue</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ChartContainer config={{ amount: { theme: { light: 'hsl(var(--primary))' } } }}>
+            <ChartContainer>
               <BarChart data={recentClientsData} margin={{ top: 5, right: 30, left: 20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 

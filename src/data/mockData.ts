@@ -5,52 +5,82 @@ export const mockClients: Client[] = [
   {
     id: '1',
     companyName: 'Tech Solutions Ltd',
+    contactName: 'Rajesh Kumar',
     gstNumber: '27AAPFU0939F1ZV',
     phoneNumber: '+91 9876543210',
+    phone: '+91 9876543210',
     email: 'contact@techsolutions.com',
     bankAccountNumber: '37892073891',
     bankDetails: 'HDFC Bank, Branch: Andheri East, IFSC: HDFC0001402',
-    address: '123 Tech Park, Mumbai, Maharashtra 400093'
+    address: '123 Tech Park',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    postalCode: '400093',
+    website: 'https://techsolutions.com'
   },
   {
     id: '2',
     companyName: 'Green Builders Pvt Ltd',
+    contactName: 'Priya Sharma',
     gstNumber: '29AABCR1234C1ZX',
     phoneNumber: '+91 8765432109',
+    phone: '+91 8765432109',
     email: 'info@greenbuilders.in',
     bankAccountNumber: '20384756123',
     bankDetails: 'ICICI Bank, Branch: Whitefield, IFSC: ICIC0006543',
-    address: '45 Green Avenue, Bangalore, Karnataka 560066'
+    address: '45 Green Avenue',
+    city: 'Bangalore',
+    state: 'Karnataka',
+    postalCode: '560066',
+    website: 'https://greenbuilders.in'
   },
   {
     id: '3',
     companyName: 'Global Exports Inc',
+    contactName: 'Vikram Patel',
     gstNumber: '33AAACG7543R1ZM',
     phoneNumber: '+91 7654321098',
+    phone: '+91 7654321098',
     email: 'exports@globalinc.com',
     bankAccountNumber: '10293847561',
     bankDetails: 'SBI, Branch: Anna Nagar, IFSC: SBIN0007321',
-    address: '78 Trade Center, Chennai, Tamil Nadu 600040'
+    address: '78 Trade Center',
+    city: 'Chennai',
+    state: 'Tamil Nadu',
+    postalCode: '600040',
+    website: 'https://globalexports.com'
   },
   {
     id: '4',
     companyName: 'Smart Retail Solutions',
+    contactName: 'Ananya Singh',
     gstNumber: '07AABCS1234D1Z1',
     phoneNumber: '+91 9988776655',
+    phone: '+91 9988776655',
     email: 'info@smartretail.com',
     bankAccountNumber: '82736450912',
     bankDetails: 'Axis Bank, Branch: Connaught Place, IFSC: UTIB0000007',
-    address: '212 Market Complex, New Delhi, Delhi 110001'
+    address: '212 Market Complex',
+    city: 'New Delhi',
+    state: 'Delhi',
+    postalCode: '110001',
+    website: 'https://smartretail.com'
   },
   {
     id: '5',
     companyName: 'Creative Designs Studio',
+    contactName: 'Ravi Desai',
     gstNumber: '24AADCC9876B1ZQ',
     phoneNumber: '+91 8899776655',
+    phone: '+91 8899776655',
     email: 'hello@creativedesigns.in',
     bankAccountNumber: '30142536789',
     bankDetails: 'Kotak Mahindra Bank, Branch: Ahmedabad Main, IFSC: KKBK0000958',
-    address: '67 Design Hub, Ahmedabad, Gujarat 380009'
+    address: '67 Design Hub',
+    city: 'Ahmedabad',
+    state: 'Gujarat',
+    postalCode: '380009',
+    website: 'https://creativedesigns.in'
   }
 ];
 
@@ -106,7 +136,7 @@ export const mockInvoices: Invoice[] = [
     subtotal: 35000,
     gstAmount: 6300,
     total: 41300,
-    status: 'sent'
+    status: 'pending'
   },
   {
     id: '3',
@@ -137,6 +167,6 @@ export const mockInvoices: Invoice[] = [
     subtotal: 80000,
     gstAmount: 14100,
     total: 94100,
-    status: 'draft'
+    status: 'overdue'
   }
 ];
