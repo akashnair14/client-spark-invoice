@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Eye, Save } from "lucide-react";
+import { calculateSubtotal, calculateGstAmount, calculateTotalAmount } from "@/utils/invoiceUtils";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -37,41 +38,32 @@ const NewInvoice = () => {
   }, [location]);
 
   const handleInvoiceSubmit = (formData: any) => {
-    // Calculate totals
+    // Update items to ensure amounts are calculated correctly
     const items: InvoiceItem[] = formData.items.map((item: any) => ({
       ...item,
       amount: item.quantity * item.rate
     }));
 
-    const newSubtotal = items.reduce((sum: number, item: InvoiceItem) => sum + item.amount, 0);
-    const newGstAmount = items.reduce((sum: number, item: InvoiceItem) => sum + (item.amount * item.gstRate / 100), 0);
-    const newTotal = newSubtotal + newGstAmount;
+    // Calculate totals using utility functions
+    const newSubtotal = calculateSubtotal(items);
+    const newGstAmount = calculateGstAmount(items);
+    const newTotal = calculateTotalAmount(items);
 
-    // Create a new invoice object
-    const newInvoice: Invoice = {
-      id: uuidv4(),
-      clientId: formData.clientId,
-      invoiceNumber: formData.invoiceNumber,
-      date: formData.date.toISOString().split('T')[0], // Format date
-      dueDate: formData.dueDate.toISOString().split('T')[0], // Format date
-      items,
-      subtotal: newSubtotal,
-      gstAmount: newGstAmount,
-      total: newTotal,
-      status: 'draft',
-      notes: formData.notes
-    };
-
-    // Update state
+    // Update state with calculated values
+    setSubtotal(newSubtotal);
+    setGstAmount(newGstAmount);
+    setTotal(newTotal);
+    
+    // Set invoice data and client
     setInvoiceData({
       ...formData,
+      items,
       date: formData.date,
       dueDate: formData.dueDate,
     });
     setSelectedClient(mockClients.find(client => client.id === formData.clientId));
-    setSubtotal(newSubtotal);
-    setGstAmount(newGstAmount);
-    setTotal(newTotal);
+    
+    // Switch to preview tab
     setActiveTab("preview");
 
     // Show success toast
@@ -86,7 +78,27 @@ const NewInvoice = () => {
   };
 
   const handleSaveInvoice = () => {
-    // Here you would typically save the invoice to your database
+    if (!invoiceData || !selectedClient) return;
+    
+    // Create a new invoice object to be saved
+    const newInvoice: Invoice = {
+      id: uuidv4(),
+      clientId: selectedClient.id,
+      invoiceNumber: invoiceData.invoiceNumber,
+      date: invoiceData.date.toISOString().split('T')[0], // Format date
+      dueDate: invoiceData.dueDate.toISOString().split('T')[0], // Format date
+      items: invoiceData.items,
+      subtotal: subtotal,
+      gstAmount: gstAmount,
+      total: total,
+      status: 'draft',
+      notes: invoiceData.notes || ""
+    };
+
+    // In a real app, this would save to a database
+    // For now we'll add it to the mockInvoices array
+    mockInvoices.push(newInvoice);
+    
     toast({
       title: "Invoice Saved",
       description: `Invoice ${invoiceData.invoiceNumber} has been saved successfully.`,

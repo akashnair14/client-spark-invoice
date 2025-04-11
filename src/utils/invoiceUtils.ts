@@ -5,14 +5,14 @@ import { InvoiceItem } from "@/types";
  * Calculate the subtotal of invoice items
  */
 export const calculateSubtotal = (items: InvoiceItem[]): number => {
-  return items.reduce((sum, item) => sum + item.amount, 0);
+  return items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
 };
 
 /**
  * Calculate the GST amount of invoice items
  */
 export const calculateGstAmount = (items: InvoiceItem[]): number => {
-  return items.reduce((sum, item) => sum + (item.amount * item.gstRate / 100), 0);
+  return items.reduce((sum, item) => sum + ((item.quantity * item.rate) * item.gstRate / 100), 0);
 };
 
 /**
@@ -32,4 +32,13 @@ export const formatCurrency = (amount: number): string => {
 export const generateInvoiceNumber = (): string => {
   const now = new Date();
   return `INV-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+};
+
+/**
+ * Calculate the total amount of an invoice
+ */
+export const calculateTotalAmount = (items: InvoiceItem[]): number => {
+  const subtotal = calculateSubtotal(items);
+  const gstAmount = calculateGstAmount(items);
+  return subtotal + gstAmount;
 };

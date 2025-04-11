@@ -32,6 +32,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { calculateSubtotal, calculateGstAmount, calculateTotalAmount } from "@/utils/invoiceUtils";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
@@ -106,18 +107,28 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
 
   const watchItems = form.watch("items");
 
+  // Update totals whenever items change
   useEffect(() => {
     const updateTotals = () => {
+      // Calculate amounts for each item first
+      const updatedItems = watchItems.map(item => ({
+        ...item,
+        amount: item.quantity * item.rate
+      }));
+      
+      // Update each item's amount in the form
+      updatedItems.forEach((item, index) => {
+        if (form.getValues(`items.${index}.amount`) !== item.amount) {
+          form.setValue(`items.${index}.amount`, item.amount);
+        }
+      });
+      
       // Calculate subtotal
-      const newSubtotal = watchItems.reduce((total, item) => {
-        return total + item.quantity * item.rate;
-      }, 0);
+      const newSubtotal = calculateSubtotal(updatedItems);
       setSubtotal(newSubtotal);
 
       // Calculate GST amount
-      const newGstAmount = watchItems.reduce((total, item) => {
-        return total + (item.quantity * item.rate * item.gstRate) / 100;
-      }, 0);
+      const newGstAmount = calculateGstAmount(updatedItems);
       setGstAmount(newGstAmount);
 
       // Calculate total
@@ -125,12 +136,20 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     };
 
     updateTotals();
-  }, [watchItems]);
+  }, [watchItems, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    // Calculate final amounts to ensure they're up to date
+    const updatedItems = values.items.map(item => ({
+      ...item,
+      amount: item.quantity * item.rate
+    }));
+    
     const updatedValues = {
       ...values,
+      items: updatedItems,
     };
+    
     onSubmit(updatedValues);
   };
 
@@ -381,6 +400,8 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
                               <Select
                                 onValueChange={(value) => {
                                   field.onChange(parseInt(value));
+                                  // Force recalculation after GST rate change
+                                  setTimeout(() => handleQuantityOrRateChange(index), 0);
                                 }}
                                 defaultValue={field.value.toString()}
                               >
@@ -412,6 +433,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
                                 {...field}
                                 readOnly
                                 className="bg-muted cursor-not-allowed"
+                                value={`₹${field.value.toFixed(2)}`}
                               />
                             </FormControl>
                           )}

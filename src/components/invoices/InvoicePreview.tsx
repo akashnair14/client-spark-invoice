@@ -8,6 +8,7 @@ import { Download, Printer, Share2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { formatCurrency } from "@/utils/invoiceUtils";
 
 interface InvoicePreviewProps {
   invoice: {
@@ -52,6 +53,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
         scale: 2,
         logging: false,
         useCORS: true,
+        backgroundColor: "#ffffff",
       });
       
       // Remove temporary class
@@ -197,7 +199,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
 
             {/* Invoice Table */}
             <div className="overflow-x-auto mb-8">
-              <table className="w-full border-collapse">
+              <table className="w-full border-collapse invoice-table">
                 <thead>
                   <tr className="bg-muted border-b border-border">
                     <th className="py-3 px-4 text-left font-medium">#</th>
@@ -265,7 +267,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between mb-10">
             <div>
-              <h1 className="text-3xl font-bold text-[#3b82f6] mb-1">INVOICE</h1>
+              <h1 className="text-3xl font-bold text-primary mb-1" style={{color: '#3b82f6'}}>INVOICE</h1>
               <p className="text-sm text-gray-600">
                 #{invoice.invoiceNumber}
               </p>
@@ -310,26 +312,40 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           <div className="overflow-x-auto mb-8">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100 border-b border-gray-200">
-                  <th className="py-3 px-4 text-left font-medium">#</th>
-                  <th className="py-3 px-4 text-left font-medium">Description</th>
-                  <th className="py-3 px-4 text-left font-medium">HSN</th>
-                  <th className="py-3 px-4 text-right font-medium">Qty</th>
-                  <th className="py-3 px-4 text-right font-medium">Rate</th>
-                  <th className="py-3 px-4 text-right font-medium">GST%</th>
-                  <th className="py-3 px-4 text-right font-medium">Amount</th>
+                <tr style={{backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb'}}>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600}}>
+                    #
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600}}>
+                    Description
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600}}>
+                    HSN
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>
+                    Qty
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>
+                    Rate
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>
+                    GST%
+                  </th>
+                  <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>
+                    Amount
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {invoice.items.map((item, index) => (
-                  <tr key={item.id} className="border-b border-gray-200">
-                    <td className="py-3 px-4 text-sm">{index + 1}</td>
-                    <td className="py-3 px-4 text-sm">{item.description}</td>
-                    <td className="py-3 px-4 text-sm">{item.hsnCode}</td>
-                    <td className="py-3 px-4 text-sm text-right">{item.quantity}</td>
-                    <td className="py-3 px-4 text-sm text-right">₹{item.rate.toFixed(2)}</td>
-                    <td className="py-3 px-4 text-sm text-right">{item.gstRate}%</td>
-                    <td className="py-3 px-4 text-sm text-right">₹{item.amount.toFixed(2)}</td>
+                  <tr key={item.id} style={{borderBottom: '1px solid #e5e7eb'}}>
+                    <td style={{padding: '0.75rem 1rem'}}>{index + 1}</td>
+                    <td style={{padding: '0.75rem 1rem'}}>{item.description}</td>
+                    <td style={{padding: '0.75rem 1rem'}}>{item.hsnCode}</td>
+                    <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>{item.quantity}</td>
+                    <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>₹{item.rate.toFixed(2)}</td>
+                    <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>{item.gstRate}%</td>
+                    <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>₹{item.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -339,31 +355,31 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           {/* Totals */}
           <div className="flex justify-end mb-8">
             <div className="w-full max-w-xs">
-              <div className="grid grid-cols-2 gap-2 border-t border-gray-200 pt-4">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="text-right">₹{subtotal.toFixed(2)}</span>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem'}}>
+                <span style={{color: '#6b7280'}}>Subtotal:</span>
+                <span style={{textAlign: 'right'}}>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 py-2">
-                <span className="text-gray-600">GST:</span>
-                <span className="text-right">₹{gstAmount.toFixed(2)}</span>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', padding: '0.5rem 0'}}>
+                <span style={{color: '#6b7280'}}>GST:</span>
+                <span style={{textAlign: 'right'}}>₹{gstAmount.toFixed(2)}</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 border-t border-gray-200 pt-4 font-bold">
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem', fontWeight: 'bold'}}>
                 <span>Total:</span>
-                <span className="text-right">₹{total.toFixed(2)}</span>
+                <span style={{textAlign: 'right'}}>₹{total.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           {/* Notes */}
           {invoice.notes && (
-            <div className="border-t border-gray-200 pt-4">
-              <h4 className="text-sm font-medium mb-2">Notes:</h4>
-              <p className="text-sm text-gray-600">{invoice.notes}</p>
+            <div style={{borderTop: '1px solid #e5e7eb', paddingTop: '1rem'}}>
+              <h4 style={{fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem'}}>Notes:</h4>
+              <p style={{fontSize: '0.875rem', color: '#6b7280'}}>{invoice.notes}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="border-t border-gray-200 mt-8 pt-4 text-center text-sm text-gray-600">
+          <div style={{borderTop: '1px solid #e5e7eb', marginTop: '2rem', paddingTop: '1rem', textAlign: 'center', fontSize: '0.875rem', color: '#6b7280'}}>
             <p>Thank you for your business!</p>
           </div>
         </div>
