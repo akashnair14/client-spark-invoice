@@ -144,7 +144,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
 
       <Card className="border border-gray-200 print:border-0 print:shadow-none animate-fade-in">
         <CardContent className="p-6 md:p-8" ref={invoiceRef}>
-          {/* This is what the user sees in the UI - with status */}
+          {/* This is what the user sees in the UI */}
           <div className="invoice-content">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between mb-10">
@@ -186,9 +186,9 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
                   <span className="text-sm text-muted-foreground">Due Date:</span>
                   <span className="font-medium">{format(invoice.dueDate, "dd/MM/yyyy")}</span>
                 </div>
-                <div className="grid grid-cols-2 gap-x-2 md:text-right mt-4 print:hidden">
+                <div className="grid grid-cols-2 gap-x-2 md:text-right mt-4 print-hide">
                   <span className="text-sm font-semibold text-muted-foreground">Status:</span>
-                  <span className="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                  <span className="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 print:hidden">
                     Generated
                   </span>
                 </div>
@@ -265,7 +265,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between mb-10">
             <div>
-              <h1 className="text-3xl font-bold text-[#9b87f5] mb-1">INVOICE</h1>
+              <h1 className="text-3xl font-bold text-[#3b82f6] mb-1">INVOICE</h1>
               <p className="text-sm text-gray-600">
                 #{invoice.invoiceNumber}
               </p>
@@ -285,7 +285,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <h3 className="text-sm font-medium mb-2 text-gray-600">Bill To:</h3>
-              <div className="border-l-2 border-[#9b87f5] pl-3">
+              <div className="border-l-2 border-[#3b82f6] pl-3">
                 <h4 className="font-bold">{client.companyName}</h4>
                 <p className="text-sm mt-1">{client.address}</p>
                 <p className="text-sm mt-2">GSTIN: {client.gstNumber}</p>

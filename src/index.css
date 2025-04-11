@@ -95,12 +95,12 @@
     visibility: hidden;
   }
   
-  .page-container *,
-  .page-container {
+  .invoice-content *,
+  .invoice-content {
     visibility: visible;
   }
   
-  .page-container {
+  .invoice-content {
     position: absolute;
     left: 0;
     top: 0;
@@ -113,6 +113,16 @@
 
   /* Hide status markers in print version */
   .print-hide {
+    display: none !important;
+  }
+  
+  /* Hide UI elements not needed in print */
+  .page-header,
+  button,
+  nav,
+  .sidebar,
+  .tabs-list,
+  .print-hidden {
     display: none !important;
   }
 }
@@ -163,7 +173,7 @@
 .invoice-logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #9b87f5;
+  color: #3b82f6;
 }
 
 .invoice-company {
@@ -195,4 +205,18 @@
   font-weight: 700;
   padding-top: 0.75rem;
   margin-top: 0.5rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
 }

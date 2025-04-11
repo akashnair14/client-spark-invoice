@@ -57,9 +57,10 @@ const formSchema = z.object({
 interface InvoiceFormProps {
   clients: Client[];
   onSubmit: (values: z.infer<typeof formSchema>) => void;
+  initialClientId?: string;
 }
 
-const InvoiceForm = ({ clients, onSubmit }: InvoiceFormProps) => {
+const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
   const [subtotal, setSubtotal] = useState(0);
   const [gstAmount, setGstAmount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -67,7 +68,7 @@ const InvoiceForm = ({ clients, onSubmit }: InvoiceFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      clientId: "",
+      clientId: initialClientId || "",
       date: new Date(),
       dueDate: new Date(new Date().setDate(new Date().getDate() + 14)), // Default to 14 days from now
       invoiceNumber: `INV-${new Date().getFullYear()}-${String(
@@ -91,6 +92,12 @@ const InvoiceForm = ({ clients, onSubmit }: InvoiceFormProps) => {
       notes: "",
     },
   });
+
+  useEffect(() => {
+    if (initialClientId) {
+      form.setValue("clientId", initialClientId);
+    }
+  }, [initialClientId, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

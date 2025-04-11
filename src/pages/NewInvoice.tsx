@@ -10,7 +10,7 @@ import { mockClients, mockInvoices } from "@/data/mockData";
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye } from "lucide-react";
+import { ArrowLeft, Eye, Save } from "lucide-react";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -85,6 +85,20 @@ const NewInvoice = () => {
     setActiveTab("edit");
   };
 
+  const handleSaveInvoice = () => {
+    // Here you would typically save the invoice to your database
+    toast({
+      title: "Invoice Saved",
+      description: `Invoice ${invoiceData.invoiceNumber} has been saved successfully.`,
+      variant: "default",
+    });
+    
+    // Navigate back to invoices list after short delay
+    setTimeout(() => {
+      navigate("/invoices");
+    }, 1500);
+  };
+
   return (
     <Layout>
       <div className="page-header">
@@ -92,20 +106,30 @@ const NewInvoice = () => {
         <p className="page-description">Create and preview a new invoice</p>
       </div>
 
-      {activeTab === "edit" ? (
-        <div className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="edit">Edit Invoice</TabsTrigger>
+          <TabsTrigger value="preview" disabled={!invoiceData}>Preview</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="edit" className="space-y-4">
           <InvoiceForm
             clients={mockClients}
             onSubmit={handleInvoiceSubmit}
+            initialClientId={selectedClient?.id}
           />
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2 mb-4">
+        </TabsContent>
+        
+        <TabsContent value="preview" className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
             <Button variant="outline" onClick={handleBackToEdit}>
               <ArrowLeft className="h-4 w-4 mr-2" /> Back to Edit
             </Button>
-            {invoiceData && <span className="text-muted-foreground">Preview of invoice #{invoiceData.invoiceNumber}</span>}
+            {invoiceData && (
+              <Button variant="default" onClick={handleSaveInvoice}>
+                <Save className="h-4 w-4 mr-2" /> Save Invoice
+              </Button>
+            )}
           </div>
 
           {invoiceData ? (
@@ -123,8 +147,8 @@ const NewInvoice = () => {
               <p className="text-muted-foreground mt-2">Please create an invoice first</p>
             </div>
           )}
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </Layout>
   );
 };

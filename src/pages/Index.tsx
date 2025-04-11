@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 import { mockInvoices, mockClients } from "@/data/mockData";
 import { BarChart3, Users, Wallet } from "lucide-react";
-import { Chart } from "@/components/ui/chart";
 
 // Get the current date in ISO format (YYYY-MM-DD)
 const currentDate = new Date().toISOString().split('T')[0];
@@ -20,7 +19,8 @@ const getMonthFromDate = (dateString: string) => {
 const totalRevenue = mockInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
 
 // Calculate overdue invoices
-const overdueInvoices = mockInvoices.filter(invoice => invoice.status === "overdue").length;
+const overdueInvoices = mockInvoices.filter(invoice => 
+  invoice.status === "overdue").length;
 
 // Calculate total clients
 const totalClients = mockClients.length;
@@ -143,41 +143,18 @@ const Index = () => {
             <CardDescription>Revenue trend over the past months</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <Chart
-              config={{
-                type: "bar",
-                options: {
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                },
-                data: {
-                  labels: monthlyRevenueData.map(d => d.name),
-                  datasets: [
-                    {
-                      label: "Revenue",
-                      data: monthlyRevenueData.map(d => d.revenue),
-                      backgroundColor: "hsl(var(--primary))",
-                    },
-                  ],
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyRevenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="name" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <Tooltip
-                    formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Revenue']}
-                    contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}
-                  />
-                  <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </Chart>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyRevenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="name" className="text-xs" />
+                <YAxis className="text-xs" />
+                <Tooltip
+                  formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                  contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}
+                />
+                <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
@@ -187,45 +164,30 @@ const Index = () => {
             <CardDescription>Distribution of invoice status</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <Chart
-              config={{
-                type: "pie",
-                data: {
-                  labels: invoiceStatusData.map(d => d.name),
-                  datasets: [
-                    {
-                      data: invoiceStatusData.map(d => d.value),
-                      backgroundColor: invoiceStatusData.map(d => STATUS_COLORS[d.name as keyof typeof STATUS_COLORS]),
-                    },
-                  ],
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                  <Pie
-                    data={invoiceStatusData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {invoiceStatusData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={STATUS_COLORS[entry.name as keyof typeof STATUS_COLORS]} 
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </Chart>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <Pie
+                  data={invoiceStatusData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  labelLine={false}
+                >
+                  {invoiceStatusData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={STATUS_COLORS[entry.name as keyof typeof STATUS_COLORS]} 
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
