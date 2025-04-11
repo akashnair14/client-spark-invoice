@@ -5,14 +5,29 @@ import { InvoiceItem } from "@/types";
  * Calculate the subtotal of invoice items
  */
 export const calculateSubtotal = (items: InvoiceItem[]): number => {
-  return items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+  // Ensure all required properties exist before calculation
+  const validItems = items.filter(item => 
+    item && typeof item.quantity === 'number' && 
+    typeof item.rate === 'number' && 
+    item.id !== undefined
+  ) as InvoiceItem[];
+  
+  return validItems.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
 };
 
 /**
  * Calculate the GST amount of invoice items
  */
 export const calculateGstAmount = (items: InvoiceItem[]): number => {
-  return items.reduce((sum, item) => sum + ((item.quantity * item.rate) * item.gstRate / 100), 0);
+  // Ensure all required properties exist before calculation
+  const validItems = items.filter(item => 
+    item && typeof item.quantity === 'number' && 
+    typeof item.rate === 'number' && 
+    typeof item.gstRate === 'number' &&
+    item.id !== undefined
+  ) as InvoiceItem[];
+  
+  return validItems.reduce((sum, item) => sum + ((item.quantity * item.rate) * item.gstRate / 100), 0);
 };
 
 /**
