@@ -162,6 +162,9 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     if (item.quantity && item.rate) {
       const amount = item.quantity * item.rate;
       form.setValue(`items.${index}.amount`, amount);
+      
+      // Force a re-render to update totals
+      form.trigger(`items.${index}`);
     }
   };
 
