@@ -42,7 +42,6 @@ const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>
           invoiceNumber={invoice.invoiceNumber} 
           isPDF={true}
           companyDetails={companyDetails}
-          status={invoice.status}
         />
         <InvoiceClientInfo 
           client={client} 
@@ -50,13 +49,12 @@ const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>
           dueDate={invoice.dueDate} 
           isPDF={true}
           showStatus={false}
+          status={invoice.status}
         />
         <InvoiceItemsTable items={invoice.items} isPDF={true} />
         <InvoiceTotals 
           subtotal={subtotal} 
           gstAmount={gstAmount}
-          cgstAmount={cgstAmount}
-          sgstAmount={sgstAmount}
           total={total} 
           isPDF={true}
         />

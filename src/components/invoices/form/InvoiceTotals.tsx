@@ -1,14 +1,11 @@
 
 import React from "react";
+import { useInvoiceForm } from "@/context/InvoiceFormContext";
 import { convertNumberToWords } from "@/utils/numberToWords";
 
-interface InvoiceTotalsProps {
-  subtotal: number;
-  gstAmount: number;
-  total: number;
-}
-
-const InvoiceTotals = ({ subtotal, gstAmount, total }: InvoiceTotalsProps) => {
+const InvoiceTotals = () => {
+  const { subtotal, gstAmount, total } = useInvoiceForm();
+  
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-end space-y-2">
