@@ -1,8 +1,7 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { X, LayoutDashboard, Users, FileText, PlusCircle, UserCog } from "lucide-react";
+import { X, LayoutDashboard, Users, FileText, PlusCircle } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface SidebarProps {
@@ -24,11 +23,6 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       label: "Clients",
       href: "/clients",
       icon: <Users className="h-5 w-5 mr-2" />,
-    },
-    {
-      label: "Client Details",
-      href: "/client-details",
-      icon: <UserCog className="h-5 w-5 mr-2" />,
     },
     {
       label: "Invoices",
