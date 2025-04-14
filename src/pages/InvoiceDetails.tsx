@@ -4,14 +4,30 @@ import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { mockInvoices, mockClients } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { 
+  ArrowLeft, 
+  CheckCircle2, 
+  Clock, 
+  Send, 
+  AlertCircle,
+  FileWarning
+} from "lucide-react";
 import InvoicePreview from "@/components/invoices/InvoicePreview";
-import { Client } from "@/types";
+import { Client, Invoice } from "@/types";
 import { format, parseISO } from "date-fns";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const InvoiceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [invoice, setInvoice] = useState<any>(null);
   const [client, setClient] = useState<Client | undefined>(undefined);
   
@@ -32,6 +48,67 @@ const InvoiceDetails = () => {
       }
     }
   }, [id]);
+  
+  const updateInvoiceStatus = (status: Invoice['status']) => {
+    if (!invoice || !id) return;
+    
+    // Update local state
+    setInvoice({
+      ...invoice,
+      status
+    });
+    
+    // In a real app, this would send an API request
+    // For now, we're updating the mock data
+    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
+    if (invoiceIndex !== -1) {
+      mockInvoices[invoiceIndex].status = status;
+    }
+    
+    // Show toast notification
+    const statusMessages = {
+      paid: "Invoice marked as paid",
+      pending: "Invoice marked as pending payment",
+      sent: "Invoice marked as sent",
+      overdue: "Invoice marked as overdue",
+      draft: "Invoice status set to draft"
+    };
+    
+    toast({
+      title: statusMessages[status],
+      description: `Invoice ${invoice.invoiceNumber} status updated successfully.`
+    });
+  };
+  
+  const getStatusIcon = (status: Invoice['status']) => {
+    switch (status) {
+      case 'paid':
+        return <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />;
+      case 'pending':
+        return <Clock className="w-4 h-4 mr-2 text-yellow-500" />;
+      case 'sent':
+        return <Send className="w-4 h-4 mr-2 text-blue-500" />;
+      case 'overdue':
+        return <AlertCircle className="w-4 h-4 mr-2 text-red-500" />;
+      default:
+        return <FileWarning className="w-4 h-4 mr-2 text-gray-500" />;
+    }
+  };
+  
+  const getStatusBadgeClass = (status: Invoice['status']) => {
+    switch (status) {
+      case 'paid':
+        return "bg-green-100 text-green-800";
+      case 'pending':
+        return "bg-yellow-100 text-yellow-800";
+      case 'sent':
+        return "bg-blue-100 text-blue-800";
+      case 'overdue':
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
   
   if (!invoice) {
     return (
@@ -66,12 +143,53 @@ const InvoiceDetails = () => {
             </p>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(invoice.status)}`}>
+            {getStatusIcon(invoice.status)}
+            <span>{invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}</span>
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Change Status
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => updateInvoiceStatus('paid')}>
+                <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> 
+                Mark as Paid
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => updateInvoiceStatus('pending')}>
+                <Clock className="w-4 h-4 mr-2 text-yellow-500" /> 
+                Mark as Pending
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => updateInvoiceStatus('sent')}>
+                <Send className="w-4 h-4 mr-2 text-blue-500" /> 
+                Mark as Sent
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => updateInvoiceStatus('overdue')}>
+                <AlertCircle className="w-4 h-4 mr-2 text-red-500" /> 
+                Mark as Overdue
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => updateInvoiceStatus('draft')}>
+                <FileWarning className="w-4 h-4 mr-2 text-gray-500" /> 
+                Set as Draft
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       
       <div className="space-y-6">
         {client && (
           <InvoicePreview 
-            invoice={invoice}
+            invoice={{
+              ...invoice,
+              status: invoice.status
+            }}
             client={client}
             subtotal={invoice.subtotal}
             gstAmount={invoice.gstAmount}

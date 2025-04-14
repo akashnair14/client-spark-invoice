@@ -19,6 +19,7 @@ interface InvoicePreviewProps {
     invoiceNumber: string;
     items: InvoiceItem[];
     notes?: string;
+    status?: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   };
   client: Client | undefined;
   subtotal: number;
@@ -33,6 +34,13 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
   if (!client) {
     return <div className="text-center py-8">Please select a client to preview invoice</div>;
   }
+
+  const companyDetails = {
+    name: "Your Company Name",
+    address: [client.address, client.city || "", client.state || ""],
+    gstNumber: client.gstNumber,
+    contact: client.email
+  };
 
   return (
     <div className="space-y-6">
@@ -49,11 +57,15 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
       <Card className="border border-gray-200 print:border-0 print:shadow-none animate-fade-in">
         <CardContent className="p-6 md:p-8" ref={invoiceRef}>
           <div className="invoice-content">
-            <InvoiceHeader invoiceNumber={invoice.invoiceNumber} />
+            <InvoiceHeader 
+              invoiceNumber={invoice.invoiceNumber} 
+              companyDetails={companyDetails}
+            />
             <InvoiceClientInfo 
               client={client} 
               date={invoice.date} 
-              dueDate={invoice.dueDate} 
+              dueDate={invoice.dueDate}
+              status={invoice.status}
             />
             <InvoiceItemsTable items={invoice.items} />
             <InvoiceTotals 

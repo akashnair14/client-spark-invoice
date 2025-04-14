@@ -15,6 +15,7 @@ interface PrintableInvoiceProps {
     invoiceNumber: string;
     items: InvoiceItem[];
     notes?: string;
+    status?: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   };
   client: Client;
   subtotal: number;
@@ -24,9 +25,20 @@ interface PrintableInvoiceProps {
 
 const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>(
   ({ invoice, client, subtotal, gstAmount, total }, ref) => {
+    const companyDetails = {
+      name: "Your Company Name",
+      address: [client.address, client.city || "", client.state || ""],
+      gstNumber: client.gstNumber,
+      contact: client.email
+    };
+
     return (
       <div ref={ref} className="p-6 md:p-8 bg-white">
-        <InvoiceHeader invoiceNumber={invoice.invoiceNumber} isPDF={true} />
+        <InvoiceHeader 
+          invoiceNumber={invoice.invoiceNumber} 
+          isPDF={true}
+          companyDetails={companyDetails}
+        />
         <InvoiceClientInfo 
           client={client} 
           date={invoice.date} 
