@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Client, Invoice, InvoiceItem } from "@/types";
 import { mockClients, mockInvoices } from "@/data/mockData";
 import { v4 as uuidv4 } from 'uuid';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Eye, Save } from "lucide-react";
 import { calculateSubtotal, calculateGstAmount, calculateTotalAmount } from "@/utils/invoiceUtils";
@@ -80,6 +80,10 @@ const NewInvoice = () => {
   const handleSaveInvoice = () => {
     if (!invoiceData || !selectedClient) return;
     
+    // Determine invoice status automatically based on required fields
+    const isComplete = validateInvoiceCompleteness(invoiceData, selectedClient);
+    const autoStatus = isComplete ? 'pending' : 'draft';
+    
     // Create a new invoice object to be saved
     const newInvoice: Invoice = {
       id: uuidv4(),
@@ -91,7 +95,7 @@ const NewInvoice = () => {
       subtotal: subtotal,
       gstAmount: gstAmount,
       total: total,
-      status: 'draft',
+      status: autoStatus,
       notes: invoiceData.notes || ""
     };
 
@@ -101,7 +105,7 @@ const NewInvoice = () => {
     
     toast({
       title: "Invoice Saved",
-      description: `Invoice ${invoiceData.invoiceNumber} has been saved successfully.`,
+      description: `Invoice ${invoiceData.invoiceNumber} has been saved as ${autoStatus.toUpperCase()}.`,
       variant: "default",
     });
     
@@ -109,6 +113,31 @@ const NewInvoice = () => {
     setTimeout(() => {
       navigate("/invoices");
     }, 1500);
+  };
+
+  // Function to validate if all necessary details are filled
+  const validateInvoiceCompleteness = (invoice: any, client: Client): boolean => {
+    // Check if client details are complete
+    const clientComplete = client && 
+                          client.companyName && 
+                          client.address && 
+                          client.gstNumber;
+    
+    // Check if invoice has valid items
+    const itemsComplete = invoice.items && 
+                          invoice.items.length > 0 && 
+                          invoice.items.every((item: InvoiceItem) => 
+                            item.description && 
+                            item.quantity > 0 && 
+                            item.rate > 0 && 
+                            item.hsnCode);
+    
+    // Check if basic invoice details are complete
+    const invoiceDetailsComplete = invoice.invoiceNumber && 
+                                   invoice.date && 
+                                   invoice.dueDate;
+    
+    return clientComplete && itemsComplete && invoiceDetailsComplete;
   };
 
   return (

@@ -59,11 +59,13 @@ const InvoiceItemsTable = ({ handleQuantityOrRateChange }: InvoiceItemsTableProp
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr className="[&_th]:px-4 [&_th]:py-3 [&_th]:text-left">
-              <th className="w-[40%]">Description</th>
+              <th className="w-[35%]">Description</th>
               <th className="w-[10%]">Qty</th>
-              <th className="w-[15%]">HSN Code</th>
-              <th className="w-[12%]">Rate (₹)</th>
+              <th className="w-[12%]">HSN Code</th>
+              <th className="w-[10%]">Rate (₹)</th>
               <th className="w-[10%]">GST %</th>
+              <th className="w-[8%]">CGST</th>
+              <th className="w-[8%]">SGST</th>
               <th className="w-[10%]">Amount (₹)</th>
               <th className="w-[3%]"></th>
             </tr>
@@ -163,6 +165,14 @@ const InvoiceItemsTable = ({ handleQuantityOrRateChange }: InvoiceItemsTableProp
                       </FormControl>
                     )}
                   />
+                </td>
+                <td className="p-2 text-center">
+                  {form.watch(`items.${index}.rate`) && form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.gstRate`) ? 
+                    `${(form.watch(`items.${index}.gstRate`) / 2)}%` : "-"}
+                </td>
+                <td className="p-2 text-center">
+                  {form.watch(`items.${index}.rate`) && form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.gstRate`) ? 
+                    `${(form.watch(`items.${index}.gstRate`) / 2)}%` : "-"}
                 </td>
                 <td className="p-2">
                   <FormField

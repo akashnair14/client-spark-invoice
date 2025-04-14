@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormControl,
@@ -30,10 +30,18 @@ import { format } from "date-fns";
 
 interface InvoiceDetailsProps {
   clients: Client[];
+  initialClientId?: string;
 }
 
-const InvoiceDetails = ({ clients }: InvoiceDetailsProps) => {
+const InvoiceDetails = ({ clients, initialClientId }: InvoiceDetailsProps) => {
   const form = useFormContext();
+
+  // Set the initialClientId when the component mounts or when initialClientId changes
+  useEffect(() => {
+    if (initialClientId && form.getValues("clientId") !== initialClientId) {
+      form.setValue("clientId", initialClientId);
+    }
+  }, [initialClientId, form]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -45,6 +53,7 @@ const InvoiceDetails = ({ clients }: InvoiceDetailsProps) => {
             <FormLabel>Client</FormLabel>
             <Select
               onValueChange={field.onChange}
+              value={field.value}
               defaultValue={field.value}
             >
               <FormControl>
