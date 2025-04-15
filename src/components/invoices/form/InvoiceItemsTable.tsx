@@ -18,13 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash } from "lucide-react";
+import { useInvoiceItems } from "@/hooks/useInvoiceItems";
 
-interface InvoiceItemsTableProps {
-  handleQuantityOrRateChange: (index: number) => void;
-}
-
-const InvoiceItemsTable = ({ handleQuantityOrRateChange }: InvoiceItemsTableProps) => {
+const InvoiceItemsTable = () => {
   const form = useFormContext();
+  const { handleQuantityOrRateChange } = useInvoiceItems(form);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

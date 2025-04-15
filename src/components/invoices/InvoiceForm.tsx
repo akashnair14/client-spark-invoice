@@ -77,9 +77,6 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     }
   }, [initialClientId, form]);
 
-  // Use our custom hook to manage item calculations
-  const { handleQuantityOrRateChange } = useInvoiceItems(form);
-
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     // Calculate final amounts to ensure they're up to date
     const updatedItems = values.items.map(item => ({
@@ -104,7 +101,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
             <InvoiceDetails clients={clients} />
 
             {/* Invoice Items */}
-            <InvoiceItemsTable handleQuantityOrRateChange={handleQuantityOrRateChange} />
+            <InvoiceItemsTable />
 
             {/* Totals */}
             <InvoiceTotals />
