@@ -24,10 +24,11 @@ interface InvoicePreviewProps {
   client: Client | undefined;
   subtotal: number;
   gstAmount: number;
+  roundoff?: number;
   total: number;
 }
 
-const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: InvoicePreviewProps) => {
+const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, total }: InvoicePreviewProps) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const printableRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +71,8 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
             <InvoiceItemsTable items={invoice.items} />
             <InvoiceTotals 
               subtotal={subtotal} 
-              gstAmount={gstAmount} 
+              gstAmount={gstAmount}
+              roundoff={roundoff}
               total={total} 
             />
             <InvoiceNotes notes={invoice.notes} />
@@ -87,6 +89,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, total }: Invoice
           client={client}
           subtotal={subtotal}
           gstAmount={gstAmount}
+          roundoff={roundoff}
           total={total}
         />
       </div>

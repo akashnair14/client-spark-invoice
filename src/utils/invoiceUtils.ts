@@ -37,6 +37,15 @@ export const calculateGstAmount = (items: InvoiceItem[]): number => {
 };
 
 /**
+ * Calculate roundoff amount to the nearest integer
+ */
+export const calculateRoundoff = (subtotal: number, gstAmount: number): number => {
+  const exactTotal = parseFloat((subtotal + gstAmount).toFixed(2));
+  const roundedTotal = Math.round(exactTotal);
+  return parseFloat((roundedTotal - exactTotal).toFixed(2));
+};
+
+/**
  * Format currency amount
  */
 export const formatCurrency = (amount: number): string => {
@@ -56,10 +65,11 @@ export const generateInvoiceNumber = (): string => {
 };
 
 /**
- * Calculate the total amount of an invoice
+ * Calculate the total amount of an invoice (including roundoff)
  */
 export const calculateTotalAmount = (items: InvoiceItem[]): number => {
   const subtotal = calculateSubtotal(items);
   const gstAmount = calculateGstAmount(items);
-  return subtotal + gstAmount;
+  const roundoff = calculateRoundoff(subtotal, gstAmount);
+  return parseFloat((subtotal + gstAmount + roundoff).toFixed(2));
 };

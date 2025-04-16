@@ -4,7 +4,7 @@ import { useInvoiceForm } from "@/context/InvoiceFormContext";
 import { convertNumberToWords } from "@/utils/numberToWords";
 
 const InvoiceTotals = () => {
-  const { subtotal, gstAmount, total } = useInvoiceForm();
+  const { subtotal, gstAmount, roundoff, total } = useInvoiceForm();
   
   return (
     <div className="space-y-4">
@@ -18,6 +18,11 @@ const InvoiceTotals = () => {
           <span className="font-medium">Tax:</span>
           <span className="text-center"></span>
           <span className="text-right">₹{gstAmount.toFixed(2)}</span>
+        </div>
+        
+        <div className="flex items-center w-full max-w-md justify-between">
+          <span className="font-medium">Round Off:</span>
+          <span>₹{roundoff.toFixed(2)}</span>
         </div>
         
         <div className="flex items-center w-full max-w-md justify-between text-lg font-bold border-t pt-2 mt-2">

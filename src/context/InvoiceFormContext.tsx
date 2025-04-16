@@ -6,6 +6,7 @@ import { calculateSubtotal, calculateGstAmount, calculateTotalAmount } from "@/u
 interface InvoiceFormContextType {
   subtotal: number;
   gstAmount: number;
+  roundoff: number;
   total: number;
   updateTotals: (items: InvoiceItem[]) => void;
 }
@@ -15,6 +16,7 @@ const InvoiceFormContext = createContext<InvoiceFormContextType | undefined>(und
 export const InvoiceFormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [subtotal, setSubtotal] = useState(0);
   const [gstAmount, setGstAmount] = useState(0);
+  const [roundoff, setRoundoff] = useState(0);
   const [total, setTotal] = useState(0);
 
   const updateTotals = (items: InvoiceItem[]) => {
@@ -26,14 +28,23 @@ export const InvoiceFormProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const newGstAmount = parseFloat(calculateGstAmount(items).toFixed(2));
     setGstAmount(newGstAmount);
 
-    // Calculate total
-    const newTotal = parseFloat((newSubtotal + newGstAmount).toFixed(2));
+    // Calculate subtotal + GST
+    const exactTotal = parseFloat((newSubtotal + newGstAmount).toFixed(2));
+    
+    // Calculate roundoff value (to nearest integer)
+    const roundedTotal = Math.round(exactTotal);
+    const newRoundoff = parseFloat((roundedTotal - exactTotal).toFixed(2));
+    setRoundoff(newRoundoff);
+
+    // Calculate final total with roundoff
+    const newTotal = parseFloat((exactTotal + newRoundoff).toFixed(2));
     setTotal(newTotal);
   };
 
   const value = {
     subtotal,
     gstAmount,
+    roundoff,
     total,
     updateTotals
   };

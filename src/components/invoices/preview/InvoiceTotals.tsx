@@ -5,11 +5,12 @@ import { convertNumberToWords } from "@/utils/numberToWords";
 interface InvoiceTotalsProps {
   subtotal: number;
   gstAmount: number;
+  roundoff?: number;
   total: number;
   isPDF?: boolean;
 }
 
-const InvoiceTotals = ({ subtotal, gstAmount, total, isPDF = false }: InvoiceTotalsProps) => {
+const InvoiceTotals = ({ subtotal, gstAmount, roundoff = 0, total, isPDF = false }: InvoiceTotalsProps) => {
   if (isPDF) {
     return (
       <div className="flex flex-col mb-8">
@@ -31,6 +32,12 @@ const InvoiceTotals = ({ subtotal, gstAmount, total, isPDF = false }: InvoiceTot
               <span style={{color: '#6b7280'}}>SGST:</span>
               <span style={{textAlign: 'center'}}>{(gstAmount / 2 / subtotal * 100).toFixed(0)}%</span>
               <span style={{textAlign: 'right'}}>₹{(gstAmount / 2).toFixed(2)}</span>
+            </div>
+
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', padding: '0.5rem 0'}}>
+              <span style={{color: '#6b7280'}}>Round Off:</span>
+              <span></span>
+              <span style={{textAlign: 'right'}}>₹{roundoff.toFixed(2)}</span>
             </div>
             
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem', fontWeight: 'bold'}}>
@@ -81,6 +88,12 @@ const InvoiceTotals = ({ subtotal, gstAmount, total, isPDF = false }: InvoiceTot
             <span className="text-muted-foreground">SGST:</span>
             <span className="text-center">{(gstAmount / 2 / subtotal * 100).toFixed(0)}%</span>
             <span className="text-right">₹{(gstAmount / 2).toFixed(2)}</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 py-2">
+            <span className="text-muted-foreground">Round Off:</span>
+            <span></span>
+            <span className="text-right">₹{roundoff.toFixed(2)}</span>
           </div>
           
           <div className="grid grid-cols-3 gap-2 border-t border-border pt-4 font-bold">

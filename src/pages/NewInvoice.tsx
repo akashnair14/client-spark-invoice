@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Eye, Save } from "lucide-react";
-import { calculateSubtotal, calculateGstAmount, calculateTotalAmount } from "@/utils/invoiceUtils";
+import { calculateSubtotal, calculateGstAmount, calculateRoundoff, calculateTotalAmount } from "@/utils/invoiceUtils";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -22,6 +22,7 @@ const NewInvoice = () => {
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [subtotal, setSubtotal] = useState(0);
   const [gstAmount, setGstAmount] = useState(0);
+  const [roundoff, setRoundoff] = useState(0);
   const [total, setTotal] = useState(0);
 
   // Get client ID from query params if provided
@@ -47,11 +48,13 @@ const NewInvoice = () => {
     // Calculate totals using utility functions
     const newSubtotal = calculateSubtotal(items);
     const newGstAmount = calculateGstAmount(items);
+    const newRoundoff = calculateRoundoff(newSubtotal, newGstAmount);
     const newTotal = calculateTotalAmount(items);
 
     // Update state with calculated values
     setSubtotal(newSubtotal);
     setGstAmount(newGstAmount);
+    setRoundoff(newRoundoff);
     setTotal(newTotal);
     
     // Set invoice data and client
@@ -179,6 +182,7 @@ const NewInvoice = () => {
               client={selectedClient}
               subtotal={subtotal}
               gstAmount={gstAmount}
+              roundoff={roundoff}
               total={total}
             />
           ) : (

@@ -124,6 +124,18 @@ const InvoiceDetails = () => {
     );
   }
   
+  // Calculate roundoff value based on subtotal and gstAmount
+  const calculateRoundoff = () => {
+    if (!invoice) return 0;
+    
+    const exactTotal = parseFloat((invoice.subtotal + invoice.gstAmount).toFixed(2));
+    const roundedTotal = Math.round(exactTotal);
+    return parseFloat((roundedTotal - exactTotal).toFixed(2));
+  };
+  
+  // Get roundoff value
+  const roundoff = calculateRoundoff();
+  
   return (
     <Layout>
       <div className="page-header flex items-center justify-between mb-6">
@@ -193,6 +205,7 @@ const InvoiceDetails = () => {
             client={client}
             subtotal={invoice.subtotal}
             gstAmount={invoice.gstAmount}
+            roundoff={roundoff}
             total={invoice.total}
           />
         )}

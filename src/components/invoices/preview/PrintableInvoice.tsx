@@ -20,11 +20,12 @@ interface PrintableInvoiceProps {
   client: Client;
   subtotal: number;
   gstAmount: number;
+  roundoff?: number;
   total: number;
 }
 
 const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>(
-  ({ invoice, client, subtotal, gstAmount, total }, ref) => {
+  ({ invoice, client, subtotal, gstAmount, roundoff = 0, total }, ref) => {
     // Calculate CGST and SGST (each is half of the total GST)
     const cgstAmount = gstAmount / 2;
     const sgstAmount = gstAmount / 2;
@@ -55,6 +56,7 @@ const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>
         <InvoiceTotals 
           subtotal={subtotal} 
           gstAmount={gstAmount}
+          roundoff={roundoff}
           total={total} 
           isPDF={true}
         />
