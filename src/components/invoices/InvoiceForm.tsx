@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Form } from "@/components/ui/form";
 import { Client } from "@/types";
 import { InvoiceFormProvider } from "@/context/InvoiceFormContext";
-import { useInvoiceItems } from "@/hooks/useInvoiceItems";
 import InvoiceDetails from "./form/InvoiceDetails";
 import InvoiceItemsTable from "./form/InvoiceItemsTable";
 import InvoiceTotals from "./form/InvoiceTotals";
@@ -29,6 +28,8 @@ const formSchema = z.object({
       hsnCode: z.string().min(1, { message: "HSN code is required" }),
       rate: z.coerce.number().min(0, { message: "Rate is required" }),
       gstRate: z.coerce.number(),
+      cgstRate: z.coerce.number(),
+      sgstRate: z.coerce.number(),
       amount: z.coerce.number(),
     })
   ).min(1, { message: "At least one item is required" }),
@@ -63,6 +64,8 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
           hsnCode: "",
           rate: 0,
           gstRate: 18,
+          cgstRate: 9,
+          sgstRate: 9,
           amount: 0,
         },
       ],

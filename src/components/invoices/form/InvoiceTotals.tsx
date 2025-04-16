@@ -15,15 +15,9 @@ const InvoiceTotals = () => {
         </div>
         
         <div className="grid grid-cols-3 w-full max-w-md">
-          <span className="font-medium">CGST:</span>
-          <span className="text-center">{(gstAmount / 2 / subtotal * 100).toFixed(0)}%</span>
-          <span className="text-right">₹{(gstAmount / 2).toFixed(2)}</span>
-        </div>
-        
-        <div className="grid grid-cols-3 w-full max-w-md">
-          <span className="font-medium">SGST:</span>
-          <span className="text-center">{(gstAmount / 2 / subtotal * 100).toFixed(0)}%</span>
-          <span className="text-right">₹{(gstAmount / 2).toFixed(2)}</span>
+          <span className="font-medium">Tax:</span>
+          <span className="text-center"></span>
+          <span className="text-right">₹{gstAmount.toFixed(2)}</span>
         </div>
         
         <div className="flex items-center w-full max-w-md justify-between text-lg font-bold border-t pt-2 mt-2">

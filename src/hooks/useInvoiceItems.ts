@@ -38,6 +38,8 @@ export const useInvoiceItems = (form: UseFormReturn<any>) => {
           hsnCode: item.hsnCode || '',
           rate: item.rate || 0,
           gstRate: item.gstRate || 0,
+          cgstRate: item.cgstRate || 0,
+          sgstRate: item.sgstRate || 0,
           amount: item.amount || 0
         }));
       
@@ -61,5 +63,15 @@ export const useInvoiceItems = (form: UseFormReturn<any>) => {
     }
   };
 
-  return { handleQuantityOrRateChange };
+  const handleGstRateChange = (index: number, gstRate: number) => {
+    // Set CGST and SGST to half of GST by default
+    const halfGstRate = gstRate / 2;
+    form.setValue(`items.${index}.cgstRate`, halfGstRate);
+    form.setValue(`items.${index}.sgstRate`, halfGstRate);
+    
+    // Force a re-render to update totals
+    form.trigger(`items.${index}`);
+  };
+
+  return { handleQuantityOrRateChange, handleGstRateChange };
 };

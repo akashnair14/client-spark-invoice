@@ -23,11 +23,17 @@ export const calculateGstAmount = (items: InvoiceItem[]): number => {
   const validItems = items.filter(item => 
     item && typeof item.quantity === 'number' && 
     typeof item.rate === 'number' && 
-    typeof item.gstRate === 'number' &&
+    typeof item.cgstRate === 'number' &&
+    typeof item.sgstRate === 'number' &&
     item.id !== undefined
   ) as InvoiceItem[];
   
-  return validItems.reduce((sum, item) => sum + ((item.quantity * item.rate) * item.gstRate / 100), 0);
+  return validItems.reduce((sum, item) => {
+    const itemValue = item.quantity * item.rate;
+    const cgstAmount = itemValue * (item.cgstRate / 100);
+    const sgstAmount = itemValue * (item.sgstRate / 100);
+    return sum + cgstAmount + sgstAmount;
+  }, 0);
 };
 
 /**

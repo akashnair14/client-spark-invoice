@@ -23,6 +23,8 @@ export interface InvoiceItem {
   hsnCode: string;
   rate: number;
   gstRate: number;
+  cgstRate: number;
+  sgstRate: number;
   amount: number;
 }
 

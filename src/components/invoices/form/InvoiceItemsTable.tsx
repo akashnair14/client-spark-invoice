@@ -22,7 +22,7 @@ import { useInvoiceItems } from "@/hooks/useInvoiceItems";
 
 const InvoiceItemsTable = () => {
   const form = useFormContext();
-  const { handleQuantityOrRateChange } = useInvoiceItems(form);
+  const { handleQuantityOrRateChange, handleGstRateChange } = useInvoiceItems(form);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -45,6 +45,8 @@ const InvoiceItemsTable = () => {
               hsnCode: "",
               rate: 0,
               gstRate: 18,
+              cgstRate: 9,
+              sgstRate: 9,
               amount: 0,
             });
           }}
@@ -57,13 +59,13 @@ const InvoiceItemsTable = () => {
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr className="[&_th]:px-4 [&_th]:py-3 [&_th]:text-left">
-              <th className="w-[35%]">Description</th>
-              <th className="w-[10%]">Qty</th>
-              <th className="w-[12%]">HSN Code</th>
+              <th className="w-[30%]">Description</th>
+              <th className="w-[8%]">Qty</th>
+              <th className="w-[10%]">HSN Code</th>
               <th className="w-[10%]">Rate (₹)</th>
-              <th className="w-[10%]">GST %</th>
-              <th className="w-[8%]">CGST</th>
-              <th className="w-[8%]">SGST</th>
+              <th className="w-[8%]">GST %</th>
+              <th className="w-[8%]">CGST %</th>
+              <th className="w-[8%]">SGST %</th>
               <th className="w-[10%]">Amount (₹)</th>
               <th className="w-[3%]"></th>
             </tr>
@@ -141,8 +143,8 @@ const InvoiceItemsTable = () => {
                         <Select
                           onValueChange={(value) => {
                             field.onChange(parseInt(value));
-                            // Force recalculation after GST rate change
-                            setTimeout(() => handleQuantityOrRateChange(index), 0);
+                            // Update CGST and SGST rates
+                            handleGstRateChange(index, parseInt(value));
                           }}
                           defaultValue={field.value.toString()}
                         >
@@ -164,13 +166,53 @@ const InvoiceItemsTable = () => {
                     )}
                   />
                 </td>
-                <td className="p-2 text-center">
-                  {form.watch(`items.${index}.rate`) && form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.gstRate`) ? 
-                    `${(form.watch(`items.${index}.gstRate`) / 2)}%` : "-"}
+                <td className="p-2">
+                  <FormField
+                    control={form.control}
+                    name={`items.${index}.cgstRate`}
+                    render={({ field }) => (
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="w-full"
+                          onChange={(e) => {
+                            field.onChange(parseFloat(e.target.value));
+                            // Update total GST rate
+                            const sgstRate = form.getValues(`items.${index}.sgstRate`) || 0;
+                            form.setValue(`items.${index}.gstRate`, parseFloat(e.target.value) + sgstRate);
+                            handleQuantityOrRateChange(index);
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  />
                 </td>
-                <td className="p-2 text-center">
-                  {form.watch(`items.${index}.rate`) && form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.gstRate`) ? 
-                    `${(form.watch(`items.${index}.gstRate`) / 2)}%` : "-"}
+                <td className="p-2">
+                  <FormField
+                    control={form.control}
+                    name={`items.${index}.sgstRate`}
+                    render={({ field }) => (
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="w-full"
+                          onChange={(e) => {
+                            field.onChange(parseFloat(e.target.value));
+                            // Update total GST rate
+                            const cgstRate = form.getValues(`items.${index}.cgstRate`) || 0;
+                            form.setValue(`items.${index}.gstRate`, cgstRate + parseFloat(e.target.value));
+                            handleQuantityOrRateChange(index);
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  />
                 </td>
                 <td className="p-2">
                   <FormField
