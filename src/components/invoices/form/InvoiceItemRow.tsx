@@ -27,7 +27,11 @@ interface InvoiceItemRowProps {
 
 const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) => {
   const form = useFormContext();
-  const { handleQuantityOrRateChange, handleGstRateChange } = useInvoiceItems(form);
+  const { 
+    handleQuantityOrRateChange, 
+    handleGstRateChange,
+    handleCgstSgstChange 
+  } = useInvoiceItems(form);
 
   return (
     <tr className="border-b">
@@ -129,10 +133,7 @@ const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) =
                 onChange={(e) => {
                   const newRate = parseFloat(e.target.value) || 0;
                   field.onChange(newRate);
-                  // Update total GST rate
-                  const sgstRate = form.getValues(`items.${index}.sgstRate`) || 0;
-                  form.setValue(`items.${index}.gstRate`, newRate + sgstRate);
-                  handleQuantityOrRateChange(index);
+                  handleCgstSgstChange(index);
                 }}
               />
             </FormControl>
@@ -154,10 +155,7 @@ const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) =
                 onChange={(e) => {
                   const newRate = parseFloat(e.target.value) || 0;
                   field.onChange(newRate);
-                  // Update total GST rate
-                  const cgstRate = form.getValues(`items.${index}.cgstRate`) || 0;
-                  form.setValue(`items.${index}.gstRate`, cgstRate + newRate);
-                  handleQuantityOrRateChange(index);
+                  handleCgstSgstChange(index);
                 }}
               />
             </FormControl>

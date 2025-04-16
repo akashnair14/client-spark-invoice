@@ -1,77 +1,25 @@
 
-import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { InvoiceItem } from "@/types";
-import { useInvoiceForm } from "@/context/InvoiceFormContext";
+import { useItemCalculations } from "./useItemCalculations";
+import { useGstCalculations } from "./useGstCalculations";
+import { useInvoiceTotals } from "./useInvoiceTotals";
 
+/**
+ * Main hook for invoice item operations that combines more focused hooks
+ */
 export const useInvoiceItems = (form: UseFormReturn<any>) => {
-  const { updateTotals } = useInvoiceForm();
-  const watchItems = form.watch("items");
+  // Setup calculations for item amounts
+  const { handleQuantityOrRateChange } = useItemCalculations(form);
+  
+  // Setup calculations for GST rates
+  const { handleGstRateChange, handleCgstSgstChange } = useGstCalculations(form);
+  
+  // Initialize the invoice totals hook for automatic total calculations
+  useInvoiceTotals(form);
 
-  useEffect(() => {
-    const calculateAndUpdateItems = () => {
-      // Calculate amounts for each item first
-      const updatedItems = watchItems.map(item => ({
-        ...item,
-        amount: item.quantity * item.rate
-      }));
-      
-      // Update each item's amount in the form
-      updatedItems.forEach((item, index) => {
-        if (form.getValues(`items.${index}.amount`) !== item.amount) {
-          form.setValue(`items.${index}.amount`, item.amount);
-        }
-      });
-      
-      // Make sure all items have required properties
-      const validItems: InvoiceItem[] = updatedItems
-        .filter(item => 
-          item && 
-          typeof item.quantity === 'number' && 
-          typeof item.rate === 'number' &&
-          item.id !== undefined
-        )
-        .map(item => ({
-          id: item.id || '',
-          description: item.description || '',
-          quantity: item.quantity || 0,
-          hsnCode: item.hsnCode || '',
-          rate: item.rate || 0,
-          gstRate: item.gstRate || 0,
-          cgstRate: item.cgstRate || 0,
-          sgstRate: item.sgstRate || 0,
-          amount: item.amount || 0
-        }));
-      
-      // Update the totals in context
-      updateTotals(validItems);
-    };
-
-    calculateAndUpdateItems();
-  }, [watchItems, form, updateTotals]);
-
-  const handleQuantityOrRateChange = (index: number) => {
-    const items = form.getValues("items");
-    const item = items[index];
-    
-    if (item.quantity && item.rate) {
-      const amount = item.quantity * item.rate;
-      form.setValue(`items.${index}.amount`, amount);
-      
-      // Force a re-render to update totals
-      form.trigger(`items.${index}`);
-    }
+  return { 
+    handleQuantityOrRateChange,
+    handleGstRateChange,
+    handleCgstSgstChange
   };
-
-  const handleGstRateChange = (index: number, gstRate: number) => {
-    // Set CGST and SGST to half of GST by default
-    const halfGstRate = gstRate / 2;
-    form.setValue(`items.${index}.cgstRate`, halfGstRate);
-    form.setValue(`items.${index}.sgstRate`, halfGstRate);
-    
-    // Force a re-render to update totals
-    form.trigger(`items.${index}`);
-  };
-
-  return { handleQuantityOrRateChange, handleGstRateChange };
 };
