@@ -99,6 +99,8 @@ export const mockInvoices: Invoice[] = [
         hsnCode: '998314',
         rate: 50000,
         gstRate: 18,
+        cgstRate: 9,
+        sgstRate: 9,
         amount: 50000
       },
       {
@@ -108,6 +110,8 @@ export const mockInvoices: Invoice[] = [
         hsnCode: '998361',
         rate: 10000,
         gstRate: 18,
+        cgstRate: 9,
+        sgstRate: 9,
         amount: 30000
       }
     ],
@@ -130,6 +134,8 @@ export const mockInvoices: Invoice[] = [
         hsnCode: '998599',
         rate: 35000,
         gstRate: 18,
+        cgstRate: 9,
+        sgstRate: 9,
         amount: 35000
       }
     ],
@@ -152,6 +158,8 @@ export const mockInvoices: Invoice[] = [
         hsnCode: '998391',
         rate: 75000,
         gstRate: 18,
+        cgstRate: 9,
+        sgstRate: 9,
         amount: 75000
       },
       {
@@ -161,6 +169,8 @@ export const mockInvoices: Invoice[] = [
         hsnCode: '998912',
         rate: 500,
         gstRate: 12,
+        cgstRate: 6,
+        sgstRate: 6,
         amount: 5000
       }
     ],
