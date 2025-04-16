@@ -11,7 +11,7 @@ export const useItemCalculations = (form: UseFormReturn<any>) => {
     const item = items[index];
     
     if (item.quantity && item.rate) {
-      const amount = item.quantity * item.rate;
+      const amount = parseFloat((item.quantity * item.rate).toFixed(2));
       form.setValue(`items.${index}.amount`, amount);
       
       // Force a re-render to update totals

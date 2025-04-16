@@ -7,7 +7,7 @@ import { UseFormReturn } from "react-hook-form";
 export const useGstCalculations = (form: UseFormReturn<any>) => {
   const handleGstRateChange = (index: number, gstRate: number) => {
     // Set CGST and SGST to half of GST by default
-    const halfGstRate = gstRate / 2;
+    const halfGstRate = parseFloat((gstRate / 2).toFixed(2));
     form.setValue(`items.${index}.cgstRate`, halfGstRate);
     form.setValue(`items.${index}.sgstRate`, halfGstRate);
     
@@ -17,9 +17,9 @@ export const useGstCalculations = (form: UseFormReturn<any>) => {
 
   const handleCgstSgstChange = (index: number) => {
     // Update total GST rate based on CGST and SGST
-    const cgstRate = form.getValues(`items.${index}.cgstRate`) || 0;
-    const sgstRate = form.getValues(`items.${index}.sgstRate`) || 0;
-    form.setValue(`items.${index}.gstRate`, cgstRate + sgstRate);
+    const cgstRate = Number(form.getValues(`items.${index}.cgstRate`)) || 0;
+    const sgstRate = Number(form.getValues(`items.${index}.sgstRate`)) || 0;
+    form.setValue(`items.${index}.gstRate`, parseFloat((cgstRate + sgstRate).toFixed(2)));
     
     // Force a re-render to update totals
     form.trigger(`items.${index}`);

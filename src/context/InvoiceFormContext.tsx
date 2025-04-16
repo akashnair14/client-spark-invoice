@@ -19,15 +19,16 @@ export const InvoiceFormProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const updateTotals = (items: InvoiceItem[]) => {
     // Calculate subtotal
-    const newSubtotal = calculateSubtotal(items);
+    const newSubtotal = parseFloat(calculateSubtotal(items).toFixed(2));
     setSubtotal(newSubtotal);
 
     // Calculate GST amount
-    const newGstAmount = calculateGstAmount(items);
+    const newGstAmount = parseFloat(calculateGstAmount(items).toFixed(2));
     setGstAmount(newGstAmount);
 
     // Calculate total
-    setTotal(newSubtotal + newGstAmount);
+    const newTotal = parseFloat((newSubtotal + newGstAmount).toFixed(2));
+    setTotal(newTotal);
   };
 
   const value = {

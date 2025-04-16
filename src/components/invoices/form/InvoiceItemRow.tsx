@@ -57,7 +57,8 @@ const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) =
                 type="number"
                 min="1"
                 onChange={(e) => {
-                  field.onChange(e);
+                  const value = parseFloat(e.target.value) || 0;
+                  field.onChange(value);
                   handleQuantityOrRateChange(index);
                 }}
               />
@@ -88,7 +89,8 @@ const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) =
                 min="0"
                 step="0.01"
                 onChange={(e) => {
-                  field.onChange(e);
+                  const value = parseFloat(e.target.value) || 0;
+                  field.onChange(value);
                   handleQuantityOrRateChange(index);
                 }}
               />
@@ -172,7 +174,7 @@ const InvoiceItemRow = ({ index, remove, disableRemove }: InvoiceItemRowProps) =
                 {...field}
                 readOnly
                 className="bg-muted cursor-not-allowed"
-                value={`₹${field.value.toFixed(2)}`}
+                value={`₹${Number(field.value).toFixed(2)}`}
               />
             </FormControl>
           )}

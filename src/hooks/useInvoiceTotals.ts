@@ -16,7 +16,7 @@ export const useInvoiceTotals = (form: UseFormReturn<any>) => {
       // Calculate amounts for each item first
       const updatedItems = watchItems.map(item => ({
         ...item,
-        amount: item.quantity * item.rate
+        amount: parseFloat((item.quantity * item.rate).toFixed(2))
       }));
       
       // Update each item's amount in the form
@@ -37,19 +37,20 @@ export const useInvoiceTotals = (form: UseFormReturn<any>) => {
         .map(item => ({
           id: item.id || '',
           description: item.description || '',
-          quantity: item.quantity || 0,
+          quantity: Number(item.quantity) || 0,
           hsnCode: item.hsnCode || '',
-          rate: item.rate || 0,
-          gstRate: item.gstRate || 0,
-          cgstRate: item.cgstRate || 0,
-          sgstRate: item.sgstRate || 0,
-          amount: item.amount || 0
+          rate: Number(item.rate) || 0,
+          gstRate: Number(item.gstRate) || 0,
+          cgstRate: Number(item.cgstRate) || 0,
+          sgstRate: Number(item.sgstRate) || 0,
+          amount: Number(item.amount) || 0
         }));
       
       // Update the totals in context
       updateTotals(validItems);
     };
 
+    // Run calculation immediately when items change
     calculateAndUpdateItems();
   }, [watchItems, form, updateTotals]);
 };

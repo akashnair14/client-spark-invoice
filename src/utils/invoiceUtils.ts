@@ -12,7 +12,7 @@ export const calculateSubtotal = (items: InvoiceItem[]): number => {
     item.id !== undefined
   ) as InvoiceItem[];
   
-  return validItems.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+  return validItems.reduce((sum, item) => sum + Number(item.quantity * item.rate), 0);
 };
 
 /**
@@ -29,9 +29,9 @@ export const calculateGstAmount = (items: InvoiceItem[]): number => {
   ) as InvoiceItem[];
   
   return validItems.reduce((sum, item) => {
-    const itemValue = item.quantity * item.rate;
-    const cgstAmount = itemValue * (item.cgstRate / 100);
-    const sgstAmount = itemValue * (item.sgstRate / 100);
+    const itemValue = Number(item.quantity) * Number(item.rate);
+    const cgstAmount = itemValue * (Number(item.cgstRate) / 100);
+    const sgstAmount = itemValue * (Number(item.sgstRate) / 100);
     return sum + cgstAmount + sgstAmount;
   }, 0);
 };
