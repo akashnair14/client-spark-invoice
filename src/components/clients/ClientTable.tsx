@@ -60,13 +60,14 @@ const ClientTable = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+  const [searchType, setSearchType] = useState<"companyName" | "gstNumber">("companyName");
 
   const columns: ColumnDef<Client>[] = [
     {
       accessorKey: "companyName",
       header: "Company",
       cell: ({ row }) => (
-        <Link to={`/client-details/${row.original.id}`} className="font-medium hover:underline">
+        <Link to={`/clients/${row.original.id}`} className="font-medium hover:underline">
           {row.getValue("companyName")}
         </Link>
       ),
@@ -84,6 +85,11 @@ const ClientTable = ({
       header: "Phone",
     },
     {
+      accessorKey: "gstNumber",
+      header: "GST Number",
+      cell: ({ row }) => row.original.gstNumber || "N/A",
+    },
+    {
       id: "actions",
       cell: ({ row }) => {
         const client = row.original;
@@ -98,7 +104,7 @@ const ClientTable = ({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem 
-                onClick={() => window.location.href = `/client-details/${client.id}`}
+                onClick={() => window.location.href = `/clients/${client.id}`}
                 className="flex items-center cursor-pointer"
               >
                 <Eye className="mr-2 h-4 w-4" />
@@ -150,15 +156,25 @@ const ClientTable = ({
 
   return (
     <div>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Search by company name..."
-          value={(table.getColumn("companyName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("companyName")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex items-center gap-4 py-4">
+        <div className="flex items-center gap-2 flex-1">
+          <select 
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value as "companyName" | "gstNumber")}
+            className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="companyName">Company Name</option>
+            <option value="gstNumber">GST Number</option>
+          </select>
+          <Input
+            placeholder={searchType === "companyName" ? "Search by company name..." : "Search by GST number..."}
+            value={(table.getColumn(searchType)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(searchType)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm flex-1"
+          />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

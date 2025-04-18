@@ -24,7 +24,8 @@ import {
   FileText,
   Trash2, 
   Edit,
-  ArrowLeft
+  ArrowLeft,
+  Receipt
 } from "lucide-react";
 import ClientForm from "@/components/clients/ClientForm";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,6 +38,7 @@ const ClientDetails = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [clientInvoices, setClientInvoices] = useState<any[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
+  const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
   
   // In a real app, this would be replaced with API calls
   useEffect(() => {
@@ -48,6 +50,20 @@ const ClientDetails = () => {
       
       const invoices = mockInvoices.filter(invoice => invoice.clientId === id);
       setClientInvoices(invoices);
+      
+      // Calculate current financial year (April to March)
+      const today = new Date();
+      const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+      const startDate = new Date(`${currentYear}-04-01`);
+      const endDate = new Date(`${currentYear + 1}-03-31`);
+      
+      // Filter invoices for current financial year
+      const fyInvoices = invoices.filter(invoice => {
+        const invoiceDate = new Date(invoice.date);
+        return invoiceDate >= startDate && invoiceDate <= endDate;
+      });
+      
+      setCurrentYearInvoices(fyInvoices);
     }
   }, [id]);
   
@@ -140,6 +156,24 @@ const ClientDetails = () => {
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">Company</p>
                 <p className="text-sm text-muted-foreground">{client.companyName}</p>
+              </div>
+            </div>
+            
+            {/* GST Number */}
+            <div className="flex items-start space-x-4">
+              <Receipt className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium leading-none">GST Number</p>
+                <p className="text-sm text-muted-foreground">{client.gstNumber || "Not provided"}</p>
+              </div>
+            </div>
+
+            {/* FY Invoices */}
+            <div className="flex items-start space-x-4">
+              <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium leading-none">FY Invoices</p>
+                <p className="text-sm text-muted-foreground">{currentYearInvoices.length}</p>
               </div>
             </div>
             
