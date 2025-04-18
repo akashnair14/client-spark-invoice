@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useInvoiceState } from "@/hooks/useInvoiceState";
 import InvoicePreviewActions from "@/components/invoices/form/InvoicePreviewActions";
 import InvoicePreviewPlaceholder from "@/components/invoices/form/InvoicePreviewPlaceholder";
+import { Invoice } from "@/types";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -66,9 +66,10 @@ const NewInvoice = () => {
     if (!invoiceData || !selectedClient) return;
     
     const isComplete = validateInvoiceCompleteness(invoiceData, selectedClient);
-    const autoStatus = isComplete ? 'pending' : 'draft';
+    // Explicitly type the autoStatus to match the Invoice type
+    const autoStatus = isComplete ? 'pending' as const : 'draft' as const;
     
-    const newInvoice = {
+    const newInvoice: Invoice = {
       id: uuidv4(),
       clientId: selectedClient.id,
       invoiceNumber: invoiceData.invoiceNumber,
