@@ -51,7 +51,7 @@ const InvoiceTotals = ({ subtotal, gstAmount, roundoff = 0, total, isPDF = false
         {/* Amount in words for PDF */}
         <div style={{marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid #e5e7eb'}}>
           <p style={{fontSize: '0.875rem', color: '#6b7280'}}>
-            <span style={{fontWeight: '500'}}>Rupees:</span> {convertNumberToWords(total)}
+            <span style={{fontWeight: '500'}}>Rupees:</span> {convertNumberToWords(total)} Only
           </p>
         </div>
         
@@ -107,7 +107,7 @@ const InvoiceTotals = ({ subtotal, gstAmount, roundoff = 0, total, isPDF = false
       {/* Amount in words */}
       <div className="mt-4 pt-2 border-t border-border">
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium">Rupees:</span> {convertNumberToWords(total)}
+          <span className="font-medium">Rupees:</span> {convertNumberToWords(total)} Only
         </p>
       </div>
       

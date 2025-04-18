@@ -73,7 +73,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
              invoiceDate <= endDate;
     });
     
-    // Get next invoice number
+    // Get next invoice number - starting from 1 if no invoices exist
     const nextNumber = clientInvoices.length + 1;
     
     return `${fyPrefix}/${nextNumber.toString().padStart(3, '0')}`;
@@ -110,7 +110,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     },
   });
 
-  // Set initial client ID and generate invoice number when client changes
+  // Set initial client ID and generate invoice number when component mounts
   useEffect(() => {
     const clientId = form.getValues("clientId") || initialClientId;
     if (clientId) {
@@ -118,7 +118,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
       const nextInvoiceNumber = getNextInvoiceNumber(clientId);
       form.setValue("invoiceNumber", nextInvoiceNumber);
     }
-  }, [initialClientId, form, form.getValues("clientId")]);
+  }, [initialClientId, form]);
 
   // Update invoice number when client changes
   const clientId = form.watch("clientId");

@@ -1,14 +1,24 @@
 
 import React from "react";
-import { Eye } from "lucide-react";
+import { FileSpreadsheet, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const InvoicePreviewPlaceholder = () => {
   return (
-    <div className="text-center py-10 border rounded-lg bg-muted/20">
-      <Eye className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-      <h3 className="text-lg font-medium">No Preview Available</h3>
-      <p className="text-muted-foreground mt-2">Please create an invoice first</p>
-    </div>
+    <Card className="w-full shadow-sm">
+      <CardContent className="flex flex-col items-center justify-center py-16 px-4">
+        <FileSpreadsheet className="h-16 w-16 text-muted-foreground mb-6" />
+        <h3 className="text-xl font-medium mb-2">No Preview Available</h3>
+        <p className="text-muted-foreground mb-6 text-center max-w-md">
+          Please complete the invoice form to generate a preview. 
+          Make sure to select a client and add at least one item.
+        </p>
+        <Button variant="outline" size="sm" className="gap-2">
+          <ChevronLeft className="h-4 w-4" /> Go to Invoice Form
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 

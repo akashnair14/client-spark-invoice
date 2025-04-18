@@ -19,7 +19,6 @@ const InvoiceItemsTable = ({ items, isPDF = false }: InvoiceItemsTableProps) => 
               <th style={{padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600}}>HSN</th>
               <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>Qty</th>
               <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>Rate</th>
-              <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>GST%</th>
               <th style={{padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600}}>Amount</th>
             </tr>
           </thead>
@@ -31,7 +30,6 @@ const InvoiceItemsTable = ({ items, isPDF = false }: InvoiceItemsTableProps) => 
                 <td style={{padding: '0.75rem 1rem'}}>{item.hsnCode}</td>
                 <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>{item.quantity}</td>
                 <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>₹{item.rate.toFixed(2)}</td>
-                <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>{item.gstRate}%</td>
                 <td style={{padding: '0.75rem 1rem', textAlign: 'right'}}>₹{item.amount.toFixed(2)}</td>
               </tr>
             ))}
@@ -51,7 +49,6 @@ const InvoiceItemsTable = ({ items, isPDF = false }: InvoiceItemsTableProps) => 
             <th className="py-3 px-4 text-left font-medium">HSN</th>
             <th className="py-3 px-4 text-right font-medium">Qty</th>
             <th className="py-3 px-4 text-right font-medium">Rate</th>
-            <th className="py-3 px-4 text-right font-medium">GST%</th>
             <th className="py-3 px-4 text-right font-medium">Amount</th>
           </tr>
         </thead>
@@ -63,7 +60,6 @@ const InvoiceItemsTable = ({ items, isPDF = false }: InvoiceItemsTableProps) => 
               <td className="py-3 px-4 text-sm">{item.hsnCode}</td>
               <td className="py-3 px-4 text-sm text-right">{item.quantity}</td>
               <td className="py-3 px-4 text-sm text-right">₹{item.rate.toFixed(2)}</td>
-              <td className="py-3 px-4 text-sm text-right">{item.gstRate}%</td>
               <td className="py-3 px-4 text-sm text-right">₹{item.amount.toFixed(2)}</td>
             </tr>
           ))}
