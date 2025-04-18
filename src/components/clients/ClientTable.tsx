@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -43,6 +42,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { mockInvoices } from "@/data/mockData";
 
 interface ClientTableProps {
   clients: Client[];
@@ -62,6 +62,21 @@ const ClientTable = ({
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [searchType, setSearchType] = useState<"companyName" | "gstNumber">("companyName");
 
+  // Calculate current financial year
+  const today = new Date();
+  const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+  const startDate = new Date(`${currentYear}-04-01`);
+  const endDate = new Date(`${currentYear + 1}-03-31`);
+
+  const getFinancialYearInvoices = (clientId: string) => {
+    return mockInvoices.filter(invoice => {
+      const invoiceDate = new Date(invoice.date);
+      return invoice.clientId === clientId && 
+             invoiceDate >= startDate && 
+             invoiceDate <= endDate;
+    }).length;
+  };
+
   const columns: ColumnDef<Client>[] = [
     {
       accessorKey: "companyName",
@@ -73,21 +88,14 @@ const ClientTable = ({
       ),
     },
     {
-      accessorKey: "contactName",
-      header: "Contact",
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "phone",
-      header: "Phone",
-    },
-    {
       accessorKey: "gstNumber",
       header: "GST Number",
       cell: ({ row }) => row.original.gstNumber || "N/A",
+    },
+    {
+      accessorKey: "fyInvoices",
+      header: "FY Invoices",
+      cell: ({ row }) => getFinancialYearInvoices(row.original.id),
     },
     {
       id: "actions",
