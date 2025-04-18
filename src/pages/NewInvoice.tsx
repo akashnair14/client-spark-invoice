@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -62,7 +61,14 @@ const NewInvoice = () => {
       ...formData,
       items,
       date: formData.date,
-      dueDate: formData.dueDate,
+      gstType: formData.gstType,
+      challanNumber: formData.challanNumber,
+      challanDate: formData.challanDate,
+      poNumber: formData.poNumber,
+      poDate: formData.poDate,
+      dcNumber: formData.dcNumber,
+      dcDate: formData.dcDate,
+      ewbNumber: formData.ewbNumber
     });
     setSelectedClient(mockClients.find(client => client.id === formData.clientId));
     
@@ -93,13 +99,21 @@ const NewInvoice = () => {
       clientId: selectedClient.id,
       invoiceNumber: invoiceData.invoiceNumber,
       date: invoiceData.date.toISOString().split('T')[0], // Format date
-      dueDate: invoiceData.dueDate.toISOString().split('T')[0], // Format date
       items: invoiceData.items,
       subtotal: subtotal,
       gstAmount: gstAmount,
       total: total,
       status: autoStatus,
-      notes: invoiceData.notes || ""
+      notes: invoiceData.notes || "",
+      // Additional fields
+      gstType: invoiceData.gstType,
+      challanNumber: invoiceData.challanNumber,
+      challanDate: invoiceData.challanDate,
+      poNumber: invoiceData.poNumber,
+      poDate: invoiceData.poDate,
+      dcNumber: invoiceData.dcNumber,
+      dcDate: invoiceData.dcDate,
+      ewbNumber: invoiceData.ewbNumber
     };
 
     // In a real app, this would save to a database
@@ -137,8 +151,7 @@ const NewInvoice = () => {
     
     // Check if basic invoice details are complete
     const invoiceDetailsComplete = invoice.invoiceNumber && 
-                                   invoice.date && 
-                                   invoice.dueDate;
+                                   invoice.date;
     
     return clientComplete && itemsComplete && invoiceDetailsComplete;
   };

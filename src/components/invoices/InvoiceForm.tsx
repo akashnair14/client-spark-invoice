@@ -12,12 +12,21 @@ import InvoiceItemsTable from "./form/InvoiceItemsTable";
 import InvoiceTotals from "./form/InvoiceTotals";
 import InvoiceNotes from "./form/InvoiceNotes";
 import FormActions from "./form/FormActions";
+import AdditionalDetails from "./form/AdditionalDetails";
+import { mockInvoices } from "@/data/mockData";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
   date: z.date(),
-  dueDate: z.date(),
   invoiceNumber: z.string().min(1, { message: "Invoice number is required" }),
+  challanNumber: z.string().optional(),
+  challanDate: z.date().optional().nullable(),
+  poNumber: z.string().optional(),
+  poDate: z.date().optional().nullable(),
+  dcNumber: z.string().optional(),
+  dcDate: z.date().optional().nullable(),
+  ewbNumber: z.string().optional(),
+  gstType: z.enum(["regular", "igst"]).default("regular"),
   items: z.array(
     z.object({
       id: z.string(),
@@ -43,19 +52,47 @@ interface InvoiceFormProps {
 }
 
 const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
+  // Generate next invoice number for the client
+  const getNextInvoiceNumber = (clientId: string) => {
+    if (!clientId) return "";
+    
+    // Get current financial year
+    const today = new Date();
+    const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+    const nextYear = currentYear + 1;
+    const fyPrefix = `FY${currentYear.toString().slice(2)}-${nextYear.toString().slice(2)}`;
+    
+    // Filter invoices for selected client in current financial year
+    const startDate = new Date(`${currentYear}-04-01`);
+    const endDate = new Date(`${nextYear}-03-31`);
+    
+    const clientInvoices = mockInvoices.filter(invoice => {
+      const invoiceDate = new Date(invoice.date);
+      return invoice.clientId === clientId && 
+             invoiceDate >= startDate && 
+             invoiceDate <= endDate;
+    });
+    
+    // Get next invoice number
+    const nextNumber = clientInvoices.length + 1;
+    
+    return `${fyPrefix}/${nextNumber.toString().padStart(3, '0')}`;
+  };
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       clientId: initialClientId || "",
       date: new Date(),
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 14)), // Default to 14 days from now
-      invoiceNumber: `INV-${new Date().getFullYear()}-${String(
-        new Date().getMonth() + 1
-      ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}-${Math.floor(
-        Math.random() * 1000
-      )
-        .toString()
-        .padStart(3, "0")}`,
+      invoiceNumber: "",
+      challanNumber: "",
+      challanDate: null,
+      poNumber: "",
+      poDate: null,
+      dcNumber: "",
+      dcDate: null,
+      ewbNumber: "",
+      gstType: "regular",
       items: [
         {
           id: uuidv4(),
@@ -73,12 +110,24 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     },
   });
 
-  // Set initial client ID when provided
+  // Set initial client ID and generate invoice number when client changes
   useEffect(() => {
-    if (initialClientId) {
-      form.setValue("clientId", initialClientId);
+    const clientId = form.getValues("clientId") || initialClientId;
+    if (clientId) {
+      form.setValue("clientId", clientId);
+      const nextInvoiceNumber = getNextInvoiceNumber(clientId);
+      form.setValue("invoiceNumber", nextInvoiceNumber);
     }
-  }, [initialClientId, form]);
+  }, [initialClientId, form, form.getValues("clientId")]);
+
+  // Update invoice number when client changes
+  const clientId = form.watch("clientId");
+  useEffect(() => {
+    if (clientId) {
+      const nextInvoiceNumber = getNextInvoiceNumber(clientId);
+      form.setValue("invoiceNumber", nextInvoiceNumber);
+    }
+  }, [clientId, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     // Calculate final amounts to ensure they're up to date
@@ -102,6 +151,9 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             {/* Client and Invoice Details */}
             <InvoiceDetails clients={clients} />
+
+            {/* Additional Details (Challan, PO, DC, EWB) */}
+            <AdditionalDetails />
 
             {/* Invoice Items */}
             <InvoiceItemsTable />

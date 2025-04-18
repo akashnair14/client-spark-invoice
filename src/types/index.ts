@@ -32,7 +32,7 @@ export interface Invoice {
   id: string;
   clientId: string;
   date: string;
-  dueDate: string;
+  dueDate?: string;
   invoiceNumber: string;
   items: InvoiceItem[];
   subtotal: number;
@@ -40,6 +40,15 @@ export interface Invoice {
   total: number;
   status: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   notes?: string;
+  // Added fields
+  gstType?: "regular" | "igst";
+  challanNumber?: string;
+  challanDate?: Date | null;
+  poNumber?: string;
+  poDate?: Date | null;
+  dcNumber?: string;
+  dcDate?: Date | null;
+  ewbNumber?: string;
 }
 
 export type GstRate = 0 | 5 | 12 | 18 | 28;
