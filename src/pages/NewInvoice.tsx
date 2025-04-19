@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -43,6 +44,19 @@ const NewInvoice = () => {
   }, [location, setSelectedClient]);
 
   const handleInvoiceSubmit = (formData: any) => {
+    const client = mockClients.find(c => c.id === formData.clientId);
+    
+    if (!client) {
+      toast({
+        title: "Error",
+        description: "Please select a valid client",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setSelectedClient(client);
+    
     const items = formData.items.map((item: any) => ({
       ...item,
       amount: item.quantity * item.rate
@@ -151,7 +165,7 @@ const NewInvoice = () => {
             hasInvoiceData={!!invoiceData}
           />
 
-          {invoiceData ? (
+          {invoiceData && selectedClient ? (
             <InvoicePreview
               invoice={invoiceData}
               client={selectedClient}

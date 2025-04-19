@@ -60,7 +60,6 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     const today = new Date();
     const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
     const nextYear = currentYear + 1;
-    const fyPrefix = `FY${currentYear.toString().slice(2)}-${nextYear.toString().slice(2)}`;
     
     // Filter invoices for selected client in current financial year
     const startDate = new Date(`${currentYear}-04-01`);
@@ -76,7 +75,8 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     // Get next invoice number - starting from 1 if no invoices exist
     const nextNumber = clientInvoices.length + 1;
     
-    return `${fyPrefix}/${nextNumber.toString().padStart(3, '0')}`;
+    // Return just the number as string
+    return nextNumber.toString();
   };
   
   const form = useForm<z.infer<typeof formSchema>>({
