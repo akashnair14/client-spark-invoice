@@ -43,11 +43,11 @@ export interface Invoice {
   // Added fields
   gstType?: "regular" | "igst";
   challanNumber?: string;
-  challanDate?: Date | null;
+  challanDate?: Date | string | null;
   poNumber?: string;
-  poDate?: Date | null;
+  poDate?: Date | string | null;
   dcNumber?: string;
-  dcDate?: Date | null;
+  dcDate?: Date | string | null;
   ewbNumber?: string;
 }
 

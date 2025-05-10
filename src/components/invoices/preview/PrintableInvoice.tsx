@@ -10,8 +10,8 @@ import InvoiceFooter from "./InvoiceFooter";
 
 interface PrintableInvoiceProps {
   invoice: {
-    date: Date;
-    dueDate: Date;
+    date: Date | string | null;
+    dueDate: Date | string | null;
     invoiceNumber: string;
     items: InvoiceItem[];
     notes?: string;
@@ -37,6 +37,13 @@ const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>
       contact: client.email
     };
 
+    // Ensure we have valid date objects
+    const invoiceDate = invoice.date instanceof Date ? invoice.date : 
+                       (invoice.date ? new Date(invoice.date) : new Date());
+    
+    const dueDate = invoice.dueDate instanceof Date ? invoice.dueDate : 
+                   (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
+
     return (
       <div ref={ref} className="p-6 md:p-8 bg-white">
         <InvoiceHeader 
@@ -46,8 +53,8 @@ const PrintableInvoice = React.forwardRef<HTMLDivElement, PrintableInvoiceProps>
         />
         <InvoiceClientInfo 
           client={client} 
-          date={invoice.date} 
-          dueDate={invoice.dueDate} 
+          date={invoiceDate} 
+          dueDate={dueDate} 
           isPDF={true}
           showStatus={false}
           status={invoice.status}

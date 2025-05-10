@@ -12,8 +12,8 @@ import {
 
 interface InvoiceClientInfoProps {
   client: Client;
-  date: Date;
-  dueDate: Date;
+  date: Date | string | null;
+  dueDate: Date | string | null;
   isPDF?: boolean;
   showStatus?: boolean;
   status?: Invoice['status'];
@@ -57,6 +57,22 @@ const InvoiceClientInfo = ({
     }
   };
   
+  // Helper function to safely format dates or return a fallback
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return "N/A";
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      // Check if date is valid before formatting
+      if (isNaN(dateObj.getTime())) {
+        return "Invalid date";
+      }
+      return format(dateObj, "dd-MMM-yy");
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "Invalid date";
+    }
+  };
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
       <div>
@@ -74,15 +90,15 @@ const InvoiceClientInfo = ({
       <div className="flex flex-col justify-start gap-3 md:items-end">
         <div className="grid grid-cols-2 gap-x-2 md:text-right">
           <span className={isPDF ? "text-sm text-gray-600" : "text-sm text-muted-foreground"}>Invoice No:</span>
-          <span className="font-medium">{date.toLocaleDateString('en-IN')}</span>
+          <span className="font-medium">{typeof date === 'object' && date ? date.toLocaleDateString('en-IN') : 'N/A'}</span>
         </div>
         <div className="grid grid-cols-2 gap-x-2 md:text-right">
           <span className={isPDF ? "text-sm text-gray-600" : "text-sm text-muted-foreground"}>Issue Date:</span>
-          <span className="font-medium">{format(date, "dd-MMM-yy")}</span>
+          <span className="font-medium">{formatDate(date)}</span>
         </div>
         <div className="grid grid-cols-2 gap-x-2 md:text-right">
           <span className={isPDF ? "text-sm text-gray-600" : "text-sm text-muted-foreground"}>Due Date:</span>
-          <span className="font-medium">{format(dueDate, "dd-MMM-yy")}</span>
+          <span className="font-medium">{formatDate(dueDate)}</span>
         </div>
         {showStatus && !isPDF && status && (
           <div className="grid grid-cols-2 gap-x-2 md:text-right mt-4">

@@ -2,7 +2,6 @@
 import React, { useRef } from "react";
 import { Client, InvoiceItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
 import InvoiceActions from "./preview/InvoiceActions";
 import InvoiceHeader from "./preview/InvoiceHeader";
 import InvoiceClientInfo from "./preview/InvoiceClientInfo";
@@ -14,8 +13,8 @@ import PrintableInvoice from "./preview/PrintableInvoice";
 
 interface InvoicePreviewProps {
   invoice: {
-    date: Date;
-    dueDate: Date;
+    date: Date | string | null;
+    dueDate: Date | string | null;
     invoiceNumber: string;
     items: InvoiceItem[];
     notes?: string;
@@ -36,6 +35,13 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
     return <div className="text-center py-8">Please select a client to preview invoice</div>;
   }
 
+  // Ensure we have valid date objects
+  const invoiceDate = invoice.date instanceof Date ? invoice.date : 
+                     (invoice.date ? new Date(invoice.date) : new Date());
+  
+  const dueDate = invoice.dueDate instanceof Date ? invoice.dueDate : 
+                 (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
+
   const companyDetails = {
     name: "Your Company Name",
     address: [client.address, client.city || "", client.state || ""],
@@ -52,7 +58,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
         clientName={client.companyName}
         clientPhoneNumber={client.phoneNumber}
         total={total}
-        dueDate={invoice.dueDate}
+        dueDate={dueDate}
       />
 
       <Card className="border border-gray-200 print:border-0 print:shadow-none animate-fade-in">
@@ -64,8 +70,8 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
             />
             <InvoiceClientInfo 
               client={client} 
-              date={invoice.date} 
-              dueDate={invoice.dueDate}
+              date={invoiceDate} 
+              dueDate={dueDate}
               status={invoice.status}
             />
             <InvoiceItemsTable items={invoice.items} />
@@ -85,7 +91,11 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
       <div className="hidden">
         <PrintableInvoice
           ref={printableRef}
-          invoice={invoice}
+          invoice={{
+            ...invoice,
+            date: invoiceDate,
+            dueDate: dueDate
+          }}
           client={client}
           subtotal={subtotal}
           gstAmount={gstAmount}

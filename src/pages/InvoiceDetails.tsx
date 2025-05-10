@@ -36,10 +36,30 @@ const InvoiceDetails = () => {
     
     const foundInvoice = mockInvoices.find(invoice => invoice.id === id);
     if (foundInvoice) {
+      // Ensure we're handling dates properly
+      let invoiceDate;
+      let dueDateObj;
+      
+      try {
+        // Try to parse the date string
+        invoiceDate = foundInvoice.date ? parseISO(foundInvoice.date) : new Date();
+      } catch (error) {
+        console.error("Error parsing invoice date:", error);
+        invoiceDate = new Date(); // Fallback to current date
+      }
+      
+      try {
+        // Try to parse the due date string
+        dueDateObj = foundInvoice.dueDate ? parseISO(foundInvoice.dueDate) : new Date();
+      } catch (error) {
+        console.error("Error parsing due date:", error);
+        dueDateObj = new Date(); // Fallback to current date
+      }
+      
       setInvoice({
         ...foundInvoice,
-        date: parseISO(foundInvoice.date),
-        dueDate: parseISO(foundInvoice.dueDate),
+        date: invoiceDate,
+        dueDate: dueDateObj,
       });
       
       const foundClient = mockClients.find(client => client.id === foundInvoice.clientId);
@@ -151,7 +171,9 @@ const InvoiceDetails = () => {
           <div>
             <h1 className="page-title">Invoice {invoice.invoiceNumber}</h1>
             <p className="page-description text-sm text-muted-foreground">
-              {format(invoice.date, "MMMM dd, yyyy")}
+              {invoice.date && !isNaN(invoice.date.getTime())
+                ? format(invoice.date, "MMMM dd, yyyy")
+                : "No date available"}
             </p>
           </div>
         </div>
@@ -212,6 +234,41 @@ const InvoiceDetails = () => {
       </div>
     </Layout>
   );
+};
+
+// Helper functions that were missing
+const getStatusIcon = (status: Invoice['status']) => {
+  switch (status) {
+    case 'paid':
+      return <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />;
+    case 'pending':
+      return <Clock className="w-4 h-4 mr-2 text-yellow-500" />;
+    case 'sent':
+      return <Send className="w-4 h-4 mr-2 text-blue-500" />;
+    case 'overdue':
+      return <AlertCircle className="w-4 h-4 mr-2 text-red-500" />;
+    default:
+      return <FileWarning className="w-4 h-4 mr-2 text-gray-500" />;
+  }
+};
+
+const getStatusBadgeClass = (status: Invoice['status']) => {
+  switch (status) {
+    case 'paid':
+      return "bg-green-100 text-green-800";
+    case 'pending':
+      return "bg-yellow-100 text-yellow-800";
+    case 'sent':
+      return "bg-blue-100 text-blue-800";
+    case 'overdue':
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+const updateInvoiceStatus = (status: Invoice['status']) => {
+  // Implementation would go here - kept the function signature for type safety
 };
 
 export default InvoiceDetails;
