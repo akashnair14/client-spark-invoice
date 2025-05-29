@@ -20,62 +20,72 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Trash2, Mail, Download, Users } from "lucide-react";
-import { Client } from "@/types";
+import { MoreHorizontal, Trash2, Mail, Download, FileText, CheckCircle2 } from "lucide-react";
+import { Invoice } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
-interface BulkActionsProps {
-  selectedClients: string[];
-  onSelectionChange: (clientIds: string[]) => void;
-  clients: Client[];
-  onBulkDelete: (clientIds: string[]) => void;
+interface InvoiceBulkActionsProps {
+  selectedInvoices: string[];
+  onSelectionChange: (invoiceIds: string[]) => void;
+  invoices: Invoice[];
+  onBulkDelete: (invoiceIds: string[]) => void;
+  onBulkStatusUpdate: (invoiceIds: string[], status: Invoice['status']) => void;
 }
 
-const BulkActions = ({
-  selectedClients,
+const InvoiceBulkActions = ({
+  selectedInvoices,
   onSelectionChange,
-  clients,
+  invoices,
   onBulkDelete,
-}: BulkActionsProps) => {
+  onBulkStatusUpdate,
+}: InvoiceBulkActionsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
 
-  const allSelected = clients.length > 0 && selectedClients.length === clients.length;
-  const someSelected = selectedClients.length > 0 && selectedClients.length < clients.length;
+  const allSelected = invoices.length > 0 && selectedInvoices.length === invoices.length;
+  const someSelected = selectedInvoices.length > 0 && selectedInvoices.length < invoices.length;
 
   const handleSelectAll = () => {
     if (allSelected) {
       onSelectionChange([]);
     } else {
-      onSelectionChange(clients.map(client => client.id));
+      onSelectionChange(invoices.map(invoice => invoice.id));
     }
   };
 
   const handleBulkDelete = () => {
-    onBulkDelete(selectedClients);
+    onBulkDelete(selectedInvoices);
     onSelectionChange([]);
     setShowDeleteDialog(false);
     toast({
-      title: "Clients Deleted",
-      description: `${selectedClients.length} client(s) have been deleted successfully.`,
+      title: "Invoices Deleted",
+      description: `${selectedInvoices.length} invoice(s) have been deleted successfully.`,
+    });
+  };
+
+  const handleMarkAsPaid = () => {
+    onBulkStatusUpdate(selectedInvoices, 'paid');
+    toast({
+      title: "Status Updated",
+      description: `${selectedInvoices.length} invoice(s) marked as paid.`,
     });
   };
 
   const handleSendReminders = () => {
     toast({
       title: "Reminders Sent",
-      description: `Reminders sent to ${selectedClients.length} client(s).`,
+      description: `Reminders sent for ${selectedInvoices.length} invoice(s).`,
     });
   };
 
   const handleExportData = () => {
     toast({
       title: "Export Started",
-      description: `Exporting data for ${selectedClients.length} client(s).`,
+      description: `Exporting ${selectedInvoices.length} invoice(s).`,
     });
   };
 
-  if (clients.length === 0) return null;
+  if (invoices.length === 0) return null;
 
   return (
     <div className="flex items-center gap-4 py-2">
@@ -86,34 +96,38 @@ const BulkActions = ({
           onCheckedChange={handleSelectAll}
         />
         <span className="text-sm text-muted-foreground">
-          {selectedClients.length > 0 ? (
-            `${selectedClients.length} of ${clients.length} selected`
+          {selectedInvoices.length > 0 ? (
+            `${selectedInvoices.length} of ${invoices.length} selected`
           ) : (
-            `Select all ${clients.length} clients`
+            `Select all ${invoices.length} invoices`
           )}
         </span>
       </div>
 
-      {selectedClients.length > 0 && (
+      {selectedInvoices.length > 0 && (
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
-                <Users className="h-4 w-4" />
-                Actions ({selectedClients.length})
+                <FileText className="h-4 w-4" />
+                Actions ({selectedInvoices.length})
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Bulk Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleMarkAsPaid} className="gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                Mark as Paid
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSendReminders} className="gap-2">
                 <Mail className="h-4 w-4" />
                 Send Reminders
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportData} className="gap-2">
                 <Download className="h-4 w-4" />
-                Export Data
+                Export Selected
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
@@ -139,10 +153,10 @@ const BulkActions = ({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Selected Clients</AlertDialogTitle>
+            <AlertDialogTitle>Delete Selected Invoices</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selectedClients.length} client(s)? 
-              This action cannot be undone and will remove all associated data.
+              Are you sure you want to delete {selectedInvoices.length} invoice(s)? 
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -151,7 +165,7 @@ const BulkActions = ({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleBulkDelete}
             >
-              Delete {selectedClients.length} Client(s)
+              Delete {selectedInvoices.length} Invoice(s)
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -160,4 +174,4 @@ const BulkActions = ({
   );
 };
 
-export default BulkActions;
+export default InvoiceBulkActions;

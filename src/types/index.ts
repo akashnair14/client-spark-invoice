@@ -1,3 +1,4 @@
+
 export interface Client {
   id: string;
   companyName: string;
@@ -15,6 +16,10 @@ export interface Client {
   website?: string;
   tags?: string[];
   status?: 'active' | 'inactive' | 'pending';
+  lastInvoiceDate?: string;
+  totalInvoiced?: number;
+  pendingInvoices?: number;
+  fyInvoices?: number;
 }
 
 export interface InvoiceItem {
@@ -41,7 +46,6 @@ export interface Invoice {
   total: number;
   status: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   notes?: string;
-  // Added fields
   gstType?: "regular" | "igst";
   challanNumber?: string;
   challanDate?: Date | string | null;
@@ -50,6 +54,7 @@ export interface Invoice {
   dcNumber?: string;
   dcDate?: Date | string | null;
   ewbNumber?: string;
+  lastStatusUpdate?: string;
 }
 
 export type GstRate = 0 | 5 | 12 | 18 | 28;
