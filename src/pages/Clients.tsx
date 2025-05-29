@@ -15,8 +15,14 @@ const Clients = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // In a real app, this would be replaced with API calls and React Query
-  const [clients, setClients] = useState<Client[]>(mockClients);
+  // Add sample tags and status to mock clients
+  const enhancedClients: Client[] = mockClients.map((client, index) => ({
+    ...client,
+    tags: index === 0 ? ["frequent", "vip"] : index === 1 ? ["delayed payer"] : index === 2 ? ["new", "priority"] : ["frequent"],
+    status: index === 0 ? "active" : index === 1 ? "pending" : "active",
+  })) as Client[];
+
+  const [clients, setClients] = useState<Client[]>(enhancedClients);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client | undefined>(undefined);
 
@@ -52,37 +58,39 @@ const Clients = () => {
 
   return (
     <Layout>
-      <div className="page-header flex items-center justify-between">
-        <div>
-          <h1 className="page-title">Clients</h1>
-          <p className="page-description">Manage your client information</p>
+      <div className="space-y-6">
+        <div className="page-header flex items-center justify-between">
+          <div>
+            <h1 className="page-title">Clients</h1>
+            <p className="page-description">Manage your client information and relationships</p>
+          </div>
+          <Link to="/clients/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" /> Add Client
+            </Button>
+          </Link>
         </div>
-        <Link to="/clients/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" /> Add Client
-          </Button>
-        </Link>
+
+        <ClientTable
+          clients={clients}
+          onEdit={(client) => {
+            setCurrentClient(client);
+            setIsEditClientOpen(true);
+          }}
+          onDelete={handleDeleteClient}
+          onCreateInvoice={handleCreateInvoice}
+        />
+
+        <ClientForm
+          open={isEditClientOpen}
+          onClose={() => {
+            setIsEditClientOpen(false);
+            setCurrentClient(undefined);
+          }}
+          onSubmit={handleEditClient}
+          initialData={currentClient}
+        />
       </div>
-
-      <ClientTable
-        clients={clients}
-        onEdit={(client) => {
-          setCurrentClient(client);
-          setIsEditClientOpen(true);
-        }}
-        onDelete={handleDeleteClient}
-        onCreateInvoice={handleCreateInvoice}
-      />
-
-      <ClientForm
-        open={isEditClientOpen}
-        onClose={() => {
-          setIsEditClientOpen(false);
-          setCurrentClient(undefined);
-        }}
-        onSubmit={handleEditClient}
-        initialData={currentClient}
-      />
     </Layout>
   );
 };

@@ -1,4 +1,3 @@
-
 export interface Client {
   id: string;
   companyName: string;
@@ -14,6 +13,8 @@ export interface Client {
   state?: string;
   postalCode?: string;
   website?: string;
+  tags?: string[];
+  status?: 'active' | 'inactive' | 'pending';
 }
 
 export interface InvoiceItem {
