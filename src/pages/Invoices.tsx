@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -226,6 +225,13 @@ const Invoices = () => {
   const handleQuickView = (invoice: Invoice) => {
     setQuickViewInvoice(invoice);
     setIsQuickViewOpen(true);
+  };
+
+  const handleQuickViewStatusUpdate = (status: Invoice['status']) => {
+    if (quickViewInvoice) {
+      handleStatusUpdate(quickViewInvoice.id, status);
+      setQuickViewInvoice({ ...quickViewInvoice, status });
+    }
   };
 
   const allSelected = currentInvoices.length > 0 && selectedInvoices.length === currentInvoices.length;
@@ -458,8 +464,9 @@ const Invoices = () => {
             setIsQuickViewOpen(false);
             setQuickViewInvoice(undefined);
           }}
-          invoice={quickViewInvoice}
-          client={quickViewInvoice ? clients[quickViewInvoice.clientId] : undefined}
+          invoice={quickViewInvoice || null}
+          client={quickViewInvoice ? clients[quickViewInvoice.clientId] || null : null}
+          onStatusUpdate={handleQuickViewStatusUpdate}
         />
       </div>
     </Layout>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -50,7 +49,11 @@ const ClientForm = ({
       Object.keys(initialData).forEach((key) => {
         // Skip the 'id' field since it's not part of the form
         if (key !== 'id') {
-          form.setValue(key as keyof ClientFormValues, initialData[key as keyof Client]);
+          const value = initialData[key as keyof Client];
+          // Ensure we only set string values for form fields
+          if (typeof value === 'string') {
+            form.setValue(key as keyof ClientFormValues, value);
+          }
         }
       });
     } else {

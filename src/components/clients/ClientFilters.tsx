@@ -20,41 +20,59 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Search, Filter, X } from "lucide-react";
+import { Client } from "@/types";
 
 interface ClientFiltersProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
-  stateFilter: string;
-  onStateFilterChange: (value: string) => void;
-  tagFilters: string[];
-  onTagFiltersChange: (tags: string[]) => void;
-  onClearFilters: () => void;
+  clients: Client[];
+  onFilter: (searchTerm: string, statusFilter: string, stateFilter: string, tagFilter: string) => void;
 }
 
 const availableTags = ["frequent", "delayed payer", "vip", "new", "priority"];
 const availableStates = ["Maharashtra", "Karnataka", "Tamil Nadu", "Gujarat", "Delhi", "Punjab"];
 
 const ClientFilters = ({
-  searchTerm,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  stateFilter,
-  onStateFilterChange,
-  tagFilters,
-  onTagFiltersChange,
-  onClearFilters,
+  clients,
+  onFilter,
 }: ClientFiltersProps) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [stateFilter, setStateFilter] = useState("all");
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
+
   const hasActiveFilters = statusFilter !== "all" || stateFilter !== "all" || tagFilters.length > 0;
 
   const handleTagToggle = (tag: string) => {
+    let newTagFilters;
     if (tagFilters.includes(tag)) {
-      onTagFiltersChange(tagFilters.filter(t => t !== tag));
+      newTagFilters = tagFilters.filter(t => t !== tag);
     } else {
-      onTagFiltersChange([...tagFilters, tag]);
+      newTagFilters = [...tagFilters, tag];
     }
+    setTagFilters(newTagFilters);
+    onFilter(searchTerm, statusFilter, stateFilter, newTagFilters[0] || "");
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    onFilter(value, statusFilter, stateFilter, tagFilters[0] || "");
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    onFilter(searchTerm, value, stateFilter, tagFilters[0] || "");
+  };
+
+  const handleStateFilterChange = (value: string) => {
+    setStateFilter(value);
+    onFilter(searchTerm, statusFilter, value, tagFilters[0] || "");
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setStateFilter("all");
+    setTagFilters([]);
+    onFilter("", "all", "all", "");
   };
 
   return (
@@ -66,13 +84,13 @@ const ClientFilters = ({
           <Input
             placeholder="Search clients by name or GST number..."
             value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
           />
         </div>
 
         {/* Status Filter */}
-        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+        <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
@@ -85,7 +103,7 @@ const ClientFilters = ({
         </Select>
 
         {/* State Filter */}
-        <Select value={stateFilter} onValueChange={onStateFilterChange}>
+        <Select value={stateFilter} onValueChange={handleStateFilterChange}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="State" />
           </SelectTrigger>
@@ -122,7 +140,7 @@ const ClientFilters = ({
 
         {/* Clear Filters */}
         {hasActiveFilters && (
-          <Button variant="ghost" onClick={onClearFilters} className="gap-2">
+          <Button variant="ghost" onClick={handleClearFilters} className="gap-2">
             <X className="h-4 w-4" />
             Clear
           </Button>
@@ -137,7 +155,7 @@ const ClientFilters = ({
               Status: {statusFilter}
               <X 
                 className="h-3 w-3 cursor-pointer" 
-                onClick={() => onStatusFilterChange("all")}
+                onClick={() => handleStatusFilterChange("all")}
               />
             </Badge>
           )}
@@ -146,7 +164,7 @@ const ClientFilters = ({
               State: {stateFilter}
               <X 
                 className="h-3 w-3 cursor-pointer" 
-                onClick={() => onStateFilterChange("all")}
+                onClick={() => handleStateFilterChange("all")}
               />
             </Badge>
           )}
