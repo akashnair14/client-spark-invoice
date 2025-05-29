@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -7,13 +7,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { Form } from "@/components/ui/form";
 import { Client } from "@/types";
 import { InvoiceFormProvider } from "@/context/InvoiceFormContext";
-import InvoiceDetails from "./form/InvoiceDetails";
 import InvoiceItemsTable from "./form/InvoiceItemsTable";
-import InvoiceTotals from "./form/InvoiceTotals";
 import InvoiceNotes from "./form/InvoiceNotes";
-import FormActions from "./form/FormActions";
 import AdditionalDetails from "./form/AdditionalDetails";
-import { mockInvoices } from "@/data/mockData";
+import InvoiceFormLayout from "./form/InvoiceFormLayout";
+import StickySummary from "./form/StickySummary";
+import EnhancedInvoiceDetails from "./form/EnhancedInvoiceDetails";
+import InvoiceActions from "./form/InvoiceActions";
+import InvoicePreviewPane from "./form/InvoicePreviewPane";
+import { useInvoiceForm } from "@/context/InvoiceFormContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
@@ -52,33 +55,9 @@ interface InvoiceFormProps {
 }
 
 const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
-  // Generate next invoice number for the client
-  const getNextInvoiceNumber = (clientId: string) => {
-    if (!clientId) return "";
-    
-    // Get current financial year
-    const today = new Date();
-    const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
-    const nextYear = currentYear + 1;
-    
-    // Filter invoices for selected client in current financial year
-    const startDate = new Date(`${currentYear}-04-01`);
-    const endDate = new Date(`${nextYear}-03-31`);
-    
-    const clientInvoices = mockInvoices.filter(invoice => {
-      const invoiceDate = new Date(invoice.date);
-      return invoice.clientId === clientId && 
-             invoiceDate >= startDate && 
-             invoiceDate <= endDate;
-    });
-    
-    // Get next invoice number - starting from 1 if no invoices exist
-    const nextNumber = clientInvoices.length + 1;
-    
-    // Return just the number as string
-    return nextNumber.toString();
-  };
-  
+  const [selectedClient, setSelectedClient] = useState<Client | undefined>();
+  const [showPreview, setShowPreview] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -110,27 +89,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     },
   });
 
-  // Set initial client ID and generate invoice number when component mounts
-  useEffect(() => {
-    const clientId = form.getValues("clientId") || initialClientId;
-    if (clientId) {
-      form.setValue("clientId", clientId);
-      const nextInvoiceNumber = getNextInvoiceNumber(clientId);
-      form.setValue("invoiceNumber", nextInvoiceNumber);
-    }
-  }, [initialClientId, form]);
-
-  // Update invoice number when client changes
-  const clientId = form.watch("clientId");
-  useEffect(() => {
-    if (clientId) {
-      const nextInvoiceNumber = getNextInvoiceNumber(clientId);
-      form.setValue("invoiceNumber", nextInvoiceNumber);
-    }
-  }, [clientId, form]);
-
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    // Calculate final amounts to ensure they're up to date
     const updatedItems = values.items.map(item => ({
       ...item,
       amount: item.quantity * item.rate
@@ -144,32 +103,101 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     onSubmit(updatedValues);
   };
 
+  const handleSaveDraft = () => {
+    console.log("Saving as draft...");
+    // Implement draft save logic
+  };
+
+  const handleSaveAndShare = () => {
+    console.log("Saving and sharing...");
+    // Implement save and share logic
+  };
+
+  const handleSaveAndPrint = () => {
+    console.log("Saving and printing...");
+    // Implement save and print logic
+  };
+
+  const handlePreview = () => {
+    setShowPreview(!showPreview);
+  };
+
+  const isFormValid = form.formState.isValid && selectedClient;
+
   return (
     <InvoiceFormProvider>
-      <div className="space-y-8 mb-8">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-            {/* Client and Invoice Details */}
-            <InvoiceDetails clients={clients} />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <InvoiceFormLayout
+            sidebar={
+              <div className="space-y-4">
+                <StickySummary
+                  selectedClient={selectedClient}
+                  invoiceNumber={form.watch("invoiceNumber")}
+                  date={form.watch("date")}
+                />
+                {showPreview && (
+                  <InvoicePreviewComponent 
+                    client={selectedClient}
+                    form={form}
+                  />
+                )}
+              </div>
+            }
+          >
+            {/* Enhanced Invoice Details */}
+            <EnhancedInvoiceDetails
+              clients={clients}
+              onClientSelect={setSelectedClient}
+            />
 
-            {/* Additional Details (Challan, PO, DC, EWB) */}
+            {/* Additional Details */}
             <AdditionalDetails />
 
             {/* Invoice Items */}
-            <InvoiceItemsTable />
-
-            {/* Totals */}
-            <InvoiceTotals />
+            <Card>
+              <CardHeader>
+                <CardTitle>Invoice Items</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InvoiceItemsTable />
+              </CardContent>
+            </Card>
 
             {/* Notes */}
             <InvoiceNotes />
 
-            {/* Form Actions */}
-            <FormActions />
-          </form>
-        </Form>
-      </div>
+            {/* Action Buttons */}
+            <InvoiceActions
+              onSaveDraft={handleSaveDraft}
+              onSaveAndShare={handleSaveAndShare}
+              onSaveAndPrint={handleSaveAndPrint}
+              onPreview={handlePreview}
+              isValid={isFormValid}
+              isSubmitting={form.formState.isSubmitting}
+            />
+          </InvoiceFormLayout>
+        </form>
+      </Form>
     </InvoiceFormProvider>
+  );
+};
+
+// Helper component to access context
+const InvoicePreviewComponent = ({ client, form }: { client?: Client; form: any }) => {
+  const { subtotal, gstAmount, total, gstType } = useInvoiceForm();
+  
+  return (
+    <InvoicePreviewPane
+      client={client}
+      invoiceNumber={form.watch("invoiceNumber")}
+      date={form.watch("date")}
+      items={form.watch("items")}
+      subtotal={subtotal}
+      gstAmount={gstAmount}
+      total={total}
+      gstType={form.watch("gstType")}
+    />
   );
 };
 

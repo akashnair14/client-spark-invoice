@@ -80,7 +80,6 @@ const NewInvoice = () => {
     if (!invoiceData || !selectedClient) return;
     
     const isComplete = validateInvoiceCompleteness(invoiceData, selectedClient);
-    // Explicitly type the autoStatus to match the Invoice type
     const autoStatus = isComplete ? 'pending' as const : 'draft' as const;
     
     const newInvoice: Invoice = {
@@ -141,13 +140,13 @@ const NewInvoice = () => {
     <Layout>
       <div className="page-header">
         <h1 className="page-title">New Invoice</h1>
-        <p className="page-description">Create and preview a new invoice</p>
+        <p className="page-description">Create and preview a new invoice with enhanced features</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="edit">Edit Invoice</TabsTrigger>
-          <TabsTrigger value="preview" disabled={!invoiceData}>Preview</TabsTrigger>
+          <TabsTrigger value="edit">Create Invoice</TabsTrigger>
+          <TabsTrigger value="preview" disabled={!invoiceData}>Preview & Finalize</TabsTrigger>
         </TabsList>
         
         <TabsContent value="edit" className="space-y-4">
