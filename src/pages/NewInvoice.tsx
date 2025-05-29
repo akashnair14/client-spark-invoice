@@ -12,6 +12,7 @@ import { useInvoiceState } from "@/hooks/useInvoiceState";
 import InvoicePreviewActions from "@/components/invoices/form/InvoicePreviewActions";
 import InvoicePreviewPlaceholder from "@/components/invoices/form/InvoicePreviewPlaceholder";
 import { Invoice } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -139,17 +140,25 @@ const NewInvoice = () => {
   return (
     <Layout>
       <div className="page-header">
-        <h1 className="page-title">New Invoice</h1>
-        <p className="page-description">Create and preview a new invoice with enhanced features</p>
+        <h1 className="page-title">Create New Invoice</h1>
+        <p className="page-description">Design and generate professional invoices with enhanced automation</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="edit">Create Invoice</TabsTrigger>
-          <TabsTrigger value="preview" disabled={!invoiceData}>Preview & Finalize</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Card>
+          <CardContent className="p-1">
+            <TabsList className="grid w-full grid-cols-2 h-12">
+              <TabsTrigger value="edit" className="h-10">
+                Invoice Builder
+              </TabsTrigger>
+              <TabsTrigger value="preview" disabled={!invoiceData} className="h-10">
+                Preview & Finalize
+              </TabsTrigger>
+            </TabsList>
+          </CardContent>
+        </Card>
         
-        <TabsContent value="edit" className="space-y-4">
+        <TabsContent value="edit" className="space-y-6 mt-6">
           <InvoiceForm
             clients={mockClients}
             onSubmit={handleInvoiceSubmit}
@@ -157,7 +166,7 @@ const NewInvoice = () => {
           />
         </TabsContent>
         
-        <TabsContent value="preview" className="space-y-4">
+        <TabsContent value="preview" className="space-y-6 mt-6">
           <InvoicePreviewActions
             onBackToEdit={() => setActiveTab("edit")}
             onSaveInvoice={handleSaveInvoice}

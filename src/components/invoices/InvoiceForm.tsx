@@ -15,8 +15,12 @@ import StickySummary from "./form/StickySummary";
 import EnhancedInvoiceDetails from "./form/EnhancedInvoiceDetails";
 import InvoiceActions from "./form/InvoiceActions";
 import InvoicePreviewPane from "./form/InvoicePreviewPane";
+import InvoiceTotals from "./form/InvoiceTotals";
 import { useInvoiceForm } from "@/context/InvoiceFormContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
@@ -57,6 +61,13 @@ interface InvoiceFormProps {
 const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
   const [selectedClient, setSelectedClient] = useState<Client | undefined>();
   const [showPreview, setShowPreview] = useState(false);
+  const [sectionsOpen, setSectionsOpen] = useState({
+    clientInfo: true,
+    additionalInfo: false,
+    items: true,
+    taxSummary: true,
+    notes: false
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,7 +133,11 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     setShowPreview(!showPreview);
   };
 
-  const isFormValid = form.formState.isValid && selectedClient;
+  const toggleSection = (section: keyof typeof sectionsOpen) => {
+    setSectionsOpen(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const isFormValid = form.formState.isValid && selectedClient !== undefined;
 
   return (
     <InvoiceFormProvider>
@@ -145,37 +160,150 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
               </div>
             }
           >
-            {/* Enhanced Invoice Details */}
-            <EnhancedInvoiceDetails
-              clients={clients}
-              onClientSelect={setSelectedClient}
-            />
-
-            {/* Additional Details */}
-            <AdditionalDetails />
-
-            {/* Invoice Items */}
+            {/* Client Information Section */}
             <Card>
-              <CardHeader>
-                <CardTitle>Invoice Items</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InvoiceItemsTable />
-              </CardContent>
+              <Collapsible 
+                open={sectionsOpen.clientInfo}
+                onOpenChange={() => toggleSection('clientInfo')}
+              >
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="flex items-center justify-between">
+                      Client Information
+                      {sectionsOpen.clientInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <EnhancedInvoiceDetails
+                      clients={clients}
+                      onClientSelect={setSelectedClient}
+                    />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
             </Card>
 
-            {/* Notes */}
-            <InvoiceNotes />
+            {/* Additional Details Section */}
+            <Card>
+              <Collapsible 
+                open={sectionsOpen.additionalInfo}
+                onOpenChange={() => toggleSection('additionalInfo')}
+              >
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="flex items-center justify-between">
+                      Additional Information
+                      {sectionsOpen.additionalInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <AdditionalDetails />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
 
-            {/* Action Buttons */}
-            <InvoiceActions
-              onSaveDraft={handleSaveDraft}
-              onSaveAndShare={handleSaveAndShare}
-              onSaveAndPrint={handleSaveAndPrint}
-              onPreview={handlePreview}
-              isValid={isFormValid}
-              isSubmitting={form.formState.isSubmitting}
-            />
+            {/* Invoice Items Section */}
+            <Card>
+              <Collapsible 
+                open={sectionsOpen.items}
+                onOpenChange={() => toggleSection('items')}
+              >
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="flex items-center justify-between">
+                      Invoice Items
+                      {sectionsOpen.items ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <InvoiceItemsTable />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+
+            {/* Tax Summary Section */}
+            <Card>
+              <Collapsible 
+                open={sectionsOpen.taxSummary}
+                onOpenChange={() => toggleSection('taxSummary')}
+              >
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="flex items-center justify-between">
+                      Tax & Totals
+                      {sectionsOpen.taxSummary ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <InvoiceTotals />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+
+            {/* Notes Section */}
+            <Card>
+              <Collapsible 
+                open={sectionsOpen.notes}
+                onOpenChange={() => toggleSection('notes')}
+              >
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="flex items-center justify-between">
+                      Notes & Terms
+                      {sectionsOpen.notes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <InvoiceNotes />
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+
+            {/* Sticky Action Buttons */}
+            <div className="sticky bottom-0 bg-background border-t pt-4 mt-8">
+              <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePreview}
+                  className="order-2 sm:order-1"
+                >
+                  {showPreview ? "Hide Preview" : "Show Preview"}
+                </Button>
+                
+                <div className="flex gap-2 order-1 sm:order-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleSaveDraft}
+                    disabled={form.formState.isSubmitting}
+                  >
+                    Save Draft
+                  </Button>
+                  
+                  <Button
+                    type="submit"
+                    disabled={!isFormValid || form.formState.isSubmitting}
+                  >
+                    Generate Invoice
+                  </Button>
+                </div>
+              </div>
+            </div>
           </InvoiceFormLayout>
         </form>
       </Form>
@@ -185,7 +313,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
 
 // Helper component to access context
 const InvoicePreviewComponent = ({ client, form }: { client?: Client; form: any }) => {
-  const { subtotal, gstAmount, total, gstType } = useInvoiceForm();
+  const { subtotal, gstAmount, total } = useInvoiceForm();
   
   return (
     <InvoicePreviewPane

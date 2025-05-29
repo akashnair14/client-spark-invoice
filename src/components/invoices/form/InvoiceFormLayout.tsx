@@ -10,15 +10,15 @@ interface InvoiceFormLayoutProps {
 
 const InvoiceFormLayout = ({ children, sidebar }: InvoiceFormLayoutProps) => {
   return (
-    <div className="flex flex-col lg:flex-row gap-6 relative">
+    <div className="flex flex-col xl:flex-row gap-6 relative">
       {/* Main Form Content */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 space-y-6 min-w-0">
         {children}
       </div>
       
-      {/* Sticky Sidebar */}
-      <div className="lg:w-80 xl:w-96">
-        <div className="lg:sticky lg:top-6 space-y-4">
+      {/* Responsive Sidebar */}
+      <div className="xl:w-80 2xl:w-96">
+        <div className="xl:sticky xl:top-6 space-y-4">
           {sidebar}
         </div>
       </div>
