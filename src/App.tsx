@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,8 @@ import NewInvoice from "./pages/NewInvoice";
 import NotFound from "./pages/NotFound";
 import ClientDetails from "./pages/ClientDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
+import AuthPage from "./pages/Auth";
+import { useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/clients/new" element={<NewClient />} />
           <Route path="/clients/:id" element={<ClientDetails />} />
