@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -19,11 +20,13 @@ const AuthForm: React.FC = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null); // NEW
 
   // visually reset errors on tab switch
   const handleTabSwitch = (target: "login" | "register") => {
     setTab(target);
     setError(null);
+    setInfo(null);
     setEmail("");
     setPassword("");
     setConfirm("");
@@ -33,6 +36,7 @@ const AuthForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
 
     if (tab === "register" && password !== confirm) {
       setError("Passwords do not match");
@@ -41,10 +45,16 @@ const AuthForm: React.FC = () => {
     try {
       if (tab === "register") {
         await signup(email, password);
+        setInfo("Confirm your email, then log in to get started."); // <=== Message
+        setTab("login");
+        setEmail("");
+        setPassword("");
+        setConfirm("");
+        return;
       } else {
         await login(email, password);
+        navigate("/");
       }
-      navigate("/");
     } catch (err: any) {
       setError(err.message || "Authentication error");
     }
@@ -124,6 +134,10 @@ const AuthForm: React.FC = () => {
         </div>
         {/* --- LOGIN FORM --- */}
         <div className="relative h-[265px] sm:h-[260px] transition-all duration-700">
+          {/* INFO MESSAGE if present */}
+          {info && tab === "login" && (
+            <div className="w-full bg-blue-100/20 text-blue-200 text-center rounded p-2 mb-4 font-medium shadow-sm animate-fade-in">{info}</div>
+          )}
           <form
             onSubmit={handleSubmit}
             autoComplete="on"
@@ -300,3 +314,4 @@ const AuthForm: React.FC = () => {
 };
 
 export default AuthForm;
+
