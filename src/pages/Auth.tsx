@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -7,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Lock, UserPlus, LogIn } from "lucide-react";
 
-// Custom animated gradient background
+// Modern dark animated gradient background with glowing color
 const GradientBackground = () => (
   <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-    <div className="absolute inset-0 bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-fuchsia-400 via-indigo-400 to-blue-400 opacity-70 animate-gradient-rotate" />
-    <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-indigo-100/80 to-fuchsia-50 dark:from-zinc-900/50 dark:via-indigo-950/80 dark:to-fuchsia-950/60" />
+    <div className="absolute inset-0 bg-[conic-gradient(at_right,_#2e026d,#0a0a33_30%,#410098_50%,#008cff_70%,#0a0a33_100%)] animate-gradient-rotate opacity-70" />
+    {/* Add a soft radial glow */}
+    <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[110vw] h-[60vh] bg-gradient-radial from-fuchsia-900/60 via-indigo-800/60 to-transparent opacity-80 blur-3xl" />
+    {/* Dark overlay to increase contrast */}
+    <div className="absolute inset-0 bg-gradient-to-br from-zinc-900/80 via-indigo-950/80 to-fuchsia-950/70" />
     <style>
       {`
         @keyframes gradient-rotate {
@@ -19,7 +21,7 @@ const GradientBackground = () => (
           100% { transform: rotate(360deg);}
         }
         .animate-gradient-rotate {
-          animation: gradient-rotate 8s linear infinite;
+          animation: gradient-rotate 18s linear infinite;
         }
       `}
     </style>
