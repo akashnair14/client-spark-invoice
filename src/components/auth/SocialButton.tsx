@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Google } from "lucide-react";
+import { Circle } from "lucide-react";
 
 interface SocialButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   provider?: "google"; // for future multi-provider support
@@ -15,7 +15,7 @@ const SocialButton: React.FC<SocialButtonProps> = ({ onClick, children, provider
     type="button"
     {...props}
   >
-    {provider === "google" && <Google className="w-5 h-5 mr-1 text-[#2186f7]" />}
+    {provider === "google" && <Circle className="w-5 h-5 mr-1 text-[#2186f7]" />}
     {children}
   </Button>
 );
