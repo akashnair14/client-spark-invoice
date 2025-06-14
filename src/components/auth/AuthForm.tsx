@@ -80,7 +80,7 @@ const AuthForm: React.FC = () => {
         return;
       } else {
         await login(email, password);
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (err: any) {
       // Show popup on "Email not confirmed" error
