@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +13,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 // A modern, clean, animated, accessible login/register form
 const AuthForm: React.FC = () => {
   const { user, login, signup, logout, loading } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -28,6 +29,7 @@ const AuthForm: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   // visually reset errors on tab switch
   const handleTabSwitch = (target: "login" | "register") => {
@@ -78,6 +80,28 @@ const AuthForm: React.FC = () => {
     });
   };
 
+  // New: Resend confirmation email handler
+  const handleResendConfirmation = async () => {
+    setResendLoading(true);
+    setError(null);
+    try {
+      // Call signup with the current email/password
+      await signup(email, password);
+      toast({
+        title: "Confirmation email resent",
+        description: "Please check your inbox (and spam).",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Failed to resend",
+        description: err.message || "Could not resend confirmation email.",
+        variant: "destructive"
+      });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   // Already logged in? Show summary + sign-out
   if (user) {
     return (
@@ -117,15 +141,33 @@ const AuthForm: React.FC = () => {
             We've sent a confirmation email.<br />
             <span className="font-semibold">Please confirm your email and then log in to get started.</span>
           </div>
-          <DialogFooter>
+          {/* Show resend button */}
+          <div className="flex flex-col items-center mt-3">
             <Button
-              className="w-full mt-3"
-              onClick={() => setShowConfirmPopup(false)}
+              variant="secondary"
+              className="w-full mb-2"
+              onClick={handleResendConfirmation}
+              disabled={resendLoading}
+              type="button"
+            >
+              {resendLoading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 rounded-full border-blue-400 border-t-transparent inline-block"></span>
+              ) : null}
+              Resend confirmation email
+            </Button>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowConfirmPopup(false);
+                setTab("login");
+                setPassword("");
+                setConfirm("");
+              }}
               autoFocus
             >
               Ok
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
       {/* --- Branded App Logo/Name --- */}
