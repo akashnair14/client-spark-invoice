@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
+import { LogIn, UserPlus, Eye, EyeOff, Circle, Mail, Lock } from "lucide-react";
 import SocialButton from "./SocialButton";
 
 // A modern, clean, animated, accessible login/register form
@@ -85,15 +84,24 @@ const AuthForm: React.FC = () => {
 
   // Main auth card UI
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center font-inter px-2 py-10">
-      <Card className="w-full max-w-md p-7 sm:p-10 bg-white/5 dark:bg-white/10 border border-indigo-900/60 shadow-[0_10px_40px_0_rgba(0,24,72,0.38)] rounded-xl backdrop-blur-2xl animate-fade-in flex flex-col transition-all duration-500 select-none relative">
-        {/* Toggle */}
-        <div className="flex mb-8 justify-center gap-2 relative z-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-2 py-10">
+      {/* --- Branded App Logo/Name --- */}
+      <div className="mb-8 flex flex-col items-center">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-700 to-cyan-400 flex items-center justify-center shadow-lg mb-2 animate-[fade-in_0.6s]">
+          <LogIn className="text-white w-8 h-8" />
+        </div>
+        <span className="font-bold text-[2rem] text-white tracking-wide drop-shadow-lg mb-1 animate-fade-in">Welcome Back</span>
+        <span className="text-blue-100 text-md opacity-70">Log in to your account</span>
+      </div>
+      {/* Main Login/Register Card */}
+      <Card className="w-full max-w-sm mx-auto p-8 bg-white/10 shadow-xl border-none backdrop-blur-2xl rounded-2xl mb-4 animate-fade-in transition-all duration-500">
+        {/* Toggle Tabs */}
+        <div className="flex mb-7 justify-center gap-2 relative z-10">
           <button
-            className={`px-5 py-2 rounded-full font-semibold focus-visible:ring-2 transition
+            className={`px-6 py-2 rounded-full font-semibold focus-visible:ring-2 transition
               ${tab === "login"
-                ? "bg-blue-700/90 text-white shadow shadow-blue-600/50"
-                : "bg-transparent text-blue-200 hover:bg-blue-600/40"}`}
+                ? "bg-blue-600 text-white shadow shadow-blue-600/40"
+                : "bg-transparent text-blue-200 hover:bg-blue-600/30"}`}
             onClick={() => handleTabSwitch("login")}
             aria-selected={tab === "login"}
             tabIndex={tab === "login" ? -1 : 0}
@@ -102,10 +110,10 @@ const AuthForm: React.FC = () => {
             Login
           </button>
           <button
-            className={`px-5 py-2 rounded-full font-semibold focus-visible:ring-2 transition
+            className={`px-6 py-2 rounded-full font-semibold focus-visible:ring-2 transition
               ${tab === "register"
-                ? "bg-blue-700/90 text-white shadow shadow-blue-600/50"
-                : "bg-transparent text-blue-200 hover:bg-blue-600/40"}`}
+                ? "bg-blue-600 text-white shadow shadow-blue-600/40"
+                : "bg-transparent text-blue-200 hover:bg-blue-600/30"}`}
             onClick={() => handleTabSwitch("register")}
             aria-selected={tab === "register"}
             tabIndex={tab === "register" ? -1 : 0}
@@ -114,31 +122,34 @@ const AuthForm: React.FC = () => {
             Register
           </button>
         </div>
-        {/* Animated Form Slide/Fade */}
-        <div className="relative h-[245px] sm:h-[260px] transition-all duration-700">
-          {/* Login Form */}
+        {/* --- LOGIN FORM --- */}
+        <div className="relative h-[265px] sm:h-[260px] transition-all duration-700">
           <form
             onSubmit={handleSubmit}
             autoComplete="on"
-            className={`absolute inset-0 w-full space-y-5 transition-all duration-700 ease-[cubic-bezier(.4,0,.2,1)]
+            className={`absolute inset-0 w-full space-y-6 transition-all duration-700 ease-[cubic-bezier(.4,0,.2,1)]
               ${tab === "login"
                 ? "opacity-100 translate-x-0 z-10 pointer-events-auto"
-                : "opacity-0 -translate-x-10 z-0 pointer-events-none"}`}
+                : "opacity-0 -translate-x-12 z-0 pointer-events-none"}`}
             style={{ transitionProperty: "opacity, transform" }}
             aria-hidden={tab !== "login"}
           >
-            <Input
-              placeholder="Email"
-              autoComplete="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              disabled={loading}
-              required
-              type="email"
-              spellCheck={false}
-              className="text-base bg-zinc-900/70 dark:bg-zinc-900/70 border border-zinc-700 shadow-inner shadow-blue-900/20 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-blue-500 transition w-full placeholder:text-blue-300/70 text-blue-100"
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400/70 w-5 h-5"/>
+              <Input
+                placeholder="Email"
+                autoComplete="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={loading}
+                required
+                type="email"
+                spellCheck={false}
+                className="pl-10 text-base bg-zinc-900/80 dark:bg-zinc-900/80 border border-zinc-600 shadow-inner shadow-blue-900/20 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition w-full placeholder:text-blue-200/70 text-blue-100"
+              />
+            </div>
             <div className="relative flex items-center">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400/70 w-5 h-5"/>
               <Input
                 placeholder="Password"
                 type={showPass ? "text" : "password"}
@@ -148,7 +159,7 @@ const AuthForm: React.FC = () => {
                 disabled={loading}
                 required
                 minLength={6}
-                className="pr-10 text-base bg-zinc-900/70 dark:bg-zinc-900/70 border border-zinc-700 shadow-inner shadow-blue-900/20 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-blue-500 transition w-full placeholder:text-blue-300/70 text-blue-100"
+                className="pl-10 pr-10 text-base bg-zinc-900/80 dark:bg-zinc-900/80 border border-zinc-600 shadow-inner shadow-blue-900/20 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition w-full placeholder:text-blue-200/70 text-blue-100"
               />
               <button
                 type="button"
@@ -160,15 +171,16 @@ const AuthForm: React.FC = () => {
                 {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {error && <div className="text-red-400 text-sm mb-1 text-center">{error}</div>}
+            {error && <div className="text-red-400 text-sm mb-2 text-center">{error}</div>}
+
             <Button
               type="submit"
-              className="w-full text-base gap-2 h-11 select-none transition-transform duration-150 hover:scale-105 font-semibold bg-gradient-to-r from-blue-700 via-indigo-500 to-cyan-500 text-white shadow-md shadow-blue-800/30"
+              className="w-full text-base gap-2 h-12 animate-fade-in select-none transition-transform hover:scale-105 font-semibold bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 hover:brightness-110 shadow-md shadow-blue-800/30 border-none rounded-xl"
               disabled={loading}
             >
-              <LogIn className="w-5 h-5" /> Login
+              <LogIn className="w-5 h-5 animate-fade-in" /> Log In
             </Button>
-            <div className="flex justify-between text-blue-200/75 text-xs mt-2 mb-1">
+            <div className="flex justify-end text-blue-300/80 text-xs mt-2 animate-fade-in">
               <button
                 type="button"
                 className="underline underline-offset-4 hover:text-blue-200 hover:font-medium transition"
@@ -176,17 +188,16 @@ const AuthForm: React.FC = () => {
               >
                 Forgot password?
               </button>
-              <span />
             </div>
           </form>
-          {/* Register Form */}
+          {/* REGISTER FORM stays visually unchanged */}
           <form
             onSubmit={handleSubmit}
             autoComplete="on"
             className={`absolute inset-0 w-full space-y-5 transition-all duration-700 ease-[cubic-bezier(.4,0,.2,1)]
               ${tab === "register"
                 ? "opacity-100 translate-x-0 z-10 pointer-events-auto"
-                : "opacity-0 translate-x-10 z-0 pointer-events-none"}`}
+                : "opacity-0 translate-x-12 z-0 pointer-events-none"}`}
             style={{ transitionProperty: "opacity, transform" }}
             aria-hidden={tab !== "register"}
           >
@@ -257,18 +268,19 @@ const AuthForm: React.FC = () => {
         </div>
         {/* OR divider */}
         <div className="flex items-center my-5">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-          <span className="mx-4 text-xs text-blue-200/70 font-inter">or</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-blue-600/30 to-transparent" />
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-700/40 to-transparent" />
+          <span className="mx-3 text-xs text-blue-200/80 font-medium">or</span>
+          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-blue-700/40 to-transparent" />
         </div>
-        {/* Social login section (Google enabled) */}
-        <SocialButton onClick={handleGoogleLogin} provider="google">
+        {/* Social login */}
+        <SocialButton onClick={handleGoogleLogin} provider="google" className="animate-fade-in">
           <span className="flex items-center pt-[1px]">Sign in with Google</span>
         </SocialButton>
-        <div className="mt-6 flex items-center justify-center text-sm text-zinc-400">
+        {/* Switch login/register */}
+        <div className="mt-5 flex items-center justify-center text-sm text-zinc-400">
           <span>
             {tab === "login"
-              ? "Don’t have an account?"
+              ? "Don't have an account?"
               : "Already have an account?"}{" "}
           </span>
           <button
@@ -279,8 +291,8 @@ const AuthForm: React.FC = () => {
             {tab === "login" ? "Register" : "Log in"}
           </button>
         </div>
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs opacity-60 text-center font-inter text-blue-200/70">
-          Powered by <span className="font-bold text-transparent bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text">Invoicer</span>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs opacity-70 text-center font-inter text-blue-200/80 mt-5">
+          Powered by<span className="font-bold text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text ml-1">Invoicer</span>
         </div>
       </Card>
     </div>
