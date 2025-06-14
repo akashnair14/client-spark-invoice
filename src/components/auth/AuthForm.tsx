@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LogIn, UserPlus, Eye, EyeOff, Circle, Mail, Lock } from "lucide-react";
 import SocialButton from "./SocialButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // A modern, clean, animated, accessible login/register form
 const AuthForm: React.FC = () => {
@@ -20,13 +27,12 @@ const AuthForm: React.FC = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null); // NEW
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
 
   // visually reset errors on tab switch
   const handleTabSwitch = (target: "login" | "register") => {
     setTab(target);
     setError(null);
-    setInfo(null);
     setEmail("");
     setPassword("");
     setConfirm("");
@@ -36,7 +42,6 @@ const AuthForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setInfo(null);
 
     if (tab === "register" && password !== confirm) {
       setError("Passwords do not match");
@@ -45,7 +50,7 @@ const AuthForm: React.FC = () => {
     try {
       if (tab === "register") {
         await signup(email, password);
-        setInfo("Confirm your email, then log in to get started."); // <=== Message
+        setShowConfirmPopup(true); // Show popup dialog
         setTab("login");
         setEmail("");
         setPassword("");
@@ -62,8 +67,15 @@ const AuthForm: React.FC = () => {
 
   // Social login (Google example only)
   const handleGoogleLogin = async () => {
+    // Import Supabase directly and signInWithOAuth (no await)
     const { supabase } = await import("@/integrations/supabase/client");
-    await supabase.auth.signInWithOAuth({ provider: "google" });
+    // Open Google sign in in a new popup (default Supabase flow)
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/",
+      },
+    });
   };
 
   // Already logged in? Show summary + sign-out
@@ -95,13 +107,34 @@ const AuthForm: React.FC = () => {
   // Main auth card UI
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-2 py-10">
+      {/* -- Modal for confirm email step -- */}
+      <Dialog open={showConfirmPopup} onOpenChange={(open) => setShowConfirmPopup(open)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-lg text-blue-800 dark:text-blue-200 font-semibold text-center">Confirm your email</DialogTitle>
+          </DialogHeader>
+          <div className="py-2 text-center text-blue-900 dark:text-blue-100">
+            We've sent a confirmation email.<br />
+            <span className="font-semibold">Please confirm your email and then log in to get started.</span>
+          </div>
+          <DialogFooter>
+            <Button
+              className="w-full mt-3"
+              onClick={() => setShowConfirmPopup(false)}
+              autoFocus
+            >
+              Ok
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* --- Branded App Logo/Name --- */}
       <div className="mb-8 flex flex-col items-center">
         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-700 to-cyan-400 flex items-center justify-center shadow-lg mb-2 animate-[fade-in_0.6s]">
           <LogIn className="text-white w-8 h-8" />
         </div>
         <span className="font-bold text-[2rem] text-white tracking-wide drop-shadow-lg mb-1 animate-fade-in">Welcome Back</span>
-        <span className="text-blue-100 text-md opacity-70">Log in to your account</span>
+        <span className="text-blue-100 text-md opacity-70">{tab === "login" ? "Log in to your account" : "Create your account"}</span>
       </div>
       {/* Main Login/Register Card */}
       <Card className="w-full max-w-sm mx-auto p-8 bg-white/10 shadow-xl border-none backdrop-blur-2xl rounded-2xl mb-4 animate-fade-in transition-all duration-500">
@@ -116,6 +149,7 @@ const AuthForm: React.FC = () => {
             aria-selected={tab === "login"}
             tabIndex={tab === "login" ? -1 : 0}
             type="button"
+            disabled={loading}
           >
             Login
           </button>
@@ -128,16 +162,13 @@ const AuthForm: React.FC = () => {
             aria-selected={tab === "register"}
             tabIndex={tab === "register" ? -1 : 0}
             type="button"
+            disabled={loading}
           >
             Register
           </button>
         </div>
         {/* --- LOGIN FORM --- */}
         <div className="relative h-[265px] sm:h-[260px] transition-all duration-700">
-          {/* INFO MESSAGE if present */}
-          {info && tab === "login" && (
-            <div className="w-full bg-blue-100/20 text-blue-200 text-center rounded p-2 mb-4 font-medium shadow-sm animate-fade-in">{info}</div>
-          )}
           <form
             onSubmit={handleSubmit}
             autoComplete="on"
@@ -314,4 +345,3 @@ const AuthForm: React.FC = () => {
 };
 
 export default AuthForm;
-
