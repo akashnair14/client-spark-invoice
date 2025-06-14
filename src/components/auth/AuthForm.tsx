@@ -31,6 +31,10 @@ const AuthForm: React.FC = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
+  // New: Store registration credentials temporarily for dialog use
+  const [lastRegisteredEmail, setLastRegisteredEmail] = useState<string>("");
+  const [lastRegisteredPassword, setLastRegisteredPassword] = useState<string>("");
+
   // visually reset errors on tab switch
   const handleTabSwitch = (target: "login" | "register") => {
     setTab(target);
@@ -38,33 +42,6 @@ const AuthForm: React.FC = () => {
     setEmail("");
     setPassword("");
     setConfirm("");
-  };
-
-  // Email/password auth
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (tab === "register" && password !== confirm) {
-      setError("Passwords do not match");
-      return;
-    }
-    try {
-      if (tab === "register") {
-        await signup(email, password);
-        setShowConfirmPopup(true); // Show popup dialog
-        setTab("login");
-        setEmail("");
-        setPassword("");
-        setConfirm("");
-        return;
-      } else {
-        await login(email, password);
-        navigate("/");
-      }
-    } catch (err: any) {
-      setError(err.message || "Authentication error");
-    }
   };
 
   // Social login (Google example only)
@@ -80,13 +57,71 @@ const AuthForm: React.FC = () => {
     });
   };
 
-  // New: Resend confirmation email handler
+  // Email/password auth + confirmation state
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (tab === "register" && password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    try {
+      if (tab === "register") {
+        await signup(email, password);
+        // Store for potential later resends!
+        setLastRegisteredEmail(email);
+        setLastRegisteredPassword(password);
+        setShowConfirmPopup(true); // Show popup dialog
+        setTab("login");
+        setEmail("");
+        setPassword("");
+        setConfirm("");
+        return;
+      } else {
+        await login(email, password);
+        navigate("/");
+      }
+    } catch (err: any) {
+      // Show popup on "Email not confirmed" error
+      if (
+        err &&
+        typeof err.message === "string" &&
+        err.message.toLowerCase().includes("email not confirmed")
+      ) {
+        // Allow user to trigger resend from login page too
+        if (email && password) {
+          setLastRegisteredEmail(email);
+          setLastRegisteredPassword(password);
+        }
+        setShowConfirmPopup(true);
+        setError(null);
+      } else {
+        setError(err.message || "Authentication error");
+      }
+    }
+  };
+
+  // Resend confirmation email handler
   const handleResendConfirmation = async () => {
     setResendLoading(true);
     setError(null);
+    // Use registration credentials if available, otherwise fallback to login form values
+    const targetEmail = lastRegisteredEmail || email;
+    const targetPassword = lastRegisteredPassword || password;
+
+    if (!targetEmail || !targetPassword) {
+      toast({
+        title: "Missing information",
+        description: "Please register again to resend confirmation email.",
+        variant: "destructive"
+      });
+      setResendLoading(false);
+      return;
+    }
+
     try {
-      // Call signup with the current email/password
-      await signup(email, password);
+      await signup(targetEmail, targetPassword);
       toast({
         title: "Confirmation email resent",
         description: "Please check your inbox (and spam).",
@@ -132,10 +167,12 @@ const AuthForm: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-2 py-10">
       {/* -- Modal for confirm email step -- */}
-      <Dialog open={showConfirmPopup} onOpenChange={(open) => setShowConfirmPopup(open)}>
+      <Dialog open={showConfirmPopup} onOpenChange={setShowConfirmPopup}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-lg text-blue-800 dark:text-blue-200 font-semibold text-center">Confirm your email</DialogTitle>
+            <DialogTitle className="text-lg text-blue-800 dark:text-blue-200 font-semibold text-center">
+              Confirm your email
+            </DialogTitle>
           </DialogHeader>
           <div className="py-2 text-center text-blue-900 dark:text-blue-100">
             We've sent a confirmation email.<br />
@@ -147,7 +184,7 @@ const AuthForm: React.FC = () => {
               variant="secondary"
               className="w-full mb-2"
               onClick={handleResendConfirmation}
-              disabled={resendLoading}
+              disabled={resendLoading || !(lastRegisteredEmail || email)}
               type="button"
             >
               {resendLoading ? (
@@ -157,12 +194,7 @@ const AuthForm: React.FC = () => {
             </Button>
             <Button
               className="w-full"
-              onClick={() => {
-                setShowConfirmPopup(false);
-                setTab("login");
-                setPassword("");
-                setConfirm("");
-              }}
+              onClick={() => setShowConfirmPopup(false)}
               autoFocus
             >
               Ok
@@ -267,13 +299,20 @@ const AuthForm: React.FC = () => {
             >
               <LogIn className="w-5 h-5 animate-fade-in" /> Log In
             </Button>
-            <div className="flex justify-end text-blue-300/80 text-xs mt-2 animate-fade-in">
+            <div className="flex justify-between items-center mt-2 animate-fade-in">
               <button
                 type="button"
-                className="underline underline-offset-4 hover:text-blue-200 hover:font-medium transition"
+                className="underline underline-offset-4 hover:text-blue-200 hover:font-medium transition text-blue-300/80 text-xs"
                 onClick={() => window.alert("Password reset flow not implemented (ask for support!)")}
               >
                 Forgot password?
+              </button>
+              <button
+                type="button"
+                className="underline underline-offset-4 hover:text-blue-200 transition text-blue-400 text-xs ml-2"
+                onClick={() => setShowConfirmPopup(true)}
+              >
+                Didn&apos;t get the email? Resend
               </button>
             </div>
           </form>
