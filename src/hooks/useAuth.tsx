@@ -28,7 +28,8 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
-    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+    // Supabase v2 returns { data: { subscription } }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -45,7 +46,7 @@ export function useAuth() {
     }).finally(() => setLoading(false));
 
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [fetchRole]);
 
@@ -53,7 +54,10 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    await fetchRole(supabase.auth.getUser()?.data?.user?.id);
+    // After login, fetch user, then grab role
+    const { data } = await supabase.auth.getUser();
+    const uid = data?.user?.id;
+    await fetchRole(uid);
   };
 
   // Logout
@@ -72,7 +76,7 @@ export function useAuth() {
       options: { emailRedirectTo: `${window.location.origin}/` }
     });
     if (error) throw error;
-    // After signup, store role (ignore for now: needs extra role assignment UI)
+    // After signup, role assignment would require admin/manual step
     return data;
   };
 

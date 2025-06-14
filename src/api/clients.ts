@@ -21,18 +21,19 @@ export async function getClient(id: string) {
   return data;
 }
 
-export async function createClient(client: Partial<Database["public"]["Tables"]["clients"]["Insert"]>) {
+export async function createClient(client: Database["public"]["Tables"]["clients"]["Insert"]) {
   // Simple validation example
   if (!client.company_name) throw new Error("Company name required");
   if (!client.owner_id) throw new Error("Missing owner_id");
-  const { data, error } = await supabase.from(table).insert([client]).select().maybeSingle();
+  // Supabase v2: For single insert, do not wrap in array
+  const { data, error } = await supabase.from(table).insert(client).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function updateClient(id: string, updates: Partial<Database["public"]["Tables"]["clients"]["Update"]>) {
   if (!id) throw new Error("Missing client ID");
-  const { data, error } = await supabase.from(table).update(updates).eq("id", id).select().maybeSingle();
+  const { data, error } = await supabase.from(table).update(updates).eq("id", id).select().single();
   if (error) throw error;
   return data;
 }
