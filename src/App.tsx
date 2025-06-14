@@ -13,6 +13,7 @@ import ClientDetails from "./pages/ClientDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
 import AuthPage from "./pages/Auth";
 import { useAuth } from "@/hooks/useAuth";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/invoices/new" element={<NewInvoice />} />
           <Route path="/invoices/:id" element={<InvoiceDetails />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
