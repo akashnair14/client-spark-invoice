@@ -47,6 +47,28 @@ const ClientDetails = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
   const [selectedYear, setSelectedYear] = useState<string>("All");
 
+  // Filter invoices by selected month/year
+  const filteredInvoices = useMemo(() => {
+    return clientInvoices.filter(invoice => {
+      let match = true;
+      if (selectedMonth !== "All") {
+        const monthIdx = [
+          "January","February","March","April","May","June","July",
+          "August","September","October","November","December"
+        ].indexOf(selectedMonth);
+        if (monthIdx >= 0) {
+          const invDate = new Date(invoice.date);
+          match = match && invDate.getMonth() === monthIdx;
+        }
+      }
+      if (selectedYear !== "All") {
+        const invDate = new Date(invoice.date);
+        match = match && invDate.getFullYear() === parseInt(selectedYear);
+      }
+      return match;
+    });
+  }, [clientInvoices, selectedMonth, selectedYear]);
+
   // Pagination for filteredInvoices (page size 5)
   const PAGE_SIZE = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,28 +109,6 @@ const ClientDetails = () => {
       setCurrentYearInvoices(fyInvoices);
     }
   }, [id]);
-
-  // Filter invoices by selected month/year
-  const filteredInvoices = useMemo(() => {
-    return clientInvoices.filter(invoice => {
-      let match = true;
-      if (selectedMonth !== "All") {
-        const monthIdx = [
-          "January","February","March","April","May","June","July",
-          "August","September","October","November","December"
-        ].indexOf(selectedMonth);
-        if (monthIdx >= 0) {
-          const invDate = new Date(invoice.date);
-          match = match && invDate.getMonth() === monthIdx;
-        }
-      }
-      if (selectedYear !== "All") {
-        const invDate = new Date(invoice.date);
-        match = match && invDate.getFullYear() === parseInt(selectedYear);
-      }
-      return match;
-    });
-  }, [clientInvoices, selectedMonth, selectedYear]);
 
   const resetFilters = () => {
     setSelectedMonth("All");

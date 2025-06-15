@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -178,7 +177,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
                   <CardContent>
                     <EnhancedInvoiceDetails
                       clients={clients}
-                      onClientSelect={setSelectedClient}
+                      initialClientId={initialClientId}
                     />
                   </CardContent>
                 </CollapsibleContent>
