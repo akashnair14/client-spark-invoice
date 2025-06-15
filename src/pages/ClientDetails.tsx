@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Client } from "@/types";
-import { mockInvoices } from "@/data/mockData";
 import ClientForm from "@/components/clients/ClientForm";
 import { useToast } from "@/components/ui/use-toast";
 import ClientInfoCard from "@/components/clients/ClientInfoCard";
@@ -16,7 +15,7 @@ const ClientDetails = () => {
 
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [clientInvoices, setClientInvoices] = useState<any[]>([]);
+  const [clientInvoices, setClientInvoices] = useState<any[]>([]); // Empty for now, TODO: fetch from backend
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
@@ -58,19 +57,15 @@ const ClientDetails = () => {
         });
         setLoading(false);
 
-        const invoices = mockInvoices.filter(invoice => invoice.clientId === data.id);
-        setClientInvoices(invoices);
+        // INVOICE DATA REMOVED
+        setClientInvoices([]); // TODO: Replace with backend fetch
 
         // Compute current FY
         const today = new Date();
         const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
         const startDate = new Date(`${currentYear}-04-01`);
         const endDate = new Date(`${currentYear + 1}-03-31`);
-        const fyInvoices = invoices.filter(invoice => {
-          const invoiceDate = new Date(invoice.date);
-          return invoiceDate >= startDate && invoiceDate <= endDate;
-        });
-        setCurrentYearInvoices(fyInvoices);
+        setCurrentYearInvoices([]);
       })
       .catch((err) => {
         console.error("Error loading client:", err);

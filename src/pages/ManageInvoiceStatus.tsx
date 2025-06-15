@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -8,57 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import InvoiceStatusUpdateRow from "@/components/invoices/InvoiceStatusUpdateRow";
 import { Invoice, Client } from "@/types";
-import { mockClients } from "@/data/mockData";
 import { format } from "date-fns";
 
-// MOCK DATA: Replace with actual query in production
-const mockInvoices: Invoice[] = [
-  {
-    id: "1",
-    clientId: "1",
-    date: "2024-01-15",
-    dueDate: "2024-02-14",
-    invoiceNumber: "INV-2024-001",
-    items: [],
-    subtotal: 50000,
-    gstAmount: 9000,
-    total: 59000,
-    status: "paid",
-    notes: "Thank you for your business!",
-    gstType: "regular",
-    lastStatusUpdate: "2024-01-20",
-  },
-  {
-    id: "2",
-    clientId: "2",
-    date: "2024-01-20",
-    dueDate: "2024-02-19",
-    invoiceNumber: "INV-2024-002",
-    items: [],
-    subtotal: 75000,
-    gstAmount: 13500,
-    total: 88500,
-    status: "pending",
-    notes: "",
-    gstType: "igst",
-    lastStatusUpdate: "2024-01-20",
-  },
-  {
-    id: "3",
-    clientId: "3",
-    date: "2023-12-10",
-    dueDate: "2024-01-09",
-    invoiceNumber: "INV-2023-025",
-    items: [],
-    subtotal: 30000,
-    gstAmount: 5400,
-    total: 35400,
-    status: "overdue",
-    notes: "First invoice for new client",
-    gstType: "regular",
-    lastStatusUpdate: "2023-12-10",
-  },
-];
+// All invoice/client data is now placeholder, as backend must be integrated
+
+const mockInvoices: any[] = []; // TODO: fetch from backend
+const clients: Record<string, any> = {}; // TODO: fetch from backend
 
 const statusOrder = ["draft", "sent", "pending", "overdue", "paid"];
 
@@ -78,12 +32,6 @@ const ManageInvoiceStatusPage: React.FC = () => {
 
   // We use mock data here for demo
   const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
-  const clients = useMemo(() => {
-    return mockClients.reduce((acc, client) => {
-      acc[client.id] = client;
-      return acc;
-    }, {} as Record<string, Client>);
-  }, []);
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();

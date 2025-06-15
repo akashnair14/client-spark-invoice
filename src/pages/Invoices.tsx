@@ -29,66 +29,18 @@ import {
 import { Plus, MoreHorizontal, Eye, Pencil, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Invoice, Client } from "@/types";
-import { mockClients } from "@/data/mockData";
 import { format, parseISO } from "date-fns";
 import InvoiceFilters from "@/components/invoices/InvoiceFilters";
 import InvoiceBulkActions from "@/components/invoices/InvoiceBulkActions";
 import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
 
-// Mock invoice data
-const mockInvoices: Invoice[] = [
-  {
-    id: "1",
-    clientId: "1",
-    date: "2024-01-15",
-    dueDate: "2024-02-14",
-    invoiceNumber: "INV-2024-001",
-    items: [],
-    subtotal: 50000,
-    gstAmount: 9000,
-    total: 59000,
-    status: "paid",
-    notes: "Thank you for your business!",
-    gstType: "regular",
-    lastStatusUpdate: "2024-01-20",
-  },
-  {
-    id: "2",
-    clientId: "2",
-    date: "2024-01-20",
-    dueDate: "2024-02-19",
-    invoiceNumber: "INV-2024-002",
-    items: [],
-    subtotal: 75000,
-    gstAmount: 13500,
-    total: 88500,
-    status: "pending",
-    notes: "",
-    gstType: "igst",
-    lastStatusUpdate: "2024-01-20",
-  },
-  {
-    id: "3",
-    clientId: "3",
-    date: "2023-12-10",
-    dueDate: "2024-01-09",
-    invoiceNumber: "INV-2023-025",
-    items: [],
-    subtotal: 30000,
-    gstAmount: 5400,
-    total: 35400,
-    status: "overdue",
-    notes: "First invoice for new client",
-    gstType: "regular",
-    lastStatusUpdate: "2023-12-10",
-  },
-];
+// For demo purposes, make clients/invoices empty arrays and add TODOs for backend fetch
 
 const Invoices = () => {
   const { toast } = useToast();
-  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(mockInvoices);
+  const [invoices, setInvoices] = useState<any[]>([]); // TODO: Fetch from backend
+  const [filteredInvoices, setFilteredInvoices] = useState<any[]>([]);
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quickViewInvoice, setQuickViewInvoice] = useState<Invoice | undefined>(undefined);
@@ -101,12 +53,7 @@ const Invoices = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentInvoices = filteredInvoices.slice(startIndex, endIndex);
 
-  const clients = useMemo(() => {
-    return mockClients.reduce((acc, client) => {
-      acc[client.id] = client;
-      return acc;
-    }, {} as Record<string, Client>);
-  }, []);
+  const clients: Record<string, Client> = {}; // TODO: Fetch from backend
 
   const getClientName = (clientId: string) => {
     return clients[clientId]?.companyName || "Unknown Client";
@@ -472,5 +419,4 @@ const Invoices = () => {
     </Layout>
   );
 };
-
 export default Invoices;

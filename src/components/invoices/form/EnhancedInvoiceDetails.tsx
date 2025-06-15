@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { Client } from "@/types";
@@ -27,19 +26,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { mockInvoices } from "@/data/mockData";
 
 /**
  * Calculate the next incremental invoice number (1, 2, 3, ...) based on
  * all existing invoices.
+ * TODO: Move to backend/edge function when invoices are stored there.
  */
 const getNextInvoiceNumber = () => {
-  const numbers = mockInvoices
-    .map(inv => Number(inv.invoiceNumber))
-    .filter(n => !isNaN(n));
-  return numbers.length === 0
-    ? "1"
-    : String(Math.max(...numbers) + 1);
+  // Placeholder returns "1" always, as we can't access all existing invoices
+  // Could also make this a prop if invoices are loaded in the parent
+  return "1";
 };
 
 interface EnhancedInvoiceDetailsProps {
@@ -146,4 +142,3 @@ const EnhancedInvoiceDetails = ({ clients, initialClientId }: EnhancedInvoiceDet
 };
 
 export default EnhancedInvoiceDetails;
-

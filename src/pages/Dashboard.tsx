@@ -1,42 +1,16 @@
-
 import React, { useMemo, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import RecentClients from "@/components/dashboard/RecentClients";
 import RecentInvoices from "@/components/dashboard/RecentInvoices";
-import { mockClients } from "@/data/mockData";
 
-// We'll demo with mockClients and derive mockInvoices for now.
-const mockInvoices = [
-  {
-    id: "inv-1",
-    clientId: "client1",
-    clientName: "Acme Corp",
-    amount: 24000,
-    date: "2024-06-10",
-    status: "paid"
-  },
-  {
-    id: "inv-2",
-    clientId: "client2",
-    clientName: "Globex Ltd",
-    amount: 12000,
-    date: "2024-06-08",
-    status: "pending"
-  },
-  {
-    id: "inv-3",
-    clientId: "client3",
-    clientName: "Initech",
-    amount: 8000,
-    date: "2024-05-29",
-    status: "overdue"
-  }
-];
+// Move to backend later, for now use empty arrays/placeholders
+const mockInvoices: any[] = [];
+const clients: any[] = []; // TODO: Fetch from backend
 
 // Top clients by total invoice amount
-const getTopClients = (clients, invoices, n = 3) => {
+const getTopClients = (clients: any[], invoices: any[], n = 3) => {
   const totals: Record<string, { name: string, sum: number }> = {};
   invoices.forEach(inv => {
     if (!totals[inv.clientId]) totals[inv.clientId] = {
@@ -62,17 +36,17 @@ const mockActivity = [
 const Dashboard: React.FC = () => {
   const [search, setSearch] = useState("");
   const clients = useMemo(() => {
-    if (!search.trim()) return mockClients;
-    return mockClients.filter(
-      c =>
+    if (!search.trim()) return clients;
+    return clients.filter(
+      (c: any) =>
         c.companyName.toLowerCase().includes(search.toLowerCase()) ||
         c.email.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search]);
+  }, [search, clients]);
   const invoices = useMemo(() => {
     if (!search.trim()) return mockInvoices;
     return mockInvoices.filter(
-      i =>
+      (i: any) =>
         i.clientName.toLowerCase().includes(search.toLowerCase()) ||
         i.id.toString().toLowerCase().includes(search.toLowerCase())
     );

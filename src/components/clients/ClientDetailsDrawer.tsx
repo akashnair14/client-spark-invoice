@@ -1,7 +1,5 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Client } from "@/types";
-import { mockInvoices } from "@/data/mockData";
 import {
   Drawer,
   DrawerContent,
@@ -25,11 +23,12 @@ interface ClientDetailsDrawerProps {
 const ClientDetailsDrawer = ({ client, open, onClose }: ClientDetailsDrawerProps) => {
   if (!client) return null;
 
-  // Calculate client statistics
-  const clientInvoices = mockInvoices.filter(invoice => invoice.clientId === client.id);
-  const totalAmount = clientInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
-  const pendingInvoices = clientInvoices.filter(invoice => invoice.status === 'pending' || invoice.status === 'overdue');
-  const lastInvoice = clientInvoices.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  // Remove invoice-specific stats, or add a TODO
+  // For now, set all stats to placeholders until backend is ready
+  const clientInvoices: any[] = []; // TODO: Fetch invoices from backend
+  const totalAmount = 0;
+  const pendingInvoices: any[] = [];
+  const lastInvoice = undefined;
 
   const getStatusColor = (status?: string) => {
     switch (status) {

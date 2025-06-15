@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { mockInvoices, mockClients } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { 
   ArrowLeft, 
@@ -29,46 +27,15 @@ const InvoiceDetails = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [invoice, setInvoice] = useState<any>(null);
-  const [client, setClient] = useState<Client | undefined>(undefined);
-  
+  const [client, setClient] = useState<any>(undefined);
+
   useEffect(() => {
     if (!id) return;
-    
-    const foundInvoice = mockInvoices.find(invoice => invoice.id === id);
-    if (foundInvoice) {
-      // Ensure we're handling dates properly
-      let invoiceDate;
-      let dueDateObj;
-      
-      try {
-        // Try to parse the date string
-        invoiceDate = foundInvoice.date ? parseISO(foundInvoice.date) : new Date();
-      } catch (error) {
-        console.error("Error parsing invoice date:", error);
-        invoiceDate = new Date(); // Fallback to current date
-      }
-      
-      try {
-        // Try to parse the due date string
-        dueDateObj = foundInvoice.dueDate ? parseISO(foundInvoice.dueDate) : new Date();
-      } catch (error) {
-        console.error("Error parsing due date:", error);
-        dueDateObj = new Date(); // Fallback to current date
-      }
-      
-      setInvoice({
-        ...foundInvoice,
-        date: invoiceDate,
-        dueDate: dueDateObj,
-      });
-      
-      const foundClient = mockClients.find(client => client.id === foundInvoice.clientId);
-      if (foundClient) {
-        setClient(foundClient);
-      }
-    }
+    // TODO: Fetch invoice and client from backend here!
+    setInvoice(null);
+    setClient(undefined);
   }, [id]);
-  
+
   const updateInvoiceStatus = (status: Invoice['status']) => {
     if (!invoice || !id) return;
     

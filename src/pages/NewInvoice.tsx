@@ -170,7 +170,6 @@ const NewInvoice = () => {
             clients={clients}
             onSubmit={handleInvoiceSubmit}
             initialClientId={selectedClient?.id}
-            loading={clientsLoading}
           />
         </TabsContent>
 
