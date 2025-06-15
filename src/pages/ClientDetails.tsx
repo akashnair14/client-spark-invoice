@@ -273,22 +273,24 @@ const ClientDetails = () => {
                 variant="outline"
                 onClick={() => downloadInvoicesAsCSV(filteredInvoices)}
                 size="sm"
-                className="gap-1"
+                className="gap-1 bg-blue-50 border border-blue-400 dark:bg-blue-900 dark:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-900 dark:text-blue-200"
                 title="Export to Excel"
-                style={{ background: "#dbf4ff", border: "1.5px solid #0667a6" }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 Excel
               </Button>
               <Button
                 variant="outline"
                 onClick={() => downloadInvoicesAsPDF(filteredInvoices)}
                 size="sm"
-                className="gap-1"
+                className="gap-1 bg-orange-50 border border-orange-400 dark:bg-orange-900 dark:border-orange-500 hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-900 dark:text-orange-200"
                 title="Export to PDF"
-                style={{ background: "#fbeee6", border: "1.5px solid #c2410c" }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 PDF
               </Button>
             </div>
