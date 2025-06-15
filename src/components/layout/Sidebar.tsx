@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { CircleUserRound, Menu, CircleCheck, LayoutDashboard } from "lucide-react";
+import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText } from "lucide-react";
 
 interface SidebarProps {
   open: boolean;
@@ -25,11 +26,10 @@ const sidebarItems = [
     url: "/dashboard",
     icon: LayoutDashboard,
   },
-  // add manage invoice status link
   {
     title: "Manage Invoice Status",
     url: "/manage-invoice-status",
-    icon: CircleCheck, // Just as an example, set an icon from lucide-react or as used elsewhere
+    icon: CircleCheck,
   },
   {
     title: "Clients",
@@ -39,62 +39,71 @@ const sidebarItems = [
   {
     title: "Invoices",
     url: "/invoices",
-    icon: "FileText",
+    icon: FileText,
   },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth(); // Fix: use logout
   const navigate = useNavigate();
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden flex items-center justify-center p-2"
+          aria-label="Open sidebar"
+        >
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0 pt-6">
-        <div className="px-4 py-2">
+      <SheetContent side="left" className="w-64 max-w-[90vw] p-0 pt-6 flex flex-col">
+        <div className="px-4 py-2 mb-2">
           <h1 className="font-bold text-lg">Invoicer</h1>
-          <p className="text-muted-foreground text-xs">
-            {user?.email || "No User"}
-          </p>
+          <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
         </div>
         <Separator />
-        <NavigationMenu>
-          <NavigationMenuList className="flex flex-col gap-1 p-2">
-            {sidebarItems.map((item) => (
-              <NavigationMenuItem key={item.title}>
-                <NavLink
-                  to={item.url}
-                  className={({ isActive }) =>
-                    cn(
-                      "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-[active]:bg-muted data-[active]:text-muted-foreground",
-                      isActive ? "active" : ""
-                    )
-                  }
-                >
-                  {typeof item.icon === 'string' ? (
-                    <i className={`lucide lucide-${item.icon} h-4 w-4`}></i>
-                  ) : (
-                    <item.icon className="h-4 w-4" />
-                  )}
-                  {item.title}
-                </NavLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-        <Separator />
+        <nav className="flex-1 overflow-y-auto">
+          <NavigationMenu>
+            <NavigationMenuList className="flex flex-col gap-1 p-2">
+              {sidebarItems.map((item) => (
+                <NavigationMenuItem key={item.title}>
+                  <NavLink
+                    to={item.url}
+                    className={({ isActive }) =>
+                      cn(
+                        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        isActive
+                          ? "bg-muted text-primary"
+                          : "text-muted-foreground"
+                      )
+                    }
+                  >
+                    {typeof item.icon === "string" ? (
+                      <i className={`lucide lucide-${item.icon} h-4 w-4`}></i>
+                    ) : (
+                      <item.icon className="h-5 w-5 min-w-5" />
+                    )}
+                    <span className="truncate">{item.title}</span>
+                  </NavLink>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+        <Separator className="mt-2" />
         <div className="p-4">
           <Button
             variant="outline"
-            className="w-full justify-start"
-            onClick={() => {
-              signOut();
+            className="w-full justify-center"
+            onClick={async () => {
+              await logout();
               navigate("/auth");
             }}
+            aria-label="Sign out"
           >
             Sign Out
           </Button>
@@ -105,3 +114,4 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 };
 
 export default Sidebar;
+
