@@ -47,6 +47,20 @@ const ClientDetails = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
   const [selectedYear, setSelectedYear] = useState<string>("All");
 
+  // Pagination for filteredInvoices (page size 5)
+  const PAGE_SIZE = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredInvoices.length / PAGE_SIZE);
+  const paginatedInvoices = filteredInvoices.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    // Reset to first page if filters change and currentPage is now out of bounds
+    setCurrentPage(1);
+  }, [selectedMonth, selectedYear, clientInvoices]);
+
   // In a real app, this would be replaced with API calls
   useEffect(() => {
     if (!id) return;
@@ -343,7 +357,7 @@ const ClientDetails = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredInvoices.map(invoice => (
+                {paginatedInvoices.map(invoice => (
                   <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-md">
                     <div>
                       <p className="font-medium">{invoice.invoiceNumber}</p>
@@ -363,6 +377,28 @@ const ClientDetails = () => {
                     </div>
                   </div>
                 ))}
+                {/* Pagination controls: show only if there are more than PAGE_SIZE records */}
+                {filteredInvoices.length > PAGE_SIZE && (
+                  <div className="flex items-center justify-between mt-2">
+                    <button
+                      className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-accent disabled:opacity-50"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-accent disabled:opacity-50"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
