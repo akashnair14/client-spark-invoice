@@ -47,7 +47,7 @@ const AppSidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { state } = useSidebar();
+  const { state, isMobile } = useSidebar();
 
   const isActive = (url: string) => location.pathname === url;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -59,7 +59,7 @@ const AppSidebar: React.FC = () => {
     <Sidebar
       className={cn(
         state === "collapsed" ? "w-14" : "w-60",
-        "h-screen"
+        "h-full md:h-screen flex-shrink-0 transition-all duration-200"
       )}
       collapsible="icon"
     >
@@ -67,12 +67,28 @@ const AppSidebar: React.FC = () => {
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>
         <SidebarGroup>
-          <div className="px-4 py-4">
-            <h1 className="font-bold text-lg">Invoicer</h1>
-            <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
+          {/* Brand/header */}
+          <div className={cn(
+            "px-4 py-4 whitespace-nowrap",
+            state === "collapsed" ? "px-0 text-center" : ""
+          )}>
+            <h1 className={cn(
+              "font-bold text-lg transition-all duration-200",
+              state === "collapsed" ? "text-base" : ""
+            )}>
+              {state === "collapsed" ? "I" : "Invoicer"}
+            </h1>
+            {state !== "collapsed" && (
+              <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
+            )}
           </div>
           <SidebarSeparator />
-          <SidebarGroupLabel className="px-4 pt-2 pb-0">Main Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className={cn(
+            "pt-2 pb-0 text-xs",
+            state === "collapsed" ? "opacity-0 h-0" : "px-4"
+          )}>
+            Main Menu
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => (
@@ -88,8 +104,18 @@ const AppSidebar: React.FC = () => {
                         )
                       }
                     >
-                      <item.icon className="h-5 w-5" />
-                      {state !== "collapsed" && <span className="truncate">{item.title}</span>}
+                      <item.icon className="h-5 w-5 mx-auto" />
+                      {/* Show text only if not collapsed */}
+                      <span
+                        className={cn(
+                          "truncate transition-all duration-200",
+                          state === "collapsed"
+                            ? "hidden"
+                            : "inline"
+                        )}
+                      >
+                        {item.title}
+                      </span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -109,7 +135,15 @@ const AppSidebar: React.FC = () => {
           }}
           aria-label="Sign out"
         >
-          Sign Out
+          <span className={cn(
+            state === "collapsed" ? "hidden" : "inline"
+          )}>
+            Sign Out
+          </span>
+          <Menu className={cn(
+            "w-4 h-4",
+            state === "collapsed" ? "inline-block ml-0" : "hidden"
+          )} />
         </Button>
       </SidebarFooter>
     </Sidebar>
@@ -117,4 +151,3 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
-

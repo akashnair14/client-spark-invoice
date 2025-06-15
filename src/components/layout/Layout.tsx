@@ -9,17 +9,21 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  // Only use AppSidebar; never render Sidebar directly!
-  // All sidebar state is managed by AppSidebar and SidebarProvider.
+  // Responsive full height layout, do not restrict min-width
   return (
     <SidebarProvider>
-      <Navbar />
-      <div className="flex min-h-screen w-full">
-        <AppSidebar />
-        <main className="flex-1 container py-8">{children}</main>
+      <div className="flex flex-col min-h-screen w-full">
+        <Navbar />
+        <div className="flex flex-1 min-h-0 w-full">
+          <AppSidebar />
+          <main className="flex-1 min-w-0 p-4 md:p-8 overflow-x-auto">
+            {children}
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );
 };
 
 export default Layout;
+
