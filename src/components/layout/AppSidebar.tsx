@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
@@ -42,12 +43,14 @@ const sidebarItems = [
   },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { user, logout } = useAuth(); // Fix: use logout
+// Renamed component below: was Sidebar, now AppSidebar
+const AppSidebar: React.FC = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Sheet/sidebar internal state is managed by SidebarProvider; props are not needed.
   return (
-    <Sheet open={open} onOpenChange={onClose}>
+    <Sheet>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -112,4 +115,4 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   );
 };
 
-export default Sidebar;
+export default AppSidebar;
