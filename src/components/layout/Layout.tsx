@@ -9,6 +9,7 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  // There should be no direct Sidebar component used here.
   return (
     <SidebarProvider>
       {/* Header with a sidebar trigger */}
