@@ -1,24 +1,24 @@
 
 import React from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate, NavLink } from "react-router-dom";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarTrigger,
+  SidebarFooter,
+  SidebarSeparator,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText } from "lucide-react";
-
-interface SidebarProps {
-  open: boolean;
-  onClose: () => void;
-}
 
 const sidebarItems = [
   {
@@ -43,75 +43,70 @@ const sidebarItems = [
   },
 ];
 
-// Renamed component below: was Sidebar, now AppSidebar
 const AppSidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { collapsed } = useSidebar();
+  // Helpers for nav styles
+  const isActive = (url: string) => location.pathname === url;
+  const getNavCls = ({ isActive }: { isActive: boolean }) =>
+    isActive
+      ? "bg-muted text-primary font-medium"
+      : "hover:bg-accent hover:text-accent-foreground";
 
-  // Sheet/sidebar internal state is managed by SidebarProvider; props are not needed.
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden flex items-center justify-center p-2"
-          aria-label="Open sidebar"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-64 max-w-[90vw] p-0 pt-6 flex flex-col">
-        <div className="px-4 py-2 mb-2">
-          <h1 className="font-bold text-lg">Invoicer</h1>
-          <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
-        </div>
-        <Separator />
-        <nav className="flex-1 overflow-y-auto">
-          <NavigationMenu>
-            <NavigationMenuList className="flex flex-col gap-1 p-2">
+    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
+      {/* always-visible trigger for mini mode + close */}
+      <SidebarTrigger className="m-2 self-end" />
+      <SidebarContent>
+        <SidebarGroup>
+          <div className="px-4 py-4">
+            <h1 className="font-bold text-lg">Invoicer</h1>
+            <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
+          </div>
+          <SidebarSeparator />
+          <SidebarGroupLabel className="px-4 pt-2 pb-0">Main Menu</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {sidebarItems.map((item) => (
-                <NavigationMenuItem key={item.title}>
-                  <NavLink
-                    to={item.url}
-                    className={({ isActive }) =>
-                      cn(
-                        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        isActive
-                          ? "bg-muted text-primary"
-                          : "text-muted-foreground"
-                      )
-                    }
-                  >
-                    {typeof item.icon === "string" ? (
-                      <i className={`lucide lucide-${item.icon} h-4 w-4`}></i>
-                    ) : (
-                      <item.icon className="h-5 w-5 min-w-5" />
-                    )}
-                    <span className="truncate">{item.title}</span>
-                  </NavLink>
-                </NavigationMenuItem>
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm w-full focus:outline-none transition-colors",
+                          getNavCls({ isActive })
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span className="truncate">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </nav>
-        <Separator className="mt-2" />
-        <div className="p-4">
-          <Button
-            variant="outline"
-            className="w-full justify-center"
-            onClick={async () => {
-              await logout();
-              navigate("/auth");
-            }}
-            aria-label="Sign out"
-          >
-            Sign Out
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarSeparator />
+        <Button
+          variant="outline"
+          className="w-full justify-center mt-2"
+          onClick={async () => {
+            await logout();
+            navigate("/auth");
+          }}
+          aria-label="Sign out"
+        >
+          Sign Out
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
   );
 };
 
