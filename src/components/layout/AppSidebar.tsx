@@ -9,7 +9,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarTrigger,
   SidebarFooter,
@@ -47,8 +46,9 @@ const AppSidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { state, isMobile } = useSidebar();
+  const { state } = useSidebar();
 
+  const isCollapsed = state === "collapsed";
   const isActive = (url: string) => location.pathname === url;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -58,37 +58,27 @@ const AppSidebar: React.FC = () => {
   return (
     <Sidebar
       className={cn(
-        state === "collapsed" ? "w-14" : "w-60",
-        "h-full md:h-screen flex-shrink-0 transition-all duration-200"
+        isCollapsed ? "w-14" : "w-56",
+        "h-full md:h-screen flex-shrink-0 border-r border-border bg-background transition-all duration-200 min-h-screen"
       )}
       collapsible="icon"
     >
-      {/* always-visible trigger for mini mode + close */}
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>
         <SidebarGroup>
-          {/* Brand/header */}
+          {/* Minimal brand/header */}
           <div className={cn(
-            "px-4 py-4 whitespace-nowrap",
-            state === "collapsed" ? "px-0 text-center" : ""
+            "py-4 flex items-center justify-center",
+            isCollapsed ? "px-0" : "px-4"
           )}>
             <h1 className={cn(
-              "font-bold text-lg transition-all duration-200",
-              state === "collapsed" ? "text-base" : ""
+              "font-bold text-xl text-primary tracking-tight transition-all duration-200",
+              isCollapsed ? "text-lg" : "text-xl"
             )}>
-              {state === "collapsed" ? "I" : "Invoicer"}
+              {isCollapsed ? "I" : "Invoicer"}
             </h1>
-            {state !== "collapsed" && (
-              <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
-            )}
           </div>
           <SidebarSeparator />
-          <SidebarGroupLabel className={cn(
-            "pt-2 pb-0 text-xs",
-            state === "collapsed" ? "opacity-0 h-0" : "px-4"
-          )}>
-            Main Menu
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => (
@@ -99,23 +89,31 @@ const AppSidebar: React.FC = () => {
                       end
                       className={({ isActive }) =>
                         cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm w-full focus:outline-none transition-colors",
+                          "flex items-center gap-3 p-0.5 py-2 my-1 rounded-md text-[15px] w-full focus:outline-none transition-colors relative group",
                           getNavCls({ isActive })
                         )
                       }
                     >
-                      <item.icon className="h-5 w-5 mx-auto" />
-                      {/* Show text only if not collapsed */}
-                      <span
+                      <div
                         className={cn(
-                          "truncate transition-all duration-200",
-                          state === "collapsed"
-                            ? "hidden"
-                            : "inline"
+                          "flex items-center justify-center w-10 h-10 rounded-lg",
+                          isActive(item.url)
+                            ? "bg-primary/10 text-primary"
+                            : "hover:bg-accent"
                         )}
                       >
-                        {item.title}
-                      </span>
+                        <item.icon className="h-5 w-5" />
+                      </div>
+                      {/* Only show title if not collapsed */}
+                      {!isCollapsed && (
+                        <span className="truncate px-1">{item.title}</span>
+                      )}
+                      {/* Tooltip for collapsed mode */}
+                      {isCollapsed && (
+                        <span className="absolute left-14 whitespace-nowrap bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto ml-1 z-20 transition">
+                          {item.title}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -126,24 +124,30 @@ const AppSidebar: React.FC = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarSeparator />
+        {!isCollapsed && (
+          <div className="px-4 py-3">
+            <div className="text-xs text-muted-foreground break-all mb-1 font-medium">
+              {user?.email || "No User"}
+            </div>
+          </div>
+        )}
         <Button
-          variant="outline"
-          className="w-full justify-center mt-2"
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "w-10 h-10 m-2 flex items-center justify-center",
+            !isCollapsed && "w-full px-3 justify-start h-10"
+          )}
           onClick={async () => {
             await logout();
             navigate("/auth");
           }}
           aria-label="Sign out"
         >
-          <span className={cn(
-            state === "collapsed" ? "hidden" : "inline"
-          )}>
-            Sign Out
-          </span>
-          <Menu className={cn(
-            "w-4 h-4",
-            state === "collapsed" ? "inline-block ml-0" : "hidden"
-          )} />
+          <Menu className="w-5 h-5" />
+          {!isCollapsed && (
+            <span className="ml-2 text-sm">Sign Out</span>
+          )}
         </Button>
       </SidebarFooter>
     </Sidebar>
@@ -151,3 +155,4 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
+
