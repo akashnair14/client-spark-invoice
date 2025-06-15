@@ -1,100 +1,106 @@
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import React from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { X, LayoutDashboard, Users, FileText, PlusCircle } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate, NavLink } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { CircleUserRound, Menu, CircleCheck, LayoutDashboard } from "lucide-react";
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
 }
 
-const Sidebar = ({ open, onClose }: SidebarProps) => {
-  const location = useLocation();
-  const pathname = location.pathname;
+const sidebarItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  // add manage invoice status link
+  {
+    title: "Manage Invoice Status",
+    url: "/manage-invoice-status",
+    icon: CircleCheck, // Just as an example, set an icon from lucide-react or as used elsewhere
+  },
+  {
+    title: "Clients",
+    url: "/clients",
+    icon: CircleUserRound,
+  },
+  {
+    title: "Invoices",
+    url: "/invoices",
+    icon: "FileText",
+  },
+];
 
-  const routes = [
-    {
-      label: "Dashboard",
-      href: "/",
-      icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
-    },
-    {
-      label: "Clients",
-      href: "/clients",
-      icon: <Users className="h-5 w-5 mr-2" />,
-    },
-    {
-      label: "Invoices",
-      href: "/invoices",
-      icon: <FileText className="h-5 w-5 mr-2" />,
-    },
-    {
-      label: "New Invoice",
-      href: "/invoices/new",
-      icon: <PlusCircle className="h-5 w-5 mr-2" />,
-    },
-  ];
-
-  // Force close the sidebar when navigating
-  const handleNavigation = () => {
-    if (open) {
-      onClose();
-    }
-  };
-
-  const SidebarContent = (
-    <div className="space-y-4 py-4 h-full flex flex-col">
-      <div className="px-3 flex-1">
-        <div className="mb-8">
-          <h2 className="px-4 text-lg font-semibold">
-            SparkInvoice
-          </h2>
-        </div>
-        <div className="space-y-1">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              to={route.href}
-              onClick={handleNavigation}
-            >
-              <Button
-                variant={pathname === route.href || pathname.startsWith(route.href + '/') ? "secondary" : "ghost"}
-                className={cn("w-full justify-start", 
-                  pathname === route.href || pathname.startsWith(route.href + '/') ? "bg-accent text-accent-foreground" : ""
-                )}
-              >
-                {route.icon}
-                {route.label}
-              </Button>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
-    <>
-      <aside className="hidden md:flex w-64 border-r bg-sidebar flex-col h-[calc(100vh-4rem)]">
-        {SidebarContent}
-      </aside>
-
-      <Sheet open={open} onOpenChange={onClose}>
-        <SheetContent side="left" className="p-0 w-64">
-          <Button 
-            variant="ghost" 
-            className="absolute right-4 top-4"
-            onClick={onClose}
-            size="icon"
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-64 p-0 pt-6">
+        <div className="px-4 py-2">
+          <h1 className="font-bold text-lg">Invoicer</h1>
+          <p className="text-muted-foreground text-xs">
+            {user?.email || "No User"}
+          </p>
+        </div>
+        <Separator />
+        <NavigationMenu>
+          <NavigationMenuList className="flex flex-col gap-1 p-2">
+            {sidebarItems.map((item) => (
+              <NavigationMenuItem key={item.title}>
+                <NavLink
+                  to={item.url}
+                  className={({ isActive }) =>
+                    cn(
+                      "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-[active]:bg-muted data-[active]:text-muted-foreground",
+                      isActive ? "active" : ""
+                    )
+                  }
+                >
+                  {typeof item.icon === 'string' ? (
+                    <i className={`lucide lucide-${item.icon} h-4 w-4`}></i>
+                  ) : (
+                    <item.icon className="h-4 w-4" />
+                  )}
+                  {item.title}
+                </NavLink>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+        <Separator />
+        <div className="p-4">
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => {
+              signOut();
+              navigate("/auth");
+            }}
           >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Close</span>
+            Sign Out
           </Button>
-          {SidebarContent}
-        </SheetContent>
-      </Sheet>
-    </>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

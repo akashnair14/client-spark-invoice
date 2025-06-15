@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import AuthPage from "./pages/Auth";
 import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import { ThemeProvider } from "next-themes";
+import ManageInvoiceStatusPage from "./pages/ManageInvoiceStatus";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +37,7 @@ const App = () => (
             <Route path="/invoices/new" element={<NewInvoice />} />
             <Route path="/invoices/:id" element={<InvoiceDetails />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/manage-invoice-status" element={<ManageInvoiceStatusPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
