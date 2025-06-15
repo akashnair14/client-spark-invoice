@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -22,6 +23,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+// TODO: Fetch invoice and client data from backend in useEffect.
+
 const InvoiceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -45,13 +48,8 @@ const InvoiceDetails = () => {
       status
     });
     
-    // In a real app, this would send an API request
-    // For now, we're updating the mock data
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
-    if (invoiceIndex !== -1) {
-      mockInvoices[invoiceIndex].status = status;
-    }
-    
+    // In a real app, this would send an API request to update the invoice status on the backend
+
     // Show toast notification
     const statusMessages = {
       paid: "Invoice marked as paid",
@@ -201,41 +199,6 @@ const InvoiceDetails = () => {
       </div>
     </Layout>
   );
-};
-
-// Helper functions that were missing
-const getStatusIcon = (status: Invoice['status']) => {
-  switch (status) {
-    case 'paid':
-      return <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />;
-    case 'pending':
-      return <Clock className="w-4 h-4 mr-2 text-yellow-500" />;
-    case 'sent':
-      return <Send className="w-4 h-4 mr-2 text-blue-500" />;
-    case 'overdue':
-      return <AlertCircle className="w-4 h-4 mr-2 text-red-500" />;
-    default:
-      return <FileWarning className="w-4 h-4 mr-2 text-gray-500" />;
-  }
-};
-
-const getStatusBadgeClass = (status: Invoice['status']) => {
-  switch (status) {
-    case 'paid':
-      return "bg-green-100 text-green-800";
-    case 'pending':
-      return "bg-yellow-100 text-yellow-800";
-    case 'sent':
-      return "bg-blue-100 text-blue-800";
-    case 'overdue':
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const updateInvoiceStatus = (status: Invoice['status']) => {
-  // Implementation would go here - kept the function signature for type safety
 };
 
 export default InvoiceDetails;
