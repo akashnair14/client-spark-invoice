@@ -7,7 +7,7 @@ import RecentInvoices from "@/components/dashboard/RecentInvoices";
 
 // Move to backend later, for now use empty arrays/placeholders
 const mockInvoices: any[] = [];
-const clients: any[] = []; // TODO: Fetch from backend
+const emptyClients: any[] = []; // TODO: Fetch from backend
 
 // Top clients by total invoice amount
 const getTopClients = (clients: any[], invoices: any[], n = 3) => {
@@ -35,24 +35,25 @@ const mockActivity = [
 
 const Dashboard: React.FC = () => {
   const [search, setSearch] = useState("");
-  const clients = useMemo(() => {
-    if (!search.trim()) return clients;
-    return clients.filter(
+  // Use emptyClients as base in initial memo
+  const filteredClients = useMemo(() => {
+    if (!search.trim()) return emptyClients;
+    return emptyClients.filter(
       (c: any) =>
-        c.companyName.toLowerCase().includes(search.toLowerCase()) ||
-        c.email.toLowerCase().includes(search.toLowerCase())
+        c.companyName?.toLowerCase().includes(search.toLowerCase()) ||
+        c.email?.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search, clients]);
-  const invoices = useMemo(() => {
+  }, [search]);
+  const filteredInvoices = useMemo(() => {
     if (!search.trim()) return mockInvoices;
     return mockInvoices.filter(
       (i: any) =>
-        i.clientName.toLowerCase().includes(search.toLowerCase()) ||
-        i.id.toString().toLowerCase().includes(search.toLowerCase())
+        i.clientName?.toLowerCase().includes(search.toLowerCase()) ||
+        i.id?.toString().toLowerCase().includes(search.toLowerCase())
     );
   }, [search]);
 
-  const topClients = useMemo(() => getTopClients(clients, invoices), [clients, invoices]);
+  const topClients = useMemo(() => getTopClients(filteredClients, filteredInvoices), [filteredClients, filteredInvoices]);
 
   return (
     <Layout>
@@ -61,7 +62,7 @@ const Dashboard: React.FC = () => {
           Dashboard
         </h1>
         <p className="text-muted-foreground mb-4">
-          Welcome back! Here’s an overview of your business performance.
+          Welcome back! Here's an overview of your business performance.
         </p>
         {/* Search bar */}
         <div className="mb-6 w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3">
@@ -74,7 +75,7 @@ const Dashboard: React.FC = () => {
           />
           <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
             {search && (
-              <span className="text-xs text-gray-500">Showing results for “{search}”</span>
+              <span className="text-xs text-gray-500">Showing results for "{search}"</span>
             )}
             <button
               onClick={() => setSearch("")}
@@ -87,7 +88,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-          <DashboardStats clients={clients} invoices={invoices} />
+          <DashboardStats clients={filteredClients} invoices={filteredInvoices} />
         </div>
         
         {/* Top clients */}
@@ -107,7 +108,7 @@ const Dashboard: React.FC = () => {
                       {c.name}
                     </div>
                     <span className="font-semibold text-blue-700">
-                      ₹{c.sum.toLocaleString("en-IN")}
+                      ₹{c.sum?.toLocaleString("en-IN")}
                     </span>
                   </li>
                 ))}
@@ -130,11 +131,11 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2 space-y-8">
-            <DashboardCharts clients={clients} invoices={invoices} />
-            <RecentInvoices invoices={invoices} />
+            <DashboardCharts clients={filteredClients} invoices={filteredInvoices} />
+            <RecentInvoices invoices={filteredInvoices} />
           </div>
           <div>
-            <RecentClients clients={clients} />
+            <RecentClients clients={filteredClients} />
           </div>
         </div>
       </div>
