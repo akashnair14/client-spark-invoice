@@ -31,6 +31,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ClientInvoiceFilters from "@/components/invoices/ClientInvoiceFilters";
 import { downloadInvoicesAsCSV, downloadInvoicesAsPDF } from "@/utils/invoiceExportUtils";
 import { Download, FileText as FileTextIcon, FileSpreadsheet } from "lucide-react";
+import { downloadInvoicesAsExcel } from "@/utils/invoiceExportUtils";
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -271,7 +272,21 @@ const ClientDetails = () => {
             <div className="flex flex-wrap gap-2 mt-3">
               <Button
                 variant="outline"
-                onClick={() => downloadInvoicesAsCSV(filteredInvoices)}
+                onClick={() => 
+                  downloadInvoicesAsExcel(
+                    filteredInvoices,
+                    {
+                      companyName: client.companyName,
+                      gstNumber: client.gstNumber,
+                      address: client.address,
+                      city: client.city,
+                      state: client.state,
+                      postalCode: client.postalCode,
+                      email: client.email,
+                      phoneNumber: client.phoneNumber
+                    }
+                  )
+                }
                 size="sm"
                 className="gap-1 bg-blue-50 border border-blue-400 dark:bg-blue-900 dark:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-900 dark:text-blue-200"
                 title="Export to Excel"
@@ -283,7 +298,21 @@ const ClientDetails = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => downloadInvoicesAsPDF(filteredInvoices)}
+                onClick={() =>
+                  downloadInvoicesAsPDF(
+                    filteredInvoices,
+                    {
+                      companyName: client.companyName,
+                      gstNumber: client.gstNumber,
+                      address: client.address,
+                      city: client.city,
+                      state: client.state,
+                      postalCode: client.postalCode,
+                      email: client.email,
+                      phoneNumber: client.phoneNumber
+                    }
+                  )
+                }
                 size="sm"
                 className="gap-1 bg-orange-50 border border-orange-400 dark:bg-orange-900 dark:border-orange-500 hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-900 dark:text-orange-200"
                 title="Export to PDF"
