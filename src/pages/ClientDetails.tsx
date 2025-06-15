@@ -2,97 +2,38 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Client } from "@/types";
-import { mockClients, mockInvoices } from "@/data/mockData";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { 
-  User, 
-  Building, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Globe, 
-  FileText,
-  Trash2, 
-  Edit,
-  ArrowLeft,
-  Receipt
-} from "lucide-react";
+import { mockInvoices } from "@/data/mockData";
 import ClientForm from "@/components/clients/ClientForm";
 import { useToast } from "@/components/ui/use-toast";
-import ClientInvoiceFilters from "@/components/invoices/ClientInvoiceFilters";
-import { downloadInvoicesAsCSV, downloadInvoicesAsPDF } from "@/utils/invoiceExportUtils";
-import { Download, FileText as FileTextIcon, FileSpreadsheet } from "lucide-react";
-import { downloadInvoicesAsExcel } from "@/utils/invoiceExportUtils";
+import ClientInfoCard from "@/components/clients/ClientInfoCard";
+import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
 import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
 
 const ClientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [clientInvoices, setClientInvoices] = useState<any[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
-  
-  // NEW state for filters:
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
   const [selectedYear, setSelectedYear] = useState<string>("All");
-
-  // Filter invoices by selected month/year
-  const filteredInvoices = useMemo(() => {
-    return clientInvoices.filter(invoice => {
-      let match = true;
-      if (selectedMonth !== "All") {
-        const monthIdx = [
-          "January","February","March","April","May","June","July",
-          "August","September","October","November","December"
-        ].indexOf(selectedMonth);
-        if (monthIdx >= 0) {
-          const invDate = new Date(invoice.date);
-          match = match && invDate.getMonth() === monthIdx;
-        }
-      }
-      if (selectedYear !== "All") {
-        const invDate = new Date(invoice.date);
-        match = match && invDate.getFullYear() === parseInt(selectedYear);
-      }
-      return match;
-    });
-  }, [clientInvoices, selectedMonth, selectedYear]);
-
-  // Pagination for filteredInvoices (page size 5)
   const PAGE_SIZE = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(filteredInvoices.length / PAGE_SIZE);
-  const paginatedInvoices = filteredInvoices.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
 
   useEffect(() => {
-    // Reset to first page if filters change and currentPage is now out of bounds
     setCurrentPage(1);
   }, [selectedMonth, selectedYear, clientInvoices]);
 
-  // Fetch client from Supabase backend by id
   useEffect(() => {
     if (!id) return;
     setLoading(true);
 
     getClient(id)
       .then((data) => {
-        // Convert backend client format to frontend Client, fallback for nulls
         setClient({
           id: data.id,
           companyName: data.company_name,
@@ -117,16 +58,14 @@ const ClientDetails = () => {
         });
         setLoading(false);
 
-        // Keep invoice demo portion for now, still from mock
         const invoices = mockInvoices.filter(invoice => invoice.clientId === data.id);
         setClientInvoices(invoices);
 
-        // Calculate current financial year (April to March)
+        // Compute current FY
         const today = new Date();
         const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
         const startDate = new Date(`${currentYear}-04-01`);
         const endDate = new Date(`${currentYear + 1}-03-31`);
-        // Filter invoices for current financial year
         const fyInvoices = invoices.filter(invoice => {
           const invoiceDate = new Date(invoice.date);
           return invoiceDate >= startDate && invoiceDate <= endDate;
@@ -140,11 +79,38 @@ const ClientDetails = () => {
       });
   }, [id]);
 
+  const filteredInvoices = useMemo(() => {
+    return clientInvoices.filter(invoice => {
+      let match = true;
+      if (selectedMonth !== "All") {
+        const monthIdx = [
+          "January","February","March","April","May","June","July",
+          "August","September","October","November","December"
+        ].indexOf(selectedMonth);
+        if (monthIdx >= 0) {
+          const invDate = new Date(invoice.date);
+          match = match && invDate.getMonth() === monthIdx;
+        }
+      }
+      if (selectedYear !== "All") {
+        const invDate = new Date(invoice.date);
+        match = match && invDate.getFullYear() === parseInt(selectedYear);
+      }
+      return match;
+    });
+  }, [clientInvoices, selectedMonth, selectedYear]);
+
+  const totalPages = Math.ceil(filteredInvoices.length / PAGE_SIZE);
+  const paginatedInvoices = filteredInvoices.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   const resetFilters = () => {
     setSelectedMonth("All");
     setSelectedYear("All");
   };
-  
+
   if (loading) {
     return (
       <Layout>
@@ -161,15 +127,18 @@ const ClientDetails = () => {
         <div className="flex flex-col items-center justify-center h-[60vh]">
           <h2 className="text-xl font-semibold">Client not found</h2>
           <p className="text-muted-foreground mt-2">The client you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate('/clients')} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Clients
-          </Button>
+          <button
+            className="mt-4 bg-muted px-4 py-2 rounded border"
+            onClick={() => navigate('/clients')}
+          >
+            &larr; Back to Clients
+          </button>
         </div>
       </Layout>
     );
   }
-  
-  // Save edits to Supabase backend
+
+  // Handlers
   const handleEditClient = async (updatedClient: Omit<Client, "id">) => {
     if (!id) return;
     const updates = {
@@ -189,7 +158,7 @@ const ClientDetails = () => {
       email: updatedClient.email,
     };
     try {
-      const data = await updateClient(id, updates);
+      await updateClient(id, updates);
       setClient({
         ...client,
         ...updatedClient
@@ -207,11 +176,9 @@ const ClientDetails = () => {
       });
     }
   };
-  
-  // (Optional, just show toast for delete - not implemented in navigation)
+
   const handleDeleteClient = async () => {
     try {
-      // Remove client via API for real
       if (id) await apiDeleteClient(id);
       toast({
         title: "Client Deleted",
@@ -226,7 +193,7 @@ const ClientDetails = () => {
       });
     }
   };
-  
+
   const handleCreateInvoice = () => {
     navigate(`/invoices/new?clientId=${client.id}`);
   };
@@ -235,14 +202,12 @@ const ClientDetails = () => {
     <Layout>
       <div className="page-header flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="mr-4" 
+          <button
+            className="mr-4 p-2 rounded border"
             onClick={() => navigate('/clients')}
           >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+            &larr;
+          </button>
           <div>
             <h1 className="page-title">{client.companyName}</h1>
             <p className="page-description text-sm text-muted-foreground">
@@ -250,237 +215,34 @@ const ClientDetails = () => {
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setIsEditClientOpen(true)}
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleDeleteClient}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-        </div>
       </div>
-      
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Client Information</CardTitle>
-            <CardDescription>Contact details and address</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start space-x-4">
-              <Building className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">Company</p>
-                <p className="text-sm text-muted-foreground">{client.companyName}</p>
-              </div>
-            </div>
-            
-            {/* GST Number */}
-            <div className="flex items-start space-x-4">
-              <Receipt className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">GST Number</p>
-                <p className="text-sm text-muted-foreground">{client.gstNumber || "Not provided"}</p>
-              </div>
-            </div>
 
-            {/* FY Invoices */}
-            <div className="flex items-start space-x-4">
-              <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">FY Invoices</p>
-                <p className="text-sm text-muted-foreground">{currentYearInvoices.length}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4">
-              <User className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">Contact Person</p>
-                <p className="text-sm text-muted-foreground">{client.contactName}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4">
-              <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">Email</p>
-                <p className="text-sm text-muted-foreground">{client.email}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4">
-              <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">Phone</p>
-                <p className="text-sm text-muted-foreground">{client.phone}</p>
-              </div>
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-start space-x-4">
-              <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">Address</p>
-                <p className="text-sm text-muted-foreground">
-                  {client.address}, {client.city}, {client.state} {client.postalCode}
-                </p>
-              </div>
-            </div>
-            
-            {client.website && (
-              <div className="flex items-start space-x-4">
-                <Globe className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium leading-none">Website</p>
-                  <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
-                    {client.website}
-                  </a>
-                </div>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Button onClick={handleCreateInvoice} className="w-full">
-              <FileText className="mr-2 h-4 w-4" /> Create New Invoice
-            </Button>
-          </CardFooter>
-        </Card>
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Invoices</CardTitle>
-            <CardDescription>Client invoice history</CardDescription>
-            <div className="flex flex-wrap gap-2 mt-3">
-              <Button
-                variant="outline"
-                onClick={() => 
-                  downloadInvoicesAsExcel(
-                    filteredInvoices,
-                    {
-                      companyName: client.companyName,
-                      gstNumber: client.gstNumber,
-                      address: client.address,
-                      city: client.city,
-                      state: client.state,
-                      postalCode: client.postalCode,
-                      email: client.email,
-                      phoneNumber: client.phoneNumber
-                    }
-                  )
-                }
-                size="sm"
-                className="gap-1 bg-blue-50 border border-blue-400 dark:bg-blue-900 dark:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-900 dark:text-blue-200"
-                title="Export to Excel"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Excel
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  downloadInvoicesAsPDF(
-                    filteredInvoices,
-                    {
-                      companyName: client.companyName,
-                      gstNumber: client.gstNumber,
-                      address: client.address,
-                      city: client.city,
-                      state: client.state,
-                      postalCode: client.postalCode,
-                      email: client.email,
-                      phoneNumber: client.phoneNumber
-                    }
-                  )
-                }
-                size="sm"
-                className="gap-1 bg-orange-50 border border-orange-400 dark:bg-orange-900 dark:border-orange-500 hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-900 dark:text-orange-200"
-                title="Export to PDF"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                PDF
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ClientInvoiceFilters
-              invoices={clientInvoices}
-              selectedMonth={selectedMonth}
-              setSelectedMonth={setSelectedMonth}
-              selectedYear={selectedYear}
-              setSelectedYear={setSelectedYear}
-              resetFilters={resetFilters}
-            />
-            {filteredInvoices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <FileTextIcon className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">No invoices found for selected filter</p>
-                <Button onClick={handleCreateInvoice} variant="outline" className="mt-4">
-                  Create Invoice
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {paginatedInvoices.map(invoice => (
-                  <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-md">
-                    <div>
-                      <p className="font-medium">{invoice.invoiceNumber}</p>
-                      <p className="text-sm text-muted-foreground">{invoice.date}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">₹{invoice.total.toLocaleString()}</p>
-                      <p className={`text-sm ${
-                        invoice.status === 'paid' 
-                          ? 'text-green-600' 
-                          : invoice.status === 'overdue' 
-                            ? 'text-red-600' 
-                            : 'text-amber-600'
-                      }`}>
-                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {/* Pagination controls: show only if there are more than PAGE_SIZE records */}
-                {filteredInvoices.length > PAGE_SIZE && (
-                  <div className="flex items-center justify-between mt-2">
-                    <button
-                      className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-accent disabled:opacity-50"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </button>
-                    <span className="text-sm">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                      className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-accent disabled:opacity-50"
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-3">
+        <ClientInfoCard
+          client={client}
+          currentYearInvoicesCount={currentYearInvoices.length}
+          onCreateInvoice={handleCreateInvoice}
+          onEdit={() => setIsEditClientOpen(true)}
+          onDelete={handleDeleteClient}
+        />
+        <ClientInvoicesCard
+          client={client}
+          invoices={clientInvoices}
+          filteredInvoices={filteredInvoices}
+          paginatedInvoices={paginatedInvoices}
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          resetFilters={resetFilters}
+          onCreateInvoice={handleCreateInvoice}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          PAGE_SIZE={PAGE_SIZE}
+        />
       </div>
-      
+
       <ClientForm
         open={isEditClientOpen}
         onClose={() => setIsEditClientOpen(false)}
