@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Client } from "@/types";
@@ -29,6 +28,9 @@ import {
 } from "lucide-react";
 import ClientForm from "@/components/clients/ClientForm";
 import { useToast } from "@/components/ui/use-toast";
+import ClientInvoiceFilters from "@/components/invoices/ClientInvoiceFilters";
+import { downloadInvoicesAsCSV, downloadInvoicesAsPDF } from "@/utils/invoiceExportUtils";
+import { Download, FileText as FileTextIcon, FileSpreadsheet } from "lucide-react";
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -40,6 +42,10 @@ const ClientDetails = () => {
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
   
+  // NEW state for filters:
+  const [selectedMonth, setSelectedMonth] = useState<string>("All");
+  const [selectedYear, setSelectedYear] = useState<string>("All");
+
   // In a real app, this would be replaced with API calls
   useEffect(() => {
     if (!id) return;
@@ -66,6 +72,33 @@ const ClientDetails = () => {
       setCurrentYearInvoices(fyInvoices);
     }
   }, [id]);
+
+  // Filter invoices by selected month/year
+  const filteredInvoices = useMemo(() => {
+    return clientInvoices.filter(invoice => {
+      let match = true;
+      if (selectedMonth !== "All") {
+        const monthIdx = [
+          "January","February","March","April","May","June","July",
+          "August","September","October","November","December"
+        ].indexOf(selectedMonth);
+        if (monthIdx >= 0) {
+          const invDate = new Date(invoice.date);
+          match = match && invDate.getMonth() === monthIdx;
+        }
+      }
+      if (selectedYear !== "All") {
+        const invDate = new Date(invoice.date);
+        match = match && invDate.getFullYear() === parseInt(selectedYear);
+      }
+      return match;
+    });
+  }, [clientInvoices, selectedMonth, selectedYear]);
+
+  const resetFilters = () => {
+    setSelectedMonth("All");
+    setSelectedYear("All");
+  };
   
   if (!client) {
     return (
@@ -231,24 +264,51 @@ const ClientDetails = () => {
             </Button>
           </CardFooter>
         </Card>
-        
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Invoices</CardTitle>
             <CardDescription>Client invoice history</CardDescription>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Button
+                variant="outline"
+                onClick={() => downloadInvoicesAsCSV(filteredInvoices)}
+                size="sm"
+                className="gap-1"
+                title="Export to Excel"
+              >
+                <FileSpreadsheet className="h-4 w-4" /> Excel
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => downloadInvoicesAsPDF(filteredInvoices)}
+                size="sm"
+                className="gap-1"
+                title="Export to PDF"
+              >
+                <FileTextIcon className="h-4 w-4" /> PDF
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            {clientInvoices.length === 0 ? (
+            <ClientInvoiceFilters
+              invoices={clientInvoices}
+              selectedMonth={selectedMonth}
+              setSelectedMonth={setSelectedMonth}
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              resetFilters={resetFilters}
+            />
+            {filteredInvoices.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
-                <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">No invoices yet</p>
+                <FileTextIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No invoices found for selected filter</p>
                 <Button onClick={handleCreateInvoice} variant="outline" className="mt-4">
-                  Create First Invoice
+                  Create Invoice
                 </Button>
               </div>
             ) : (
               <div className="space-y-4">
-                {clientInvoices.map(invoice => (
+                {filteredInvoices.map(invoice => (
                   <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-md">
                     <div>
                       <p className="font-medium">{invoice.invoiceNumber}</p>
