@@ -9,15 +9,13 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  // There should be no direct Sidebar component used here.
+  // There should be no direct Sidebar component used here,
+  // just AppSidebar which knows how to manage state internally.
   return (
     <SidebarProvider>
-      {/* Header with a sidebar trigger */}
       <Navbar />
       <div className="flex min-h-screen w-full">
-        {/* Sidebar (responsive/collapsible) */}
         <AppSidebar />
-        {/* Main content area */}
         <main className="flex-1 container py-8">{children}</main>
       </div>
     </SidebarProvider>
