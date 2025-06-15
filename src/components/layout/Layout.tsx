@@ -9,8 +9,8 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  // There should be no direct Sidebar component used here,
-  // just AppSidebar which manages state internally via SidebarProvider.
+  // Only use AppSidebar; never render Sidebar directly!
+  // All sidebar state is managed by AppSidebar and SidebarProvider.
   return (
     <SidebarProvider>
       <Navbar />
@@ -23,4 +23,3 @@ const Layout = ({ children }: LayoutProps) => {
 };
 
 export default Layout;
-
