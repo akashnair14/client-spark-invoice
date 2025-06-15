@@ -47,8 +47,8 @@ const AppSidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { collapsed } = useSidebar();
-  // Helpers for nav styles
+  const { state } = useSidebar();
+
   const isActive = (url: string) => location.pathname === url;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -56,7 +56,13 @@ const AppSidebar: React.FC = () => {
       : "hover:bg-accent hover:text-accent-foreground";
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
+    <Sidebar
+      className={cn(
+        state === "collapsed" ? "w-14" : "w-60",
+        "h-screen"
+      )}
+      collapsible="icon"
+    >
       {/* always-visible trigger for mini mode + close */}
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>
@@ -83,7 +89,7 @@ const AppSidebar: React.FC = () => {
                       }
                     >
                       <item.icon className="h-5 w-5" />
-                      {!collapsed && <span className="truncate">{item.title}</span>}
+                      {state !== "collapsed" && <span className="truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -111,3 +117,4 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
+
