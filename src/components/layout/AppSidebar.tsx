@@ -1,27 +1,23 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
-import {
-  LayoutDashboard,
-  CircleCheck,
-  CircleUserRound,
-  FileText,
-  LogOut,
-} from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate, NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText } from "lucide-react";
+
+interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
 
 const sidebarItems = [
   {
@@ -46,66 +42,74 @@ const sidebarItems = [
   },
 ];
 
-const AppSidebar: React.FC = () => {
-  const location = useLocation();
-  const { user, logout } = useAuth();
-  const currentPath = location.pathname;
-  const isActive = (path: string) => currentPath === path;
+const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
+  const { user, logout } = useAuth(); // Fix: use logout
+  const navigate = useNavigate();
 
   return (
-    <Sidebar
-      className="lg:w-64 w-16 transition-all duration-300 bg-sidebar px-0 shadow-md"
-      collapsible
-    >
-      {/* Mini trigger in collapsed mode */}
-      <SidebarTrigger className="m-2 self-end" />
-      <SidebarContent className="flex-1 flex flex-col">
-        <SidebarGroup>
-          <div className="pt-5 pb-3 px-4">
-            <h1 className="font-bold text-lg tracking-tight">Invoicer</h1>
-            <div className="text-xs text-muted-foreground break-all">{user?.email ?? ""}</div>
-          </div>
-          <SidebarGroupLabel className="pl-4 text-xs text-muted-foreground mt-1 mb-0.5">Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden flex items-center justify-center p-2"
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-64 max-w-[90vw] p-0 pt-6 flex flex-col">
+        <div className="px-4 py-2 mb-2">
+          <h1 className="font-bold text-lg">Invoicer</h1>
+          <p className="text-muted-foreground text-xs break-all">{user?.email || "No User"}</p>
+        </div>
+        <Separator />
+        <nav className="flex-1 overflow-y-auto">
+          <NavigationMenu>
+            <NavigationMenuList className="flex flex-col gap-1 p-2">
               {sidebarItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive: navActive }) =>
-                        cn(
-                          "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium w-full transition-colors focus:outline-none",
-                          navActive
-                            ? "bg-muted text-primary"
-                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                        )
-                      }
-                      end
-                    >
+                <NavigationMenuItem key={item.title}>
+                  <NavLink
+                    to={item.url}
+                    className={({ isActive }) =>
+                      cn(
+                        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        isActive
+                          ? "bg-muted text-primary"
+                          : "text-muted-foreground"
+                      )
+                    }
+                  >
+                    {typeof item.icon === "string" ? (
+                      <i className={`lucide lucide-${item.icon} h-4 w-4`}></i>
+                    ) : (
                       <item.icon className="h-5 w-5 min-w-5" />
-                      <span className="truncate hidden lg:inline">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                    )}
+                    <span className="truncate">{item.title}</span>
+                  </NavLink>
+                </NavigationMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        {/* Logout button at bottom */}
-        <SidebarFooter className="flex-col gap-2 mt-auto mb-4">
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+        <Separator className="mt-2" />
+        <div className="p-4">
           <Button
             variant="outline"
-            className="w-full flex justify-center items-center gap-2"
-            onClick={async () => logout()}
+            className="w-full justify-center"
+            onClick={async () => {
+              await logout();
+              navigate("/auth");
+            }}
             aria-label="Sign out"
           >
-            <LogOut className="h-4 w-4 mr-2" /> <span className="hidden lg:inline">Sign Out</span>
+            Sign Out
           </Button>
-        </SidebarFooter>
-      </SidebarContent>
-    </Sidebar>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
-export default AppSidebar;
+export default Sidebar;

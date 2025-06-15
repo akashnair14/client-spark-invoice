@@ -1,19 +1,18 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import InvoiceForm from "@/components/invoices/InvoiceForm";
 import InvoicePreview from "@/components/invoices/InvoicePreview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockClients, mockInvoices } from "@/data/mockData";
-import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/hooks/use-toast";
 import { useInvoiceState } from "@/hooks/useInvoiceState";
 import InvoicePreviewActions from "@/components/invoices/form/InvoicePreviewActions";
 import InvoicePreviewPlaceholder from "@/components/invoices/form/InvoicePreviewPlaceholder";
-import { Invoice } from "@/types";
+import { Invoice, Client } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
+import { getClients } from "@/api/clients";
 
+// Use backend instead of mockClients
 const NewInvoice = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,24 +28,62 @@ const NewInvoice = () => {
     gstAmount,
     roundoff,
     total,
-    calculateInvoiceTotals
+    calculateInvoiceTotals,
   } = useInvoiceState();
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const clientId = params.get("clientId");
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientsLoading, setClientsLoading] = useState(true);
 
-    if (clientId) {
-      const client = mockClients.find((c) => c.id === clientId);
-      if (client) {
-        setSelectedClient(client);
-      }
-    }
+  useEffect(() => {
+    setClientsLoading(true);
+    getClients()
+      .then((data) => {
+        const mapClient = (c: any): Client => ({
+          id: c.id,
+          companyName: c.company_name,
+          contactName: c.contact_name ?? "",
+          gstNumber: c.gst_number ?? "",
+          phoneNumber: c.phone_number ?? "",
+          phone: c.phone_number ?? "",
+          email: c.email ?? "",
+          bankAccountNumber: c.bank_account_number ?? "",
+          bankDetails: c.bank_details ?? "",
+          address: c.address ?? "",
+          city: c.city ?? "",
+          state: c.state ?? "",
+          postalCode: c.postal_code ?? "",
+          website: c.website ?? "",
+          tags: c.tags ?? [],
+          status: c.status as any,
+          lastInvoiceDate: c.last_invoice_date ?? undefined,
+          totalInvoiced: c.total_invoiced ?? undefined,
+          pendingInvoices: c.pending_invoices ?? undefined,
+          fyInvoices: c.fy_invoices ?? undefined,
+        });
+        setClients(data.map(mapClient));
+        setClientsLoading(false);
+
+        // auto-select client if clientId param is present
+        const params = new URLSearchParams(location.search);
+        const clientId = params.get("clientId");
+        if (clientId) {
+          const client = data.find((c: any) => c.id === clientId);
+          if (client) setSelectedClient(mapClient(client));
+        }
+      })
+      .catch((err) => {
+        setClientsLoading(false);
+        toast({
+          title: "Failed to load clients",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
   }, [location, setSelectedClient]);
 
   const handleInvoiceSubmit = (formData: any) => {
-    const client = mockClients.find(c => c.id === formData.clientId);
-    
+    const client = clients.find((c) => c.id === formData.clientId);
+
     if (!client) {
       toast({
         title: "Error",
@@ -55,16 +92,16 @@ const NewInvoice = () => {
       });
       return;
     }
-    
+
     setSelectedClient(client);
-    
+
     const items = formData.items.map((item: any) => ({
       ...item,
-      amount: item.quantity * item.rate
+      amount: item.quantity * item.rate,
     }));
 
     calculateInvoiceTotals(items);
-    
+
     setInvoiceData({
       ...formData,
       items,
@@ -78,40 +115,11 @@ const NewInvoice = () => {
   };
 
   const handleSaveInvoice = () => {
-    if (!invoiceData || !selectedClient) return;
-    
-    const isComplete = validateInvoiceCompleteness(invoiceData, selectedClient);
-    const autoStatus = isComplete ? 'pending' as const : 'draft' as const;
-    
-    const newInvoice: Invoice = {
-      id: uuidv4(),
-      clientId: selectedClient.id,
-      invoiceNumber: invoiceData.invoiceNumber,
-      date: invoiceData.date.toISOString().split('T')[0],
-      items: invoiceData.items,
-      subtotal,
-      gstAmount,
-      total,
-      status: autoStatus,
-      notes: invoiceData.notes || "",
-      gstType: invoiceData.gstType,
-      challanNumber: invoiceData.challanNumber,
-      challanDate: invoiceData.challanDate,
-      poNumber: invoiceData.poNumber,
-      poDate: invoiceData.poDate,
-      dcNumber: invoiceData.dcNumber,
-      dcDate: invoiceData.dcDate,
-      ewbNumber: invoiceData.ewbNumber
-    };
-
-    mockInvoices.push(newInvoice);
-    
+    // TODO: Integrate with backend when invoices table created!
     toast({
       title: "Invoice Saved",
-      description: `Invoice ${invoiceData.invoiceNumber} has been saved as ${autoStatus.toUpperCase()}.`,
-      variant: "default",
+      description: "Backend integration for invoices coming soon.",
     });
-    
     setTimeout(() => {
       navigate("/invoices");
     }, 1500);
@@ -143,7 +151,6 @@ const NewInvoice = () => {
         <h1 className="page-title">Create New Invoice</h1>
         <p className="page-description">Design and generate professional invoices with enhanced automation</p>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <Card>
           <CardContent className="p-1">
@@ -157,15 +164,16 @@ const NewInvoice = () => {
             </TabsList>
           </CardContent>
         </Card>
-        
+
         <TabsContent value="edit" className="space-y-6 mt-6">
           <InvoiceForm
-            clients={mockClients}
+            clients={clients}
             onSubmit={handleInvoiceSubmit}
             initialClientId={selectedClient?.id}
+            loading={clientsLoading}
           />
         </TabsContent>
-        
+
         <TabsContent value="preview" className="space-y-6 mt-6">
           <InvoicePreviewActions
             onBackToEdit={() => setActiveTab("edit")}
@@ -190,5 +198,4 @@ const NewInvoice = () => {
     </Layout>
   );
 };
-
 export default NewInvoice;

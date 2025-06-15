@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ClientTable from "@/components/clients/ClientTable";
@@ -11,69 +11,153 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
-import { mockClients } from "@/data/mockData";
+import {
+  getClients,
+  updateClient,
+  deleteClient as apiDeleteClient,
+} from "@/api/clients";
 
 const Clients = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Add sample tags and status to mock clients
-  const enhancedClients: Client[] = mockClients.map((client, index) => ({
-    ...client,
-    tags: index === 0 ? ["frequent", "vip"] : index === 1 ? ["delayed payer"] : index === 2 ? ["new", "priority"] : ["frequent"],
-    status: index === 0 ? "active" : index === 1 ? "pending" : "active",
-    lastInvoiceDate: index === 0 ? "2024-01-15" : index === 1 ? "2023-12-20" : undefined,
-    totalInvoiced: index === 0 ? 125000 : index === 1 ? 85000 : 45000,
-    pendingInvoices: index === 0 ? 2 : index === 1 ? 1 : 0,
-    fyInvoices: index === 0 ? 8 : index === 1 ? 6 : 3,
-  })) as Client[];
-
-  const [clients, setClients] = useState<Client[]>(enhancedClients);
-  const [filteredClients, setFilteredClients] = useState<Client[]>(enhancedClients);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
-  const [currentClient, setCurrentClient] = useState<Client | undefined>(undefined);
+  const [currentClient, setCurrentClient] = useState<Client | undefined>(
+    undefined
+  );
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
-  const [detailsClient, setDetailsClient] = useState<Client | undefined>(undefined);
+  const [detailsClient, setDetailsClient] = useState<Client | undefined>(
+    undefined
+  );
+  const [loading, setLoading] = useState(true);
 
-  const handleEditClient = (client: Omit<Client, "id">) => {
+  useEffect(() => {
+    setLoading(true);
+    getClients()
+      .then((data) => {
+        // Transform DB schema to Client type
+        const mapClient = (c: any): Client => ({
+          id: c.id,
+          companyName: c.company_name,
+          contactName: c.contact_name ?? "",
+          gstNumber: c.gst_number ?? "",
+          phoneNumber: c.phone_number ?? "",
+          phone: c.phone_number ?? "",
+          email: c.email ?? "",
+          bankAccountNumber: c.bank_account_number ?? "",
+          bankDetails: c.bank_details ?? "",
+          address: c.address ?? "",
+          city: c.city ?? "",
+          state: c.state ?? "",
+          postalCode: c.postal_code ?? "",
+          website: c.website ?? "",
+          tags: c.tags ?? [],
+          status: c.status as any,
+          lastInvoiceDate: c.last_invoice_date ?? undefined,
+          totalInvoiced: c.total_invoiced ?? undefined,
+          pendingInvoices: c.pending_invoices ?? undefined,
+          fyInvoices: c.fy_invoices ?? undefined,
+        });
+        setClients(data.map(mapClient));
+        setFilteredClients(data.map(mapClient));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load clients:", err);
+        setLoading(false);
+        toast({
+          title: "Failed to load clients",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  }, []);
+
+  const handleEditClient = async (client: Omit<Client, "id">) => {
     if (!currentClient) return;
-
-    const updatedClient = {
-      ...client,
-      id: currentClient.id,
-    };
-    
-    const updatedClients = clients.map((c) => (c.id === currentClient.id ? updatedClient : c));
-    setClients(updatedClients);
-    setFilteredClients(updatedClients);
-    
-    toast({
-      title: "Client Updated",
-      description: `${client.companyName} has been updated successfully.`,
-    });
-    
-    setIsEditClientOpen(false);
-    setCurrentClient(undefined);
+    try {
+      await updateClient(currentClient.id, {
+        company_name: client.companyName,
+        contact_name: client.contactName,
+        gst_number: client.gstNumber,
+        phone_number: client.phoneNumber,
+        bank_account_number: client.bankAccountNumber,
+        bank_details: client.bankDetails,
+        address: client.address,
+        city: client.city,
+        state: client.state,
+        postal_code: client.postalCode,
+        website: client.website,
+        tags: client.tags,
+        status: client.status,
+        email: client.email,
+      });
+      setClients((prev) =>
+        prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
+      );
+      setFilteredClients((prev) =>
+        prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
+      );
+      toast({
+        title: "Client Updated",
+        description: `${client.companyName} has been updated successfully.`,
+      });
+      setIsEditClientOpen(false);
+      setCurrentClient(undefined);
+    } catch (err: any) {
+      toast({
+        title: "Update Failed",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteClient = (client: Client) => {
-    const updatedClients = clients.filter((c) => c.id !== client.id);
-    setClients(updatedClients);
-    setFilteredClients(updatedClients);
-    setSelectedClients(selectedClients.filter(id => id !== client.id));
-    
-    toast({
-      title: "Client Deleted",
-      description: `${client.companyName} has been deleted.`,
-    });
+  const handleDeleteClient = async (client: Client) => {
+    try {
+      await apiDeleteClient(client.id);
+      setClients((prev) => prev.filter((c) => c.id !== client.id));
+      setFilteredClients((prev) => prev.filter((c) => c.id !== client.id));
+      setSelectedClients((prev) => prev.filter((id) => id !== client.id));
+      toast({
+        title: "Client Deleted",
+        description: `${client.companyName} has been deleted.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Delete Failed",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleBulkDelete = (clientIds: string[]) => {
-    const updatedClients = clients.filter((c) => !clientIds.includes(c.id));
-    setClients(updatedClients);
-    setFilteredClients(updatedClients);
-    setSelectedClients([]);
+  const handleBulkDelete = async (clientIds: string[]) => {
+    try {
+      await Promise.all(
+        clientIds.map((id) =>
+          apiDeleteClient(id).catch((err) => {
+            toast({
+              title: "Delete Failed",
+              description: `Could not delete some clients: ${err.message}`,
+              variant: "destructive",
+            });
+          })
+        )
+      );
+      setClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
+      setFilteredClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
+      setSelectedClients([]);
+    } catch (err: any) {
+      toast({
+        title: "Bulk Delete Failed",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCreateInvoice = (client: Client) => {
@@ -85,7 +169,12 @@ const Clients = () => {
     setIsDetailsDrawerOpen(true);
   };
 
-  const handleFilter = (searchTerm: string, statusFilter: string, stateFilter: string, tagFilter: string) => {
+  const handleFilter = (
+    searchTerm: string,
+    statusFilter: string,
+    stateFilter: string,
+    tagFilter: string
+  ) => {
     let filtered = clients;
 
     if (searchTerm) {
@@ -106,13 +195,24 @@ const Clients = () => {
     }
 
     if (tagFilter && tagFilter !== "all") {
-      filtered = filtered.filter((client) => 
-        client.tags && client.tags.includes(tagFilter)
+      filtered = filtered.filter(
+        (client) => client.tags && client.tags.includes(tagFilter)
       );
     }
 
     setFilteredClients(filtered);
   };
+
+  // Optionally show spinner/skeletons for loading
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <h2 className="text-xl font-semibold">Loading clients…</h2>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -120,7 +220,9 @@ const Clients = () => {
         <div className="page-header flex items-center justify-between">
           <div>
             <h1 className="page-title">Clients</h1>
-            <p className="page-description">Manage your client information and relationships</p>
+            <p className="page-description">
+              Manage your client information and relationships
+            </p>
           </div>
           <Link to="/clients/new">
             <Button className="gap-2">
@@ -129,10 +231,7 @@ const Clients = () => {
           </Link>
         </div>
 
-        <ClientFilters
-          clients={clients}
-          onFilter={handleFilter}
-        />
+        <ClientFilters clients={clients} onFilter={handleFilter} />
 
         <BulkActions
           selectedClients={selectedClients}
@@ -178,3 +277,4 @@ const Clients = () => {
 };
 
 export default Clients;
+
