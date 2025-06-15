@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -61,7 +60,7 @@ const AppSidebar: React.FC = () => {
       {/* Mini trigger in collapsed mode */}
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent className="flex-1 flex flex-col">
-        <SidebarGroup open>
+        <SidebarGroup>
           <div className="pt-5 pb-3 px-4">
             <h1 className="font-bold text-lg tracking-tight">Invoicer</h1>
             <div className="text-xs text-muted-foreground break-all">{user?.email ?? ""}</div>
@@ -110,4 +109,3 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
-

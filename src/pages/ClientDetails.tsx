@@ -32,6 +32,7 @@ import ClientInvoiceFilters from "@/components/invoices/ClientInvoiceFilters";
 import { downloadInvoicesAsCSV, downloadInvoicesAsPDF } from "@/utils/invoiceExportUtils";
 import { Download, FileText as FileTextIcon, FileSpreadsheet } from "lucide-react";
 import { downloadInvoicesAsExcel } from "@/utils/invoiceExportUtils";
+import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -39,6 +40,7 @@ const ClientDetails = () => {
   const { toast } = useToast();
   
   const [client, setClient] = useState<Client | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [clientInvoices, setClientInvoices] = useState<any[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
@@ -83,31 +85,59 @@ const ClientDetails = () => {
     setCurrentPage(1);
   }, [selectedMonth, selectedYear, clientInvoices]);
 
-  // In a real app, this would be replaced with API calls
+  // Fetch client from Supabase backend by id
   useEffect(() => {
     if (!id) return;
-    
-    const foundClient = mockClients.find(client => client.id === id);
-    if (foundClient) {
-      setClient(foundClient);
-      
-      const invoices = mockInvoices.filter(invoice => invoice.clientId === id);
-      setClientInvoices(invoices);
-      
-      // Calculate current financial year (April to March)
-      const today = new Date();
-      const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
-      const startDate = new Date(`${currentYear}-04-01`);
-      const endDate = new Date(`${currentYear + 1}-03-31`);
-      
-      // Filter invoices for current financial year
-      const fyInvoices = invoices.filter(invoice => {
-        const invoiceDate = new Date(invoice.date);
-        return invoiceDate >= startDate && invoiceDate <= endDate;
+    setLoading(true);
+
+    getClient(id)
+      .then((data) => {
+        // Convert backend client format to frontend Client, fallback for nulls
+        setClient({
+          id: data.id,
+          companyName: data.company_name,
+          contactName: data.contact_name ?? "",
+          gstNumber: data.gst_number ?? "",
+          phoneNumber: data.phone_number ?? "",
+          phone: data.phone_number ?? "",
+          email: data.email ?? "",
+          bankAccountNumber: data.bank_account_number ?? "",
+          bankDetails: data.bank_details ?? "",
+          address: data.address ?? "",
+          city: data.city ?? "",
+          state: data.state ?? "",
+          postalCode: data.postal_code ?? "",
+          website: data.website ?? "",
+          tags: data.tags ?? [],
+          status: data.status as any,
+          lastInvoiceDate: data.last_invoice_date ?? undefined,
+          totalInvoiced: data.total_invoiced ?? undefined,
+          pendingInvoices: data.pending_invoices ?? undefined,
+          fyInvoices: data.fy_invoices ?? undefined,
+        });
+        setLoading(false);
+
+        // Keep invoice demo portion for now, still from mock
+        const invoices = mockInvoices.filter(invoice => invoice.clientId === data.id);
+        setClientInvoices(invoices);
+
+        // Calculate current financial year (April to March)
+        const today = new Date();
+        const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+        const startDate = new Date(`${currentYear}-04-01`);
+        const endDate = new Date(`${currentYear + 1}-03-31`);
+        // Filter invoices for current financial year
+        const fyInvoices = invoices.filter(invoice => {
+          const invoiceDate = new Date(invoice.date);
+          return invoiceDate >= startDate && invoiceDate <= endDate;
+        });
+        setCurrentYearInvoices(fyInvoices);
+      })
+      .catch((err) => {
+        console.error("Error loading client:", err);
+        setLoading(false);
+        setClient(null);
       });
-      
-      setCurrentYearInvoices(fyInvoices);
-    }
   }, [id]);
 
   const resetFilters = () => {
@@ -115,6 +145,16 @@ const ClientDetails = () => {
     setSelectedYear("All");
   };
   
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <h2 className="text-xl font-semibold">Loading client details…</h2>
+        </div>
+      </Layout>
+    );
+  }
+
   if (!client) {
     return (
       <Layout>
@@ -129,26 +169,62 @@ const ClientDetails = () => {
     );
   }
   
-  const handleEditClient = (updatedClient: Omit<Client, "id">) => {
-    const updated = {
-      ...updatedClient,
-      id: client.id,
+  // Save edits to Supabase backend
+  const handleEditClient = async (updatedClient: Omit<Client, "id">) => {
+    if (!id) return;
+    const updates = {
+      company_name: updatedClient.companyName,
+      contact_name: updatedClient.contactName,
+      gst_number: updatedClient.gstNumber,
+      phone_number: updatedClient.phoneNumber,
+      bank_account_number: updatedClient.bankAccountNumber,
+      bank_details: updatedClient.bankDetails,
+      address: updatedClient.address,
+      city: updatedClient.city,
+      state: updatedClient.state,
+      postal_code: updatedClient.postalCode,
+      website: updatedClient.website,
+      tags: updatedClient.tags,
+      status: updatedClient.status,
+      email: updatedClient.email,
     };
-    setClient(updated);
-    setIsEditClientOpen(false);
-    toast({
-      title: "Client Updated",
-      description: `${updated.companyName} has been updated successfully.`,
-    });
+    try {
+      const data = await updateClient(id, updates);
+      setClient({
+        ...client,
+        ...updatedClient
+      });
+      setIsEditClientOpen(false);
+      toast({
+        title: "Client Updated",
+        description: `${updatedClient.companyName} has been updated successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
   
-  const handleDeleteClient = () => {
-    // In a real app, this would call an API
-    toast({
-      title: "Client Deleted",
-      description: `${client.companyName} has been deleted.`,
-    });
-    navigate('/clients');
+  // (Optional, just show toast for delete - not implemented in navigation)
+  const handleDeleteClient = async () => {
+    try {
+      // Remove client via API for real
+      if (id) await apiDeleteClient(id);
+      toast({
+        title: "Client Deleted",
+        description: `${client.companyName} has been deleted.`,
+      });
+      navigate('/clients');
+    } catch (error: any) {
+      toast({
+        title: "Delete Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
   
   const handleCreateInvoice = () => {
