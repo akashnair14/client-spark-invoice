@@ -1,26 +1,25 @@
 
 import React from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-// Removed Sidebar import, as local Sidebar expects props and is not in use
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/layout/AppSidebar";
+import Navbar from "@/components/layout/Navbar";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  // Removed Sidebar component entirely due to prop mismatch error.
   return (
-    <>
-      {/* Sidebar integration should be done at a higher level if using shadcn UI */}
-      <div className="flex flex-col min-h-screen">
-        {/* <AppHeader /> */}
-        <main className="container py-8">{children}</main>
+    <SidebarProvider>
+      {/* Header with a sidebar trigger */}
+      <Navbar />
+      <div className="flex min-h-screen w-full">
+        {/* Sidebar (responsive/collapsible) */}
+        <AppSidebar />
+        {/* Main content area */}
+        <main className="flex-1 container py-8">{children}</main>
       </div>
-    </>
+    </SidebarProvider>
   );
 };
 
