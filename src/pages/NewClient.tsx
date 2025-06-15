@@ -7,6 +7,28 @@ import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
 import { createClient } from "@/api/clients";
 
+// Utility function to convert Client form values to snake_case for Supabase
+function mapClientToDbInput(client: Omit<Client, "id">) {
+  return {
+    owner_id: "demo-owner-id", // TODO: Replace with supabase.auth.currentUser?.id or from auth context
+    company_name: client.companyName,
+    contact_name: client.contactName,
+    gst_number: client.gstNumber,
+    phone_number: client.phoneNumber,
+    bank_account_number: client.bankAccountNumber,
+    bank_details: client.bankDetails,
+    address: client.address,
+    city: client.city,
+    state: client.state,
+    postal_code: client.postalCode,
+    website: client.website,
+    tags: client.tags,
+    status: client.status,
+    email: client.email,
+    // last_invoice_date, total_invoiced, pending_invoices, fy_invoices are optional and not part of the form
+  };
+}
+
 const NewClient = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -14,27 +36,8 @@ const NewClient = () => {
 
   const handleAddClient = async (client: Omit<Client, "id">) => {
     try {
-      // owner_id is REQUIRED, should be passed appropriately from session context or set in the API endpoint.
-      // For now, fake owner_id for demo; replace with real one when available.
-      const owner_id = "demo-owner-id"; // TODO: Replace with supabase.auth.currentUser?.id
-      const dbInput = {
-        ...client,
-        owner_id,
-        company_name: client.companyName,
-        contact_name: client.contactName,
-        gst_number: client.gstNumber,
-        phone_number: client.phoneNumber,
-        bank_account_number: client.bankAccountNumber,
-        bank_details: client.bankDetails,
-        address: client.address,
-        city: client.city,
-        state: client.state,
-        postal_code: client.postalCode,
-        website: client.website,
-        tags: client.tags,
-        status: client.status,
-        email: client.email,
-      };
+      // Only send the correct keys to Supabase, not camelCase
+      const dbInput = mapClientToDbInput(client);
       await createClient(dbInput);
       toast({
         title: "Client Added",
@@ -67,4 +70,3 @@ const NewClient = () => {
 };
 
 export default NewClient;
-
