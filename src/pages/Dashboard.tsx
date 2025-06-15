@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import DashboardStats from "@/components/dashboard/DashboardStats";
@@ -7,9 +6,86 @@ import RecentClients from "@/components/dashboard/RecentClients";
 import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Users, Calendar, Bell } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+
+// MOCK DATA - replace with backend data later
+const mockInvoices = [
+  {
+    id: "INV-001",
+    clientId: "client-01",
+    clientName: "Acme Corp",
+    amount: 15000,
+    date: "2025-06-01",
+    status: "paid",
+  },
+  {
+    id: "INV-002",
+    clientId: "client-02",
+    clientName: "Globex Ltd",
+    amount: 8000,
+    date: "2025-06-02",
+    status: "pending",
+  },
+  {
+    id: "INV-003",
+    clientId: "client-03",
+    clientName: "Initech",
+    amount: 12000,
+    date: "2025-05-28",
+    status: "overdue",
+  },
+  {
+    id: "INV-004",
+    clientId: "client-01",
+    clientName: "Acme Corp",
+    amount: 6000,
+    date: "2025-05-27",
+    status: "pending",
+  },
+];
+const mockClients = [
+  {
+    id: "client-01",
+    companyName: "Acme Corp",
+    contactName: "Alice Smith",
+    email: "alice@acme.com",
+    gstNumber: "GST1234567",
+    phone: "+91-9000000001",
+    address: "123 Business St",
+    city: "Mumbai",
+    state: "MH",
+    postalCode: "400001",
+    tags: ["priority"],
+  },
+  {
+    id: "client-02",
+    companyName: "Globex Ltd",
+    contactName: "Bob Johnson",
+    email: "bob@globex.com",
+    gstNumber: "GST9876543",
+    phone: "+91-9000000002",
+    address: "456 Market Ave",
+    city: "Delhi",
+    state: "DL",
+    postalCode: "110001",
+    tags: ["new"],
+  },
+  {
+    id: "client-03",
+    companyName: "Initech",
+    contactName: "Carol King",
+    email: "carol@initech.com",
+    gstNumber: "GST5552221",
+    phone: "+91-9000000003",
+    address: "789 Tech Park",
+    city: "Bangalore",
+    state: "KA",
+    postalCode: "560001",
+    tags: [],
+  },
+];
 
 // Move to backend later, for now use empty arrays/placeholders
-const mockInvoices: any[] = [];
 const emptyClients: any[] = []; // TODO: Fetch from backend
 
 // Top clients by total invoice amount
@@ -45,10 +121,12 @@ const notifications = [
 
 const Dashboard: React.FC = () => {
   const [search, setSearch] = useState("");
-  // Use emptyClients as base in initial memo
+  const navigate = useNavigate();
+
+  // Modified to use mockClients if search is empty
   const filteredClients = useMemo(() => {
-    if (!search.trim()) return emptyClients;
-    return emptyClients.filter(
+    if (!search.trim()) return mockClients;
+    return mockClients.filter(
       (c: any) =>
         c.companyName?.toLowerCase().includes(search.toLowerCase()) ||
         c.email?.toLowerCase().includes(search.toLowerCase())
@@ -136,6 +214,107 @@ const Dashboard: React.FC = () => {
             >
               Clear
             </button>
+          </div>
+        </div>
+
+        {/* 
+          --- NEW: RECENT CLIENTS & RECENT INVOICES --- 
+        */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* Recent Clients */}
+          <div className="bg-white dark:bg-muted border rounded-lg shadow flex flex-col">
+            <div className="p-4 border-b">
+              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Recent Clients</h2>
+            </div>
+            <div className="p-4">
+              {filteredClients.length === 0 ? (
+                <div className="text-muted-foreground text-center">No clients found.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground">
+                      <th className="text-left py-2">Company</th>
+                      <th className="text-left py-2">Email</th>
+                      <th className="text-left py-2">Phone</th>
+                      <th className="text-center py-2">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {filteredClients.slice(0, 5).map((client) => (
+                    <tr key={client.id} className="hover:bg-accent/30 transition">
+                      <td className="py-2 font-semibold">{client.companyName}</td>
+                      <td className="py-2">{client.email}</td>
+                      <td className="py-2">{client.phone}</td>
+                      <td className="py-2 text-center">
+                        <button
+                          className="text-blue-700 font-bold underline hover:text-blue-900 rounded px-2 py-1"
+                          onClick={() => navigate(`/clients/${client.id}`)}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+          {/* Recent Invoices */}
+          <div className="bg-white dark:bg-muted border rounded-lg shadow flex flex-col">
+            <div className="p-4 border-b">
+              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Recent Invoices</h2>
+            </div>
+            <div className="p-4">
+              {filteredInvoices.length === 0 ? (
+                <div className="text-muted-foreground text-center">No invoices found.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground">
+                      <th className="py-2">#</th>
+                      <th className="py-2">Client</th>
+                      <th className="py-2">Amount</th>
+                      <th className="py-2">Status</th>
+                      <th className="py-2 text-center">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {filteredInvoices.slice(0, 5).map((inv) => (
+                    <tr key={inv.id} className="hover:bg-accent/30 transition">
+                      <td className="py-2 font-medium">{inv.id}</td>
+                      <td className="py-2">
+                        <button
+                          className="text-blue-700 underline hover:text-blue-900"
+                          onClick={() => inv.clientId && navigate(`/clients/${inv.clientId}`)}
+                        >
+                          {inv.clientName}
+                        </button>
+                      </td>
+                      <td className="py-2">₹{inv.amount.toLocaleString("en-IN")}</td>
+                      <td className="py-2">
+                        <span className={
+                          inv.status === "paid" ? "bg-green-100 text-green-800 px-2 py-1 rounded"
+                            : inv.status === "pending" ? "bg-yellow-100 text-yellow-800 px-2 py-1 rounded"
+                              : "bg-red-100 text-red-800 px-2 py-1 rounded"
+                        }>
+                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="py-2 text-center">
+                        <button
+                          className="text-blue-700 font-bold underline hover:text-blue-900 rounded px-2 py-1"
+                          onClick={() => navigate(`/invoices/${inv.id}`)}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
 
