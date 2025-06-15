@@ -1,6 +1,12 @@
 
 import React, { useMemo } from "react";
-import { Select, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 
@@ -39,21 +45,31 @@ const ClientInvoiceFilters: React.FC<FilterProps> = ({
       <div>
         <label className="text-xs font-medium block mb-1">Month</label>
         <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-          {months.map(month => (
-            <SelectItem key={month} value={month}>
-              {month}
-            </SelectItem>
-          ))}
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Month" />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map(month => (
+              <SelectItem key={month} value={month}>
+                {month}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
       <div>
         <label className="text-xs font-medium block mb-1">Year</label>
         <Select value={selectedYear} onValueChange={setSelectedYear}>
-          {years.map((year) => (
-            <SelectItem key={year} value={String(year)}>
-              {year}
-            </SelectItem>
-          ))}
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={String(year)}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
       <Button variant="ghost" size="sm" onClick={resetFilters}>
@@ -65,3 +81,4 @@ const ClientInvoiceFilters: React.FC<FilterProps> = ({
 };
 
 export default ClientInvoiceFilters;
+
