@@ -136,6 +136,7 @@ const ClientDetails = () => {
   // Handlers
   const handleEditClient = async (updatedClient: Omit<Client, "id">) => {
     if (!id) return;
+    // Always use snake_case keys for Supabase
     const updates = {
       company_name: updatedClient.companyName,
       contact_name: updatedClient.contactName,

@@ -79,7 +79,8 @@ const Clients = () => {
   const handleEditClient = async (client: Omit<Client, "id">) => {
     if (!currentClient) return;
     try {
-      await updateClient(currentClient.id, {
+      // Only send snake_case keys to Supabase
+      const updates = {
         company_name: client.companyName,
         contact_name: client.contactName,
         gst_number: client.gstNumber,
@@ -94,7 +95,8 @@ const Clients = () => {
         tags: client.tags,
         status: client.status,
         email: client.email,
-      });
+      };
+      await updateClient(currentClient.id, updates);
       setClients((prev) =>
         prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
       );
