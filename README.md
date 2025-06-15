@@ -1,73 +1,62 @@
-# Welcome to your Lovable project
 
-## Project info
+# SparkInvoice
 
-**URL**: https://lovable.dev/projects/cf365ce4-574f-4478-86e5-c56ad4685ebe
+A modern, full-stack invoice management application for small businesses and freelancers to efficiently manage clients, invoices, and payments.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Client Management:** Quickly add, view, update and list clients.
+- **Invoices:** Generate, edit, and export invoices in a professional format, with GST and total calculations.
+- **Dashboard:** Interactive dashboard with business statistics, charts, recent activity, and metrics.
+- **Authentication:** Secure login/register with optional third-party providers.
+- **Dark/Light Mode:** Instantly toggle between dark and light themes.
+- **Modern Tech Stack:** Fast, reactive UI using React, Vite, TypeScript, Tailwind CSS, and shadcn/ui components.
+- **Responsive Design:** Fully works on mobile, tablet and desktop.
+- **PDF Export/Print-ready:** Export or print invoices for sharing and compliance.
 
-**Use Lovable**
+## Technologies Used
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cf365ce4-574f-4478-86e5-c56ad4685ebe) and start prompting.
+- **Frontend:** React, TypeScript, Vite
+- **Styling:** Tailwind CSS, shadcn/ui
+- **Component Library:** Radix UI & Shadcn UI
+- **State Management:** @tanstack/react-query (queries, caching), useState, useEffect
+- **Data Visualization:** recharts
+- **Utility Libraries:** lucid-react (icons), class-variance-authority, clsx, uuid
+- **Authentication & Backend:** Supabase (for real deployments – currently mocked)
+- **PDF Generation:** jsPDF (for exporting invoices to PDF files)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+1. **Clone this repo:**
+   ```sh
+   git clone <YOUR_GIT_URL>
+   cd <YOUR_PROJECT_NAME>
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies:**
+   ```sh
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Run the development server:**
+   ```sh
+   npm run dev
+   ```
 
-Follow these steps:
+4. **Open your app:**  
+   Visit `http://localhost:8080` in your browser.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Customization
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- You can change theme (dark/light) with the button in the Navbar.
+- Update invoice formats and business logic in the `/src/components/invoices/` directory.
+- All mock data is in `/src/data/mockData.ts` – replace or connect to your API/Supabase as needed.
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Deployment
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- Deploy easily via [Lovable](https://docs.lovable.dev/user-guides/publish) or your favorite hosting provider.
+- [Custom Domain setup guide](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide).
 
-**Edit a file directly in GitHub**
+## Maintainers
+Made with 💙 using [Lovable](https://lovable.dev/).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/cf365ce4-574f-4478-86e5-c56ad4685ebe) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

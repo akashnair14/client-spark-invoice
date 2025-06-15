@@ -1,7 +1,7 @@
-
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -10,7 +10,7 @@ interface NavbarProps {
 
 const Navbar = ({ onMenuClick, className }: NavbarProps) => {
   return (
-    <header className={cn("bg-white border-b h-16 flex items-center px-4 md:px-6", className)}>
+    <header className={cn("bg-white dark:bg-[#18181b] border-b h-16 flex items-center px-4 md:px-6", className)}>
       <Button
         variant="ghost"
         className="md:hidden"
@@ -28,6 +28,8 @@ const Navbar = ({ onMenuClick, className }: NavbarProps) => {
       </div>
 
       <div className="ml-auto flex items-center space-x-2">
+        {/* Add theme toggle here */}
+        <ThemeToggle />
         {/* Right side navbar items can be added here in the future */}
       </div>
     </header>

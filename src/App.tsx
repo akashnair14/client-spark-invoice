@@ -15,32 +15,34 @@ import InvoiceDetails from "./pages/InvoiceDetails";
 import AuthPage from "./pages/Auth";
 import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
+import { ThemeProvider } from "next-themes";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Redirect / to /dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/clients/new" element={<NewClient />} />
-          <Route path="/clients/:id" element={<ClientDetails />} />
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/invoices/new" element={<NewInvoice />} />
-          <Route path="/invoices/:id" element={<InvoiceDetails />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        {/* Sonner Toaster can be removed if unused elsewhere */}
+        <BrowserRouter>
+          <Routes>
+            {/* Redirect / to /dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/clients/new" element={<NewClient />} />
+            <Route path="/clients/:id" element={<ClientDetails />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/invoices/new" element={<NewInvoice />} />
+            <Route path="/invoices/:id" element={<InvoiceDetails />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
-
