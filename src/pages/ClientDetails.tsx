@@ -268,42 +268,30 @@ const ClientDetails = () => {
           <CardHeader>
             <CardTitle>Invoices</CardTitle>
             <CardDescription>Client invoice history</CardDescription>
-            {/* --- DEBUG: Start of Export Buttons Section --- */}
-            <div style={{ border: "2px dashed #f59e42", padding: "4px", marginTop: "16px", marginBottom: "8px", background: "#fff8e6" }}>
-              <span style={{ fontWeight: "bold", color: "#b45309" }}>
-                [Export Buttons Area]
-              </span>
-              <div className="flex flex-wrap gap-2 mt-3" style={{ zIndex: 1000 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => downloadInvoicesAsCSV(filteredInvoices)}
-                  size="sm"
-                  className="gap-1"
-                  title="Export to Excel"
-                  style={{ background: "#dbf4ff", border: "1.5px solid #0667a6" }}
-                >
-                  {/* Use correct lucide icon from allowed list */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Excel
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => downloadInvoicesAsPDF(filteredInvoices)}
-                  size="sm"
-                  className="gap-1"
-                  title="Export to PDF"
-                  style={{ background: "#fbeee6", border: "1.5px solid #c2410c" }}
-                >
-                  {/* Use correct lucide icon from allowed list */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  PDF
-                </Button>
-              </div>
-              <span style={{ fontSize: "0.95em", color: "#7c470d" }}>
-                If you see this box but not the buttons, let me know!
-              </span>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Button
+                variant="outline"
+                onClick={() => downloadInvoicesAsCSV(filteredInvoices)}
+                size="sm"
+                className="gap-1"
+                title="Export to Excel"
+                style={{ background: "#dbf4ff", border: "1.5px solid #0667a6" }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Excel
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => downloadInvoicesAsPDF(filteredInvoices)}
+                size="sm"
+                className="gap-1"
+                title="Export to PDF"
+                style={{ background: "#fbeee6", border: "1.5px solid #c2410c" }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 20h16M9 16l3 3 3-3M12 4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                PDF
+              </Button>
             </div>
-            {/* --- DEBUG: End Export Buttons Section --- */}
           </CardHeader>
           <CardContent>
             <ClientInvoiceFilters
