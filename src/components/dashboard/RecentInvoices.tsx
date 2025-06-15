@@ -2,11 +2,13 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { BadgeCheck, AlertCircle, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   invoices: {
     id: string;
     clientName: string;
+    clientId?: string;
     amount: number;
     date: string;
     status: string;
@@ -16,7 +18,7 @@ interface Props {
 const statusColor = {
   paid: "bg-green-100 text-green-800",
   pending: "bg-yellow-100 text-yellow-800",
-  overdue: "bg-red-100 text-red-800"
+  overdue: "bg-red-100 text-red-800 animate-pulse"
 };
 
 const statusIcon = {
@@ -26,6 +28,7 @@ const statusIcon = {
 };
 
 const RecentInvoices: React.FC<Props> = ({ invoices }) => {
+  const navigate = useNavigate();
   return (
     <Card>
       <CardHeader>
@@ -33,10 +36,19 @@ const RecentInvoices: React.FC<Props> = ({ invoices }) => {
       </CardHeader>
       <CardContent className="space-y-3">
         {invoices.slice(0, 5).map((inv) => (
-          <div key={inv.id} className="flex justify-between items-center px-2 py-1 rounded hover:bg-muted/40 cursor-pointer transition">
-            <div>
-              <span className="font-medium">{inv.clientName}</span>
-              <div className="text-xs text-muted-foreground">{inv.date}</div>
+          <div
+            key={inv.id}
+            className="flex justify-between items-center px-2 py-1 rounded hover:bg-muted/40 cursor-pointer transition"
+            onClick={() => navigate(`/invoices/${inv.id}`)}
+            tabIndex={0}
+            aria-label={`Go to invoice ${inv.id} for ${inv.clientName}`}
+          >
+            <div onClick={(e) => { e.stopPropagation(); if (inv.clientId) navigate(`/clients/${inv.clientId}`); }}
+              className="text-blue-700 font-medium cursor-pointer underline underline-offset-2 hover:text-blue-800 mr-2"
+              tabIndex={0}
+              aria-label={`Go to client ${inv.clientName}`}
+            >
+              {inv.clientName}
             </div>
             <div className="flex items-center">
               <span className={`px-2 py-1 rounded text-xs font-semibold ${statusColor[inv.status]}`}>

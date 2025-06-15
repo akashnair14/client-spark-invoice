@@ -2,17 +2,26 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, PieChart, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardStatsProps {
   clients: any[];
   invoices: any[];
 }
 
+const statRoutes: Record<string, string> = {
+  "Clients": "/clients",
+  "Total Invoiced": "/invoices",
+  "Invoices": "/invoices",
+  "Paid": "/invoices?filter=paid"
+};
+
 const DashboardStats: React.FC<DashboardStatsProps> = ({ clients, invoices }) => {
   const totalClients = clients.length;
   const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.amount, 0);
   const totalInvoices = invoices.length;
   const paidInvoices = invoices.filter((i) => i.status === "paid").length;
+  const navigate = useNavigate();
 
   const stats = [
     {
@@ -44,7 +53,13 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ clients, invoices }) =>
   return (
     <>
       {stats.map((s) => (
-        <Card key={s.label} className="flex items-center gap-4 py-4">
+        <Card
+          key={s.label}
+          onClick={() => navigate(statRoutes[s.label] || "/")}
+          className="flex items-center gap-4 py-4 hover:shadow-lg hover:bg-accent/40 cursor-pointer transition"
+          tabIndex={0}
+          aria-label={s.label}
+        >
           <div className={`${s.color} rounded-full p-3`}>
             {s.icon}
           </div>

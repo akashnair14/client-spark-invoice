@@ -3,7 +3,13 @@
 
 A modern, full-stack invoice management application for small businesses and freelancers to efficiently manage clients, invoices, and payments.
 
-## Features
+## What's New!
+
+- **Dashboard: Modern & Interactive!**
+  - All dashboard widgets and stats are clickable, letting you quickly access clients, invoices, or specific record details.
+  - New global search bar makes it easy to find clients or invoices!
+  - Top Performing Clients now showcased, plus a Recent Activity feed for better visibility.
+  - Overdue invoices visually highlighted.
 
 - **Client Management:** Quickly add, view, update and list clients.
 - **Invoices:** Generate, edit, and export invoices in a professional format, with GST and total calculations.
@@ -52,6 +58,13 @@ A modern, full-stack invoice management application for small businesses and fre
 - Update invoice formats and business logic in the `/src/components/invoices/` directory.
 - All mock data is in `/src/data/mockData.ts` – replace or connect to your API/Supabase as needed.
 
+## Dashboard Usage
+
+- Click anywhere on the dashboard! Every stat or record navigates to corresponding details.
+- Top clients and activity log help identify priorities and recent changes.
+- Try searching! The global search bar lets you filter instantly.
+- Charts, clients, invoices — all interactive and directly linked to details.
+
 ## Deployment
 
 - Deploy easily via [Lovable](https://docs.lovable.dev/user-guides/publish) or your favorite hosting provider.
@@ -60,3 +73,4 @@ A modern, full-stack invoice management application for small businesses and fre
 ## Maintainers
 Made with 💙 using [Lovable](https://lovable.dev/).
 
+See [DOCUMENTATION.md](./DOCUMENTATION.md) for further usage and workflow details.
