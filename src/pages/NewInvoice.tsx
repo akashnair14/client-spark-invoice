@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -12,7 +13,6 @@ import { Invoice, Client } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { getClients } from "@/api/clients";
 
-// Use backend instead of mockClients
 const NewInvoice = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -110,19 +110,43 @@ const NewInvoice = () => {
 
     toast({
       title: "Invoice Generated",
-      description: `Invoice ${formData.invoiceNumber} has been created successfully.`,
+      description: `Invoice ${formData.invoiceNumber} preview is ready.`,
     });
   };
 
-  const handleSaveInvoice = () => {
-    // TODO: Integrate with backend when invoices table created!
-    toast({
-      title: "Invoice Saved",
-      description: "Backend integration for invoices coming soon.",
-    });
-    setTimeout(() => {
-      navigate("/invoices");
-    }, 1500);
+  const handleFinalizeInvoice = () => {
+    if (!invoiceData || !selectedClient) {
+      toast({
+        title: "Error",
+        description: "Missing invoice or client data",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Update invoice status to 'sent' in localStorage
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const updatedInvoices = existingInvoices.map((inv: any) => 
+        inv.invoiceNumber === invoiceData.invoiceNumber 
+          ? { ...inv, status: 'sent', lastStatusUpdate: new Date().toISOString() }
+          : inv
+      );
+      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+
+      toast({
+        title: "Invoice Finalized",
+        description: `Invoice ${invoiceData.invoiceNumber} has been finalized and marked as sent.`,
+      });
+
+      // Don't auto-close, let user decide when to leave
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to finalize invoice. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const validateInvoiceCompleteness = (invoice: any, client: any): boolean => {
@@ -176,7 +200,7 @@ const NewInvoice = () => {
         <TabsContent value="preview" className="space-y-6 mt-6">
           <InvoicePreviewActions
             onBackToEdit={() => setActiveTab("edit")}
-            onSaveInvoice={handleSaveInvoice}
+            onFinalizeInvoice={handleFinalizeInvoice}
             hasInvoiceData={!!invoiceData}
           />
 

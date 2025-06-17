@@ -1,17 +1,17 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, FileCheck } from "lucide-react";
 
 interface InvoicePreviewActionsProps {
   onBackToEdit: () => void;
-  onSaveInvoice: () => void;
+  onFinalizeInvoice: () => void;
   hasInvoiceData: boolean;
 }
 
 const InvoicePreviewActions = ({ 
   onBackToEdit, 
-  onSaveInvoice, 
+  onFinalizeInvoice, 
   hasInvoiceData 
 }: InvoicePreviewActionsProps) => {
   return (
@@ -20,8 +20,8 @@ const InvoicePreviewActions = ({
         <ArrowLeft className="h-4 w-4 mr-2" /> Back to Edit
       </Button>
       {hasInvoiceData && (
-        <Button variant="default" onClick={onSaveInvoice}>
-          <Save className="h-4 w-4 mr-2" /> Save Invoice
+        <Button variant="default" onClick={onFinalizeInvoice}>
+          <FileCheck className="h-4 w-4 mr-2" /> Finalize Invoice
         </Button>
       )}
     </div>

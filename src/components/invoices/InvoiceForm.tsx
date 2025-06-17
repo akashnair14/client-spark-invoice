@@ -58,7 +58,7 @@ interface InvoiceFormProps {
 
 const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
   const [selectedClient, setSelectedClient] = useState<Client | undefined>();
-  const [isDraftSaved, setIsDraftSaved] = useState(false);
+  const [isRecordSaved, setIsRecordSaved] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState({
     clientInfo: true,
     additionalInfo: false,
@@ -122,33 +122,69 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     onSubmit(updatedValues);
   };
 
-  const handleSaveDraft = () => {
+  const handleSaveRecord = async () => {
     const formValues = form.getValues();
     
-    // Validate required fields for draft
+    // Validate required fields for saving
     if (!formValues.clientId || !formValues.invoiceNumber) {
       toast({
         title: "Missing Information",
-        description: "Please select a client and enter an invoice number to save as draft.",
+        description: "Please select a client and enter an invoice number to save record.",
         variant: "destructive",
       });
       return;
     }
 
-    // Save draft logic - for now, we'll store in localStorage
-    const draftData = {
-      ...formValues,
-      status: 'draft',
-      savedAt: new Date().toISOString()
-    };
-    
-    localStorage.setItem(`invoice_draft_${formValues.invoiceNumber}`, JSON.stringify(draftData));
-    setIsDraftSaved(true);
-    
-    toast({
-      title: "Draft Saved",
-      description: `Invoice ${formValues.invoiceNumber} has been saved as draft.`,
-    });
+    try {
+      // Create invoice record with status 'draft'
+      const invoiceRecord = {
+        id: uuidv4(),
+        clientId: formValues.clientId,
+        date: formValues.date.toISOString(),
+        dueDate: formValues.date.toISOString(), // Default due date same as invoice date
+        invoiceNumber: formValues.invoiceNumber,
+        items: formValues.items.map(item => ({
+          ...item,
+          amount: item.quantity * item.rate
+        })),
+        subtotal: formValues.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0),
+        gstAmount: formValues.items.reduce((sum, item) => sum + (item.quantity * item.rate * item.gstRate / 100), 0),
+        total: formValues.items.reduce((sum, item) => {
+          const itemTotal = item.quantity * item.rate;
+          const itemGst = itemTotal * item.gstRate / 100;
+          return sum + itemTotal + itemGst;
+        }, 0),
+        status: 'draft' as const,
+        notes: formValues.notes,
+        gstType: formValues.gstType,
+        challanNumber: formValues.challanNumber,
+        challanDate: formValues.challanDate?.toISOString() || null,
+        poNumber: formValues.poNumber,
+        poDate: formValues.poDate?.toISOString() || null,
+        dcNumber: formValues.dcNumber,
+        dcDate: formValues.dcDate?.toISOString() || null,
+        ewbNumber: formValues.ewbNumber,
+        lastStatusUpdate: new Date().toISOString()
+      };
+
+      // Store in localStorage for now (will be replaced with backend integration)
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const updatedInvoices = [...existingInvoices.filter((inv: any) => inv.invoiceNumber !== formValues.invoiceNumber), invoiceRecord];
+      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+      
+      setIsRecordSaved(true);
+      
+      toast({
+        title: "Record Saved",
+        description: `Invoice ${formValues.invoiceNumber} has been saved successfully.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save invoice record. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const toggleSection = (section: keyof typeof sectionsOpen) => {
@@ -291,15 +327,15 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={handleSaveDraft}
+                  onClick={handleSaveRecord}
                   disabled={form.formState.isSubmitting}
                 >
-                  Save Draft
+                  Save Record
                 </Button>
                 
                 <Button
                   type="submit"
-                  disabled={!isFormValid || form.formState.isSubmitting || !isDraftSaved}
+                  disabled={!isFormValid || form.formState.isSubmitting || !isRecordSaved}
                 >
                   Generate Invoice
                 </Button>

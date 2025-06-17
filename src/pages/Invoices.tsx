@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -34,26 +35,83 @@ import InvoiceFilters from "@/components/invoices/InvoiceFilters";
 import InvoiceBulkActions from "@/components/invoices/InvoiceBulkActions";
 import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
-
-// For demo purposes, make clients/invoices empty arrays and add TODOs for backend fetch
+import { getClients } from "@/api/clients";
 
 const Invoices = () => {
   const { toast } = useToast();
-  const [invoices, setInvoices] = useState<any[]>([]); // TODO: Fetch from backend
+  const [invoices, setInvoices] = useState<any[]>([]);
   const [filteredInvoices, setFilteredInvoices] = useState<any[]>([]);
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quickViewInvoice, setQuickViewInvoice] = useState<Invoice | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [clients, setClients] = useState<Record<string, Client>>({});
+
+  // Load invoices from localStorage and clients from backend
+  useEffect(() => {
+    // Load invoices from localStorage
+    const loadInvoices = () => {
+      try {
+        const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        setInvoices(storedInvoices);
+        setFilteredInvoices(storedInvoices);
+      } catch (error) {
+        console.error('Error loading invoices from localStorage:', error);
+        setInvoices([]);
+        setFilteredInvoices([]);
+      }
+    };
+
+    // Load clients from backend
+    const loadClients = async () => {
+      try {
+        const clientsData = await getClients();
+        const clientsMap: Record<string, Client> = {};
+        clientsData.forEach((c: any) => {
+          clientsMap[c.id] = {
+            id: c.id,
+            companyName: c.company_name,
+            contactName: c.contact_name ?? "",
+            gstNumber: c.gst_number ?? "",
+            phoneNumber: c.phone_number ?? "",
+            phone: c.phone_number ?? "",
+            email: c.email ?? "",
+            bankAccountNumber: c.bank_account_number ?? "",
+            bankDetails: c.bank_details ?? "",
+            address: c.address ?? "",
+            city: c.city ?? "",
+            state: c.state ?? "",
+            postalCode: c.postal_code ?? "",
+            website: c.website ?? "",
+            tags: c.tags ?? [],
+            status: c.status as any,
+            lastInvoiceDate: c.last_invoice_date ?? undefined,
+            totalInvoiced: c.total_invoiced ?? undefined,
+            pendingInvoices: c.pending_invoices ?? undefined,
+            fyInvoices: c.fy_invoices ?? undefined,
+          };
+        });
+        setClients(clientsMap);
+      } catch (error) {
+        console.error('Error loading clients:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load clients data",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadInvoices();
+    loadClients();
+  }, [toast]);
 
   // Pagination
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentInvoices = filteredInvoices.slice(startIndex, endIndex);
-
-  const clients: Record<string, Client> = {}; // TODO: Fetch from backend
 
   const getClientName = (clientId: string) => {
     return clients[clientId]?.companyName || "Unknown Client";
@@ -93,6 +151,10 @@ const Invoices = () => {
     );
     setInvoices(updatedInvoices);
     setFilteredInvoices(updatedInvoices);
+    
+    // Update localStorage
+    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+    
     toast({
       title: "Status Updated",
       description: `Invoice ${invoices.find(i => i.id === invoiceId)?.invoiceNumber} marked as ${newStatus}.`,
@@ -108,6 +170,9 @@ const Invoices = () => {
     setInvoices(updatedInvoices);
     setFilteredInvoices(updatedInvoices);
     setSelectedInvoices([]);
+    
+    // Update localStorage
+    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
   };
 
   const handleDeleteInvoice = (invoiceId: string) => {
@@ -115,6 +180,10 @@ const Invoices = () => {
     setInvoices(updatedInvoices);
     setFilteredInvoices(updatedInvoices);
     setSelectedInvoices(selectedInvoices.filter(id => id !== invoiceId));
+    
+    // Update localStorage
+    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+    
     toast({
       title: "Invoice Deleted",
       description: "Invoice has been deleted successfully.",
@@ -126,6 +195,9 @@ const Invoices = () => {
     setInvoices(updatedInvoices);
     setFilteredInvoices(updatedInvoices);
     setSelectedInvoices([]);
+    
+    // Update localStorage
+    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
   };
 
   const handleSelectInvoice = (invoiceId: string, checked: boolean) => {
@@ -190,7 +262,7 @@ const Invoices = () => {
         <div className="page-header flex items-center justify-between">
           <div>
             <h1 className="page-title">Invoices</h1>
-            <p className="page-description">Manage and track your invoices</p>
+            <p className="page-description">Manage and track your invoices ({filteredInvoices.length} total)</p>
           </div>
           <div className="flex items-center gap-3">
             <InvoiceExport 
@@ -251,7 +323,7 @@ const Invoices = () => {
               {currentInvoices.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="h-24 text-center">
-                    No invoices found.
+                    {invoices.length === 0 ? "No invoices created yet. Click 'Create Invoice' to get started." : "No invoices found with current filters."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -348,62 +420,64 @@ const Invoices = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredInvoices.length)} of {filteredInvoices.length} invoices
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-4">
+        {filteredInvoices.length > 0 && (
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Per page:</span>
-              <Select
-                value={itemsPerPage.toString()}
-                onValueChange={(value) => {
-                  setItemsPerPage(Number(value));
-                  setCurrentPage(1);
-                }}
-              >
-                <SelectTrigger className="w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
+              <span className="text-sm text-muted-foreground">
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredInvoices.length)} of {filteredInvoices.length} invoices
+              </span>
             </div>
             
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Per page:</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               
-              <span className="text-sm text-muted-foreground">
-                Page {currentPage} of {totalPages}
-              </span>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <InvoiceQuickView
           open={isQuickViewOpen}
