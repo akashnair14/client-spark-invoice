@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
 import { createClient } from "@/api/clients";
+import { getCurrentUserId } from "@/utils/authUtils";
 
 // Utility function to convert Client form values to snake_case for Supabase
-function mapClientToDbInput(client: Omit<Client, "id">) {
+function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
   return {
-    owner_id: "demo-owner-id", // TODO: Replace with supabase.auth.currentUser?.id or from auth context
+    owner_id: ownerId,
     company_name: client.companyName,
     contact_name: client.contactName,
     gst_number: client.gstNumber,
@@ -36,9 +37,13 @@ const NewClient = () => {
 
   const handleAddClient = async (client: Omit<Client, "id">) => {
     try {
-      // Only send the correct keys to Supabase, not camelCase
-      const dbInput = mapClientToDbInput(client);
+      // Get the current authenticated user's ID
+      const ownerId = await getCurrentUserId();
+      
+      // Use the authenticated user's ID as owner_id
+      const dbInput = mapClientToDbInput(client, ownerId);
       await createClient(dbInput);
+      
       toast({
         title: "Client Added",
         description: `${client.companyName} has been added successfully.`,
