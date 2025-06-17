@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,14 +13,12 @@ import AdditionalDetails from "./form/AdditionalDetails";
 import InvoiceFormLayout from "./form/InvoiceFormLayout";
 import StickySummary from "./form/StickySummary";
 import EnhancedInvoiceDetails from "./form/EnhancedInvoiceDetails";
-import InvoiceActions from "./form/InvoiceActions";
-import InvoicePreviewPane from "./form/InvoicePreviewPane";
 import InvoiceTotals from "./form/InvoiceTotals";
-import { useInvoiceForm } from "@/context/InvoiceFormContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
@@ -59,7 +58,7 @@ interface InvoiceFormProps {
 
 const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) => {
   const [selectedClient, setSelectedClient] = useState<Client | undefined>();
-  const [showPreview, setShowPreview] = useState(false);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState({
     clientInfo: true,
     additionalInfo: false,
@@ -67,6 +66,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     taxSummary: true,
     notes: false
   });
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,6 +99,15 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     },
   });
 
+  // Watch for client selection and update the selectedClient state
+  const watchedClientId = form.watch("clientId");
+  useEffect(() => {
+    if (watchedClientId) {
+      const client = clients.find(c => c.id === watchedClientId);
+      setSelectedClient(client);
+    }
+  }, [watchedClientId, clients]);
+
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     const updatedItems = values.items.map(item => ({
       ...item,
@@ -114,22 +123,32 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
   };
 
   const handleSaveDraft = () => {
-    console.log("Saving as draft...");
-    // Implement draft save logic
-  };
+    const formValues = form.getValues();
+    
+    // Validate required fields for draft
+    if (!formValues.clientId || !formValues.invoiceNumber) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a client and enter an invoice number to save as draft.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleSaveAndShare = () => {
-    console.log("Saving and sharing...");
-    // Implement save and share logic
-  };
-
-  const handleSaveAndPrint = () => {
-    console.log("Saving and printing...");
-    // Implement save and print logic
-  };
-
-  const handlePreview = () => {
-    setShowPreview(!showPreview);
+    // Save draft logic - for now, we'll store in localStorage
+    const draftData = {
+      ...formValues,
+      status: 'draft',
+      savedAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem(`invoice_draft_${formValues.invoiceNumber}`, JSON.stringify(draftData));
+    setIsDraftSaved(true);
+    
+    toast({
+      title: "Draft Saved",
+      description: `Invoice ${formValues.invoiceNumber} has been saved as draft.`,
+    });
   };
 
   const toggleSection = (section: keyof typeof sectionsOpen) => {
@@ -150,12 +169,6 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
                   invoiceNumber={form.watch("invoiceNumber")}
                   date={form.watch("date")}
                 />
-                {showPreview && (
-                  <InvoicePreviewComponent 
-                    client={selectedClient}
-                    form={form}
-                  />
-                )}
               </div>
             }
           >
@@ -274,57 +287,28 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
 
             {/* Sticky Action Buttons */}
             <div className="sticky bottom-0 bg-background border-t pt-4 mt-8">
-              <div className="flex flex-col sm:flex-row gap-3 justify-between">
+              <div className="flex flex-col sm:flex-row gap-3 justify-end">
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={handlePreview}
-                  className="order-2 sm:order-1"
+                  variant="secondary"
+                  onClick={handleSaveDraft}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {showPreview ? "Hide Preview" : "Show Preview"}
+                  Save Draft
                 </Button>
                 
-                <div className="flex gap-2 order-1 sm:order-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleSaveDraft}
-                    disabled={form.formState.isSubmitting}
-                  >
-                    Save Draft
-                  </Button>
-                  
-                  <Button
-                    type="submit"
-                    disabled={!isFormValid || form.formState.isSubmitting}
-                  >
-                    Generate Invoice
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={!isFormValid || form.formState.isSubmitting || !isDraftSaved}
+                >
+                  Generate Invoice
+                </Button>
               </div>
             </div>
           </InvoiceFormLayout>
         </form>
       </Form>
     </InvoiceFormProvider>
-  );
-};
-
-// Helper component to access context
-const InvoicePreviewComponent = ({ client, form }: { client?: Client; form: any }) => {
-  const { subtotal, gstAmount, total } = useInvoiceForm();
-  
-  return (
-    <InvoicePreviewPane
-      client={client}
-      invoiceNumber={form.watch("invoiceNumber")}
-      date={form.watch("date")}
-      items={form.watch("items")}
-      subtotal={subtotal}
-      gstAmount={gstAmount}
-      total={total}
-      gstType={form.watch("gstType")}
-    />
   );
 };
 

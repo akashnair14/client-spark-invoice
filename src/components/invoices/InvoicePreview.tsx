@@ -3,13 +3,7 @@ import React, { useRef } from "react";
 import { Client, InvoiceItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import InvoiceActions from "./preview/InvoiceActions";
-import InvoiceHeader from "./preview/InvoiceHeader";
-import InvoiceClientInfo from "./preview/InvoiceClientInfo";
-import InvoiceItemsTable from "./preview/InvoiceItemsTable";
-import InvoiceTotals from "./preview/InvoiceTotals";
-import InvoiceNotes from "./preview/InvoiceNotes";
-import InvoiceFooter from "./preview/InvoiceFooter";
-import PrintableInvoice from "./preview/PrintableInvoice";
+import InvoiceTemplate from "./template/InvoiceTemplate";
 
 interface InvoicePreviewProps {
   invoice: {
@@ -42,13 +36,6 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
   const dueDate = invoice.dueDate instanceof Date ? invoice.dueDate : 
                  (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
 
-  const companyDetails = {
-    name: "Your Company Name",
-    address: [client.address, client.city || "", client.state || ""],
-    gstNumber: client.gstNumber,
-    contact: client.email
-  };
-
   return (
     <div className="space-y-6">
       <InvoiceActions
@@ -62,34 +49,26 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
       />
 
       <Card className="border border-gray-200 print:border-0 print:shadow-none animate-fade-in">
-        <CardContent className="p-6 md:p-8" ref={invoiceRef}>
-          <div className="invoice-content">
-            <InvoiceHeader 
-              invoiceNumber={invoice.invoiceNumber} 
-              companyDetails={companyDetails}
-            />
-            <InvoiceClientInfo 
-              client={client} 
-              date={invoiceDate} 
-              dueDate={dueDate}
-              status={invoice.status}
-            />
-            <InvoiceItemsTable items={invoice.items} />
-            <InvoiceTotals 
-              subtotal={subtotal} 
-              gstAmount={gstAmount}
-              roundoff={roundoff}
-              total={total} 
-            />
-            <InvoiceNotes notes={invoice.notes} />
-            <InvoiceFooter />
-          </div>
+        <CardContent className="p-0" ref={invoiceRef}>
+          <InvoiceTemplate
+            invoice={{
+              ...invoice,
+              date: invoiceDate,
+              dueDate: dueDate
+            }}
+            client={client}
+            subtotal={subtotal}
+            gstAmount={gstAmount}
+            roundoff={roundoff}
+            total={total}
+            isPDF={false}
+          />
         </CardContent>
       </Card>
 
-      {/* Hidden printable version without status - only used for PDF generation */}
+      {/* Hidden printable version for PDF generation */}
       <div className="hidden">
-        <PrintableInvoice
+        <InvoiceTemplate
           ref={printableRef}
           invoice={{
             ...invoice,
@@ -101,6 +80,7 @@ const InvoicePreview = ({ invoice, client, subtotal, gstAmount, roundoff = 0, to
           gstAmount={gstAmount}
           roundoff={roundoff}
           total={total}
+          isPDF={true}
         />
       </div>
     </div>
