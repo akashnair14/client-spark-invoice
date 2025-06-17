@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import InvoiceForm from "@/components/invoices/InvoiceForm";
 import InvoicePreview from "@/components/invoices/InvoicePreview";
@@ -17,6 +16,7 @@ const NewInvoice = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const {
     activeTab,
     setActiveTab,
@@ -33,6 +33,8 @@ const NewInvoice = () => {
 
   const [clients, setClients] = useState<Client[]>([]);
   const [clientsLoading, setClientsLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
 
   useEffect(() => {
     setClientsLoading(true);
@@ -63,12 +65,61 @@ const NewInvoice = () => {
         setClients(data.map(mapClient));
         setClientsLoading(false);
 
-        // auto-select client if clientId param is present
-        const params = new URLSearchParams(location.search);
-        const clientId = params.get("clientId");
-        if (clientId) {
-          const client = data.find((c: any) => c.id === clientId);
-          if (client) setSelectedClient(mapClient(client));
+        // Handle edit mode from URL params or location state
+        const editId = searchParams.get("edit");
+        const editInvoice = location.state?.editInvoice;
+        const editClient = location.state?.editClient;
+        const viewMode = location.state?.viewMode;
+
+        if (editId && editInvoice && editClient) {
+          setIsEditMode(true);
+          setIsViewMode(viewMode || false);
+          setSelectedClient(editClient);
+          setInvoiceData(editInvoice);
+          calculateInvoiceTotals(editInvoice.items);
+          
+          if (viewMode) {
+            setActiveTab("preview");
+          }
+          
+          toast({
+            title: isViewMode ? "Invoice Loaded" : "Edit Mode",
+            description: `Invoice ${editInvoice.invoiceNumber} ${isViewMode ? 'loaded for viewing' : 'loaded for editing'}.`,
+          });
+        } else if (editId) {
+          // Try to load from localStorage if not in location state
+          const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+          const invoiceToEdit = storedInvoices.find((inv: any) => inv.id === editId);
+          
+          if (invoiceToEdit) {
+            const clientToEdit = data.find((c: any) => c.id === invoiceToEdit.clientId);
+            if (clientToEdit) {
+              setIsEditMode(true);
+              setSelectedClient(mapClient(clientToEdit));
+              setInvoiceData(invoiceToEdit);
+              calculateInvoiceTotals(invoiceToEdit.items);
+              
+              toast({
+                title: "Edit Mode",
+                description: `Invoice ${invoiceToEdit.invoiceNumber} loaded for editing.`,
+              });
+            }
+          } else {
+            toast({
+              title: "Invoice Not Found",
+              description: "The invoice you're trying to edit could not be found.",
+              variant: "destructive",
+            });
+            navigate('/invoices');
+          }
+        } else {
+          // auto-select client if clientId param is present (for new invoices)
+          const params = new URLSearchParams(location.search);
+          const clientId = params.get("clientId");
+          if (clientId) {
+            const client = data.find((c: any) => c.id === clientId);
+            if (client) setSelectedClient(mapClient(client));
+          }
         }
       })
       .catch((err) => {
@@ -79,7 +130,7 @@ const NewInvoice = () => {
           variant: "destructive",
         });
       });
-  }, [location, setSelectedClient]);
+  }, [location, setSelectedClient, searchParams, navigate, toast, setInvoiceData, calculateInvoiceTotals, setActiveTab]);
 
   const handleInvoiceSubmit = (formData: any) => {
     const client = clients.find((c) => c.id === formData.clientId);
@@ -169,21 +220,29 @@ const NewInvoice = () => {
     return clientComplete && itemsComplete && invoiceDetailsComplete;
   };
 
+  const pageTitle = isEditMode 
+    ? (isViewMode ? "View Invoice" : "Edit Invoice")
+    : "Create New Invoice";
+    
+  const pageDescription = isEditMode
+    ? (isViewMode ? "View and manage this invoice" : "Modify existing invoice details")
+    : "Design and generate professional invoices with enhanced automation";
+
   return (
     <Layout>
       <div className="page-header">
-        <h1 className="page-title">Create New Invoice</h1>
-        <p className="page-description">Design and generate professional invoices with enhanced automation</p>
+        <h1 className="page-title">{pageTitle}</h1>
+        <p className="page-description">{pageDescription}</p>
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <Card>
           <CardContent className="p-1">
             <TabsList className="grid w-full grid-cols-2 h-12">
-              <TabsTrigger value="edit" className="h-10">
-                Invoice Builder
+              <TabsTrigger value="edit" className="h-10" disabled={isViewMode}>
+                {isEditMode ? "Edit Invoice" : "Invoice Builder"}
               </TabsTrigger>
               <TabsTrigger value="preview" disabled={!invoiceData} className="h-10">
-                Preview & Finalize
+                Preview & {isViewMode ? "Print" : "Finalize"}
               </TabsTrigger>
             </TabsList>
           </CardContent>
@@ -194,15 +253,19 @@ const NewInvoice = () => {
             clients={clients}
             onSubmit={handleInvoiceSubmit}
             initialClientId={selectedClient?.id}
+            editInvoice={isEditMode ? invoiceData : undefined}
+            editClient={isEditMode ? selectedClient : undefined}
           />
         </TabsContent>
 
         <TabsContent value="preview" className="space-y-6 mt-6">
-          <InvoicePreviewActions
-            onBackToEdit={() => setActiveTab("edit")}
-            onFinalizeInvoice={handleFinalizeInvoice}
-            hasInvoiceData={!!invoiceData}
-          />
+          {!isViewMode && (
+            <InvoicePreviewActions
+              onBackToEdit={() => setActiveTab("edit")}
+              onFinalizeInvoice={handleFinalizeInvoice}
+              hasInvoiceData={!!invoiceData}
+            />
+          )}
 
           {invoiceData && selectedClient ? (
             <InvoicePreview

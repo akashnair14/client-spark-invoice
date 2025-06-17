@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -115,6 +114,13 @@ const Invoices = () => {
 
   const getClientName = (clientId: string) => {
     return clients[clientId]?.companyName || "Unknown Client";
+  };
+
+  const getTaxPercentage = (invoice: any) => {
+    if (!invoice.items || invoice.items.length === 0) return "0%";
+    // Get the GST rate from the first item (assuming all items have same GST rate)
+    const gstRate = invoice.items[0]?.gstRate || 0;
+    return `${gstRate}%`;
   };
 
   const getStatusBadge = (status: Invoice["status"]) => {
@@ -253,6 +259,111 @@ const Invoices = () => {
     }
   };
 
+  const handleDownloadPDF = (invoice: any) => {
+    // Create a temporary element to render the invoice for PDF generation
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const client = clients[invoice.clientId];
+      if (!client) {
+        toast({
+          title: "Error",
+          description: "Client data not found for this invoice",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate HTML content for the invoice
+      const invoiceHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Invoice ${invoice.invoiceNumber}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+            .company-details h1 { color: #3b82f6; margin: 0; }
+            .invoice-details { text-align: right; }
+            .client-section { margin: 30px 0; }
+            .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            .items-table th { background-color: #f5f5f5; }
+            .totals { margin-left: auto; width: 300px; }
+            .total-row { display: flex; justify-content: space-between; padding: 5px 0; }
+            .total-row.final { font-weight: bold; border-top: 1px solid #000; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-details">
+              <h1>Your Company Name</h1>
+              <p>123 Business Street<br>Business City, Business State 12345<br>GST: 27AAPFU0939F1ZV</p>
+            </div>
+            <div class="invoice-details">
+              <h2>TAX INVOICE</h2>
+              <p>Invoice #${invoice.invoiceNumber}</p>
+              <p>Date: ${new Date(invoice.date).toLocaleDateString()}</p>
+            </div>
+          </div>
+          
+          <div class="client-section">
+            <h3>Bill To:</h3>
+            <p><strong>${client.companyName}</strong><br>
+            ${client.address}<br>
+            ${client.city}, ${client.state} ${client.postalCode}<br>
+            GST: ${client.gstNumber}<br>
+            Phone: ${client.phoneNumber}</p>
+          </div>
+
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>HSN Code</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${invoice.items.map((item: any) => `
+                <tr>
+                  <td>${item.description}</td>
+                  <td>${item.hsnCode}</td>
+                  <td>${item.quantity}</td>
+                  <td>₹${item.rate.toFixed(2)}</td>
+                  <td>₹${item.amount.toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="total-row"><span>Subtotal:</span><span>₹${invoice.subtotal.toFixed(2)}</span></div>
+            <div class="total-row"><span>GST (${getTaxPercentage(invoice)}):</span><span>₹${invoice.gstAmount.toFixed(2)}</span></div>
+            ${invoice.roundoff ? `<div class="total-row"><span>Round Off:</span><span>₹${invoice.roundoff.toFixed(2)}</span></div>` : ''}
+            <div class="total-row final"><span>Total:</span><span>₹${invoice.total.toFixed(2)}</span></div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(invoiceHTML);
+      printWindow.document.close();
+      
+      // Trigger print dialog
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+      };
+
+      toast({
+        title: "Download Initiated",
+        description: `Invoice ${invoice.invoiceNumber} is being prepared for download.`,
+      });
+    }
+  };
+
   const allSelected = currentInvoices.length > 0 && selectedInvoices.length === currentInvoices.length;
   const someSelected = selectedInvoices.length > 0 && selectedInvoices.length < currentInvoices.length;
 
@@ -312,7 +423,7 @@ const Invoices = () => {
                 <TableHead>Client</TableHead>
                 <TableHead className="hidden md:table-cell">Date</TableHead>
                 <TableHead className="hidden lg:table-cell">Due Date</TableHead>
-                <TableHead className="hidden lg:table-cell">Type</TableHead>
+                <TableHead className="hidden lg:table-cell">Tax %</TableHead>
                 <TableHead className="hidden xl:table-cell">Last Update</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead className="hidden md:table-cell">Status</TableHead>
@@ -349,7 +460,7 @@ const Invoices = () => {
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
                       <Badge variant="outline">
-                        {invoice.gstType === "igst" ? "IGST" : "CGST/SGST"}
+                        {getTaxPercentage(invoice)}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden xl:table-cell">
@@ -377,12 +488,15 @@ const Invoices = () => {
                             Quick View
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link to={`/invoices/${invoice.id}`}>
+                            <Link 
+                              to={`/invoices/new?edit=${invoice.id}`} 
+                              state={{ editInvoice: invoice, editClient: clients[invoice.clientId] }}
+                            >
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownloadPDF(invoice)}>
                             <Download className="mr-2 h-4 w-4" />
                             Download PDF
                           </DropdownMenuItem>
