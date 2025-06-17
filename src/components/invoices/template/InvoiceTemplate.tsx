@@ -47,45 +47,75 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
                    (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
 
     return (
-      <div ref={ref} className={`bg-white ${isPDF ? 'p-8' : 'p-6 md:p-8'}`}>
-        {/* Header Section */}
-        <InvoiceTemplateHeader 
-          companyDetails={companyDetails}
-          invoiceNumber={invoice.invoiceNumber}
-          isPDF={isPDF}
-        />
-        
-        {/* Client Information */}
-        <InvoiceTemplateClient 
-          client={client}
-          date={invoiceDate}
-          dueDate={dueDate}
-          status={invoice.status}
-          isPDF={isPDF}
-        />
-        
-        {/* Items Table */}
-        <InvoiceTemplateItems 
-          items={invoice.items}
-          isPDF={isPDF}
-        />
-        
-        {/* Totals Section */}
-        <InvoiceTemplateTotals 
-          subtotal={subtotal}
-          gstAmount={gstAmount}
-          roundoff={roundoff}
-          total={total}
-          isPDF={isPDF}
-        />
-        
-        {/* Footer with Notes */}
-        <InvoiceTemplateFooter 
-          notes={invoice.notes}
-          companyDetails={companyDetails}
-          isPDF={isPDF}
-        />
-      </div>
+      <>
+        <style>
+          {`
+            @media print {
+              body { margin: 0 !important; }
+              .print\\:hidden { display: none !important; }
+              .invoice-template * {
+                background: white !important;
+                color: black !important;
+              }
+              .invoice-template .text-primary {
+                color: #3b82f6 !important;
+              }
+              .invoice-template .text-muted-foreground {
+                color: #6b7280 !important;
+              }
+              .invoice-template .border {
+                border-color: #e5e7eb !important;
+              }
+              .invoice-template .bg-primary-foreground {
+                background: #f8fafc !important;
+              }
+            }
+          `}
+        </style>
+        <div 
+          ref={ref} 
+          className={`invoice-template bg-white text-black ${isPDF ? 'p-8' : 'p-6 md:p-8'}`}
+          style={isPDF ? { background: 'white', color: 'black' } : {}}
+        >
+          {/* Header Section */}
+          <InvoiceTemplateHeader 
+            companyDetails={companyDetails}
+            invoiceNumber={invoice.invoiceNumber}
+            isPDF={isPDF}
+          />
+          
+          {/* Client Information */}
+          <InvoiceTemplateClient 
+            client={client}
+            date={invoiceDate}
+            dueDate={dueDate}
+            status={invoice.status}
+            isPDF={isPDF}
+          />
+          
+          {/* Items Table */}
+          <InvoiceTemplateItems 
+            items={invoice.items}
+            isPDF={isPDF}
+          />
+          
+          {/* Totals Section */}
+          <InvoiceTemplateTotals 
+            subtotal={subtotal}
+            gstAmount={gstAmount}
+            roundoff={roundoff}
+            total={total}
+            isPDF={isPDF}
+          />
+          
+          {/* Footer with Notes */}
+          <InvoiceTemplateFooter 
+            notes={invoice.notes}
+            companyDetails={companyDetails}
+            isPDF={isPDF}
+          />
+        </div>
+      </>
     );
   }
 );

@@ -1,3 +1,4 @@
+
 import {
   Sheet,
   SheetContent,
@@ -77,127 +78,201 @@ const InvoiceQuickView = ({
   };
 
   const handleDownloadPDF = () => {
-    // Create a new window for PDF generation
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      const getTaxPercentage = () => {
-        if (!invoice.items || invoice.items.length === 0) return "0%";
-        const gstRate = invoice.items[0]?.gstRate || 0;
-        return `${gstRate}%`;
-      };
+    toast({
+      title: "Generating PDF",
+      description: "Please wait while we generate your invoice PDF...",
+    });
 
-      const invoiceHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Invoice ${invoice.invoiceNumber}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; }
-            .company-details h1 { color: #3b82f6; margin: 0; font-size: 28px; }
-            .company-details p { margin: 5px 0; color: #6b7280; }
-            .invoice-details { text-align: right; }
-            .invoice-details h2 { color: #3b82f6; margin: 0; font-size: 24px; }
-            .client-section { margin: 30px 0; padding: 20px; background-color: #f9fafb; border: 1px solid #e5e7eb; }
-            .client-section h3 { margin-top: 0; color: #374151; }
-            .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            .items-table th, .items-table td { border: 1px solid #d1d5db; padding: 12px; text-align: left; }
-            .items-table th { background-color: #f3f4f6; font-weight: 600; }
-            .totals { margin: 20px 0; margin-left: auto; width: 350px; border: 1px solid #e5e7eb; padding: 20px; }
-            .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
-            .total-row.final { font-weight: bold; border-top: 2px solid #374151; margin-top: 10px; padding-top: 10px; font-size: 18px; }
-            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div class="company-details">
-              <h1>Your Company Name</h1>
-              <p>123 Business Street</p>
-              <p>Business City, Business State 12345</p>
-              <p><strong>GST: 27AAPFU0939F1ZV</strong></p>
-            </div>
-            <div class="invoice-details">
-              <h2>TAX INVOICE</h2>
-              <p><strong>Invoice #${invoice.invoiceNumber}</strong></p>
-              <p>Date: ${new Date(invoice.date).toLocaleDateString()}</p>
-              ${invoice.dueDate ? `<p>Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
-            </div>
-          </div>
-          
-          <div class="client-section">
-            <h3>Bill To:</h3>
-            <p><strong>${client.companyName}</strong></p>
-            <p>${client.address}</p>
-            <p>${client.city}, ${client.state} ${client.postalCode}</p>
-            <p><strong>GST: ${client.gstNumber}</strong></p>
-            <p>Phone: ${client.phoneNumber}</p>
-            <p>Email: ${client.email}</p>
-          </div>
+    setTimeout(() => {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const getTaxPercentage = () => {
+          if (!invoice.items || invoice.items.length === 0) return "0%";
+          const gstRate = invoice.items[0]?.gstRate || 0;
+          return `${gstRate}%`;
+        };
 
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>HSN Code</th>
-                <th>Qty</th>
-                <th>Rate (₹)</th>
-                <th>Amount (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${invoice.items.map((item: any) => `
+        const invoiceHTML = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Invoice ${invoice.invoiceNumber}</title>
+            <style>
+              @media print {
+                body { margin: 0; }
+                .no-print { display: none; }
+              }
+              body { 
+                font-family: Arial, sans-serif; 
+                margin: 20px;
+                background: white;
+                color: black;
+              }
+              .header { 
+                display: flex; 
+                justify-content: space-between; 
+                margin-bottom: 30px; 
+                border-bottom: 2px solid #e5e7eb; 
+                padding-bottom: 20px; 
+              }
+              .company-details h1 { 
+                color: #3b82f6; 
+                margin: 0; 
+                font-size: 28px; 
+              }
+              .company-details p { 
+                margin: 5px 0; 
+                color: #6b7280; 
+              }
+              .invoice-details { 
+                text-align: right; 
+              }
+              .invoice-details h2 { 
+                color: #3b82f6; 
+                margin: 0; 
+                font-size: 24px; 
+              }
+              .client-section { 
+                margin: 30px 0; 
+                padding: 20px; 
+                background-color: #f9fafb; 
+                border: 1px solid #e5e7eb; 
+              }
+              .client-section h3 { 
+                margin-top: 0; 
+                color: #374151; 
+              }
+              .items-table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin: 20px 0; 
+              }
+              .items-table th, .items-table td { 
+                border: 1px solid #d1d5db; 
+                padding: 12px; 
+                text-align: left; 
+              }
+              .items-table th { 
+                background-color: #f3f4f6; 
+                font-weight: 600; 
+              }
+              .totals { 
+                margin: 20px 0; 
+                margin-left: auto; 
+                width: 350px; 
+                border: 1px solid #e5e7eb; 
+                padding: 20px; 
+              }
+              .total-row { 
+                display: flex; 
+                justify-content: space-between; 
+                padding: 8px 0; 
+              }
+              .total-row.final { 
+                font-weight: bold; 
+                border-top: 2px solid #374151; 
+                margin-top: 10px; 
+                padding-top: 10px; 
+                font-size: 18px; 
+              }
+              .footer { 
+                margin-top: 40px; 
+                padding-top: 20px; 
+                border-top: 1px solid #e5e7eb; 
+                text-align: center; 
+                color: #6b7280; 
+                font-size: 12px; 
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="company-details">
+                <h1>Your Company Name</h1>
+                <p>123 Business Street</p>
+                <p>Business City, Business State 12345</p>
+                <p><strong>GST: 27AAPFU0939F1ZV</strong></p>
+              </div>
+              <div class="invoice-details">
+                <h2>TAX INVOICE</h2>
+                <p><strong>Invoice #${invoice.invoiceNumber}</strong></p>
+                <p>Date: ${new Date(invoice.date).toLocaleDateString()}</p>
+                ${invoice.dueDate ? `<p>Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
+              </div>
+            </div>
+            
+            <div class="client-section">
+              <h3>Bill To:</h3>
+              <p><strong>${client.companyName}</strong></p>
+              <p>${client.address}</p>
+              <p>${client.city}, ${client.state} ${client.postalCode}</p>
+              <p><strong>GST: ${client.gstNumber}</strong></p>
+              <p>Phone: ${client.phoneNumber}</p>
+              <p>Email: ${client.email}</p>
+            </div>
+
+            <table class="items-table">
+              <thead>
                 <tr>
-                  <td>${item.description}</td>
-                  <td>${item.hsnCode}</td>
-                  <td>${item.quantity}</td>
-                  <td>${item.rate.toFixed(2)}</td>
-                  <td>${item.amount.toFixed(2)}</td>
+                  <th>Description</th>
+                  <th>HSN Code</th>
+                  <th>Qty</th>
+                  <th>Rate (₹)</th>
+                  <th>Amount (₹)</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${invoice.items.map((item: any) => `
+                  <tr>
+                    <td>${item.description}</td>
+                    <td>${item.hsnCode}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.rate.toFixed(2)}</td>
+                    <td>${item.amount.toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
 
-          <div class="totals">
-            <div class="total-row"><span>Subtotal:</span><span>₹${invoice.subtotal.toFixed(2)}</span></div>
-            <div class="total-row"><span>GST (${getTaxPercentage()}):</span><span>₹${invoice.gstAmount.toFixed(2)}</span></div>
-            ${invoice.roundoff ? `<div class="total-row"><span>Round Off:</span><span>₹${invoice.roundoff.toFixed(2)}</span></div>` : ''}
-            <div class="total-row final"><span>Total Amount:</span><span>₹${invoice.total.toFixed(2)}</span></div>
-          </div>
-
-          ${invoice.notes ? `
-            <div style="margin: 30px 0; padding: 15px; background-color: #f9fafb; border-left: 4px solid #3b82f6;">
-              <h4 style="margin-top: 0; color: #374151;">Notes:</h4>
-              <p style="margin-bottom: 0; color: #6b7280;">${invoice.notes}</p>
+            <div class="totals">
+              <div class="total-row"><span>Subtotal:</span><span>₹${invoice.subtotal.toFixed(2)}</span></div>
+              <div class="total-row"><span>GST (${getTaxPercentage()}):</span><span>₹${invoice.gstAmount.toFixed(2)}</span></div>
+              ${(invoice as any).roundoff ? `<div class="total-row"><span>Round Off:</span><span>₹${(invoice as any).roundoff.toFixed(2)}</span></div>` : ''}
+              <div class="total-row final"><span>Total Amount:</span><span>₹${invoice.total.toFixed(2)}</span></div>
             </div>
-          ` : ''}
 
-          <div class="footer">
-            <p>This is a computer generated invoice and does not require physical signature.</p>
-            <p><strong>Thank you for your business!</strong></p>
-          </div>
-        </body>
-        </html>
-      `;
+            ${invoice.notes ? `
+              <div style="margin: 30px 0; padding: 15px; background-color: #f9fafb; border-left: 4px solid #3b82f6;">
+                <h4 style="margin-top: 0; color: #374151;">Notes:</h4>
+                <p style="margin-bottom: 0; color: #6b7280;">${invoice.notes}</p>
+              </div>
+            ` : ''}
 
-      printWindow.document.write(invoiceHTML);
-      printWindow.document.close();
-      
-      // Trigger print dialog after content loads
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
+            <div class="footer">
+              <p>This is a computer generated invoice and does not require physical signature.</p>
+              <p><strong>Thank you for your business!</strong></p>
+            </div>
+          </body>
+          </html>
+        `;
 
-      toast({
-        title: "PDF Download Initiated",
-        description: `Invoice ${invoice.invoiceNumber} is being prepared for download.`,
-      });
-    }
+        printWindow.document.write(invoiceHTML);
+        printWindow.document.close();
+        
+        printWindow.onload = () => {
+          printWindow.print();
+          printWindow.close();
+        };
+
+        toast({
+          title: "PDF Download Initiated",
+          description: `Invoice ${invoice.invoiceNumber} is being prepared for download.`,
+        });
+      }
+    }, 500);
   };
 
   const handleViewFullInvoice = () => {
-    // Navigate to the edit page with invoice data
     navigate(`/invoices/new?edit=${invoice.id}`, {
       state: { 
         editInvoice: invoice, 

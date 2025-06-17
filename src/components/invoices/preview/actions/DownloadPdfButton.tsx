@@ -2,9 +2,7 @@
 import React from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import { useToast } from "@/hooks/use-toast";
 
 interface DownloadPdfButtonProps {
   printableRef: React.RefObject<HTMLDivElement>;
@@ -14,63 +12,82 @@ interface DownloadPdfButtonProps {
 const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonProps) => {
   const { toast } = useToast();
 
-  const handleDownloadPDF = async () => {
-    if (!printableRef.current) return;
+  const handleDownloadPDF = () => {
+    if (!printableRef.current) {
+      toast({
+        title: "Error",
+        description: "Invoice content not ready. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     toast({
       title: "Generating PDF",
       description: "Please wait while we generate your invoice PDF...",
     });
 
-    try {
-      // Add a temporary class for better PDF generation
-      printableRef.current.classList.add("pdf-generation");
+    // Get the invoice content
+    const invoiceContent = printableRef.current.innerHTML;
+    
+    // Create a new window for printing/PDF generation
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Invoice ${invoiceNumber}</title>
+          <style>
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0;
+              padding: 20px;
+              background: white !important;
+              color: black !important;
+            }
+            * {
+              background: white !important;
+              color: black !important;
+            }
+            .bg-primary { color: #3b82f6 !important; }
+            .text-primary { color: #3b82f6 !important; }
+            .text-muted-foreground { color: #6b7280 !important; }
+            .border { border: 1px solid #e5e7eb !important; }
+            .border-border { border-color: #e5e7eb !important; }
+            .bg-primary-foreground { background: #f8fafc !important; }
+          </style>
+        </head>
+        <body>
+          ${invoiceContent}
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
       
-      const canvas = await html2canvas(printableRef.current, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
-      
-      // Remove temporary class
-      printableRef.current.classList.remove("pdf-generation");
-      
-      const imgData = canvas.toDataURL("image/png");
-      
-      // Calculate PDF dimensions based on canvas
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      const pdf = new jsPDF("p", "mm", "a4");
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      
-      // If the content is longer than one page, add new pages
-      if (imgHeight > pageHeight) {
-        let heightLeft = imgHeight - pageHeight;
-        let position = -pageHeight;
+      // Wait for content to load, then trigger print
+      setTimeout(() => {
+        printWindow.print();
         
-        while (heightLeft > 0) {
-          position -= pageHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-      }
-      
-      pdf.save(`Invoice-${invoiceNumber}.pdf`);
-      
+        // Close window after print dialog
+        setTimeout(() => {
+          printWindow.close();
+          toast({
+            title: "PDF Generated",
+            description: `Invoice ${invoiceNumber} has been sent to your printer/PDF viewer.`,
+          });
+        }, 1000);
+      }, 500);
+    } else {
       toast({
-        title: "PDF Downloaded",
-        description: `Invoice ${invoiceNumber} has been successfully downloaded.`,
-        variant: "default",
-      });
-    } catch (error) {
-      console.error("PDF generation error:", error);
-      toast({
-        title: "PDF Generation Failed",
-        description: "There was a problem generating your PDF. Please try again.",
+        title: "Error",
+        description: "Unable to open print window. Please check your browser settings.",
         variant: "destructive",
       });
     }

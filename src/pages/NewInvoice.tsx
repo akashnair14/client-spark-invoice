@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -253,8 +254,8 @@ const NewInvoice = () => {
             clients={clients}
             onSubmit={handleInvoiceSubmit}
             initialClientId={selectedClient?.id}
-            editInvoice={isEditMode ? invoiceData : undefined}
-            editClient={isEditMode ? selectedClient : undefined}
+            initialData={isEditMode ? invoiceData : undefined}
+            initialClient={isEditMode ? selectedClient : undefined}
           />
         </TabsContent>
 

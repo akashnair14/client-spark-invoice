@@ -2,7 +2,7 @@
 import React from "react";
 import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
 interface ShareWhatsAppButtonProps {
@@ -24,21 +24,45 @@ const ShareWhatsAppButton = ({
 
   const handleShareWhatsApp = () => {
     try {
-      // Format the message for WhatsApp
-      const message = `Invoice ${invoiceNumber} from Your Company Name to ${clientName}.\nAmount: ₹${total.toFixed(2)}\nDue Date: ${format(dueDate, "dd/MM/yyyy")}`;
+      if (!clientPhoneNumber) {
+        toast({
+          title: "Phone Number Missing",
+          description: "Client phone number is required for WhatsApp sharing.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a shareable link to the invoice (you can customize this URL)
+      const invoiceViewUrl = `${window.location.origin}/invoices/view/${invoiceNumber}`;
+      
+      // Enhanced message with more details and invoice link
+      const message = `🧾 *Invoice ${invoiceNumber}*
+      
+📋 *From:* Your Company Name
+👤 *To:* ${clientName}
+💰 *Amount:* ₹${total.toFixed(2)}
+📅 *Due Date:* ${format(dueDate, "dd/MM/yyyy")}
+
+📎 *View Invoice:* ${invoiceViewUrl}
+
+Thank you for your business! 🙏`;
       
       // Encode the message for the URL
       const encodedMessage = encodeURIComponent(message);
       
+      // Clean phone number (remove non-digits)
+      const cleanPhone = clientPhoneNumber.replace(/\D/g, '');
+      
       // Generate WhatsApp link
-      const whatsappUrl = `https://wa.me/${clientPhoneNumber?.replace(/\D/g, '')}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
       
       // Open WhatsApp in a new tab
       window.open(whatsappUrl, '_blank');
       
       toast({
         title: "WhatsApp Opened",
-        description: `Sharing invoice ${invoiceNumber} with ${clientName} via WhatsApp.`,
+        description: `Sharing invoice ${invoiceNumber} with enhanced details via WhatsApp.`,
       });
     } catch (error) {
       console.error("WhatsApp sharing error:", error);
