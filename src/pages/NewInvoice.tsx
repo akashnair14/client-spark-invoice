@@ -254,8 +254,6 @@ const NewInvoice = () => {
             clients={clients}
             onSubmit={handleInvoiceSubmit}
             initialClientId={selectedClient?.id}
-            initialData={isEditMode ? invoiceData : undefined}
-            initialClient={isEditMode ? selectedClient : undefined}
           />
         </TabsContent>
 
