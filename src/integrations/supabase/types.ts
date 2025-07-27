@@ -89,6 +89,142 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_items: {
+        Row: {
+          amount: number
+          cgst_rate: number
+          created_at: string
+          description: string
+          gst_rate: number
+          hsn_code: string
+          id: string
+          invoice_id: string
+          quantity: number
+          rate: number
+          sgst_rate: number
+          sort_order: number
+        }
+        Insert: {
+          amount?: number
+          cgst_rate?: number
+          created_at?: string
+          description: string
+          gst_rate?: number
+          hsn_code: string
+          id?: string
+          invoice_id: string
+          quantity?: number
+          rate?: number
+          sgst_rate?: number
+          sort_order?: number
+        }
+        Update: {
+          amount?: number
+          cgst_rate?: number
+          created_at?: string
+          description?: string
+          gst_rate?: number
+          hsn_code?: string
+          id?: string
+          invoice_id?: string
+          quantity?: number
+          rate?: number
+          sgst_rate?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          challan_date: string | null
+          challan_number: string | null
+          client_id: string
+          created_at: string
+          date: string
+          dc_date: string | null
+          dc_number: string | null
+          due_date: string | null
+          ewb_number: string | null
+          gst_amount: number
+          gst_type: string
+          id: string
+          invoice_number: string
+          last_status_update: string | null
+          notes: string | null
+          owner_id: string
+          po_date: string | null
+          po_number: string | null
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          challan_date?: string | null
+          challan_number?: string | null
+          client_id: string
+          created_at?: string
+          date: string
+          dc_date?: string | null
+          dc_number?: string | null
+          due_date?: string | null
+          ewb_number?: string | null
+          gst_amount?: number
+          gst_type?: string
+          id?: string
+          invoice_number: string
+          last_status_update?: string | null
+          notes?: string | null
+          owner_id: string
+          po_date?: string | null
+          po_number?: string | null
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          challan_date?: string | null
+          challan_number?: string | null
+          client_id?: string
+          created_at?: string
+          date?: string
+          dc_date?: string | null
+          dc_number?: string | null
+          due_date?: string | null
+          ewb_number?: string | null
+          gst_amount?: number
+          gst_type?: string
+          id?: string
+          invoice_number?: string
+          last_status_update?: string | null
+          notes?: string | null
+          owner_id?: string
+          po_date?: string | null
+          po_number?: string | null
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
