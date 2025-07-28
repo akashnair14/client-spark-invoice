@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import InvoiceStatusUpdateRow from "@/components/invoices/InvoiceStatusUpdateRow";
 import { Invoice, Client } from "@/types";
+import { getInvoices, updateInvoiceStatus } from "@/api/invoices";
+import { getClients } from "@/api/clients";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
-// All invoice/client data is now placeholder, as backend must be integrated
-
-const mockInvoices: any[] = []; // TODO: fetch from backend
-const clients: Record<string, any> = {}; // TODO: fetch from backend
+// Using real data from Supabase backend
 
 const statusOrder = ["draft", "sent", "pending", "overdue", "paid"];
 
@@ -29,9 +29,89 @@ const ManageInvoiceStatusPage: React.FC = () => {
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [showPaidPrompt, setShowPaidPrompt] = useState<{show: boolean, invoice: Invoice|null}>({show: false, invoice: null});
   const [overridePaid, setOverridePaid] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [clients, setClients] = useState<Record<string, Client>>({});
+  const { toast } = useToast();
 
-  // We use mock data here for demo
-  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
+  // Load data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [invoicesData, clientsData] = await Promise.all([
+          getInvoices(),
+          getClients()
+        ]);
+
+        // Transform invoices
+        const transformedInvoices: Invoice[] = invoicesData.map((i: any) => ({
+          id: i.id,
+          invoiceNumber: i.invoice_number,
+          clientId: i.client_id,
+          clientName: i.clients?.company_name || 'Unknown Client',
+          date: i.date,
+          dueDate: i.due_date,
+          amount: Number(i.total),
+          status: i.status,
+          subtotal: Number(i.subtotal),
+          gstAmount: Number(i.gst_amount),
+          total: Number(i.total),
+          gstType: i.gst_type,
+          notes: i.notes,
+          lastStatusUpdate: i.last_status_update,
+          items: i.invoice_items?.map((item: any) => ({
+            id: item.id,
+            description: item.description,
+            hsnCode: item.hsn_code,
+            quantity: Number(item.quantity),
+            rate: Number(item.rate),
+            gstRate: Number(item.gst_rate),
+            cgstRate: Number(item.cgst_rate),
+            sgstRate: Number(item.sgst_rate),
+            amount: Number(item.amount),
+          })) || [],
+        }));
+
+        // Transform clients into lookup object
+        const clientsLookup: Record<string, Client> = {};
+        clientsData.forEach((c: any) => {
+          clientsLookup[c.id] = {
+            id: c.id,
+            companyName: c.company_name,
+            contactName: c.contact_name ?? '',
+            gstNumber: c.gst_number ?? '',
+            phoneNumber: c.phone_number ?? '',
+            phone: c.phone_number ?? '',
+            email: c.email ?? '',
+            bankAccountNumber: c.bank_account_number ?? '',
+            bankDetails: c.bank_details ?? '',
+            address: c.address ?? '',
+            city: c.city ?? '',
+            state: c.state ?? '',
+            postalCode: c.postal_code ?? '',
+            website: c.website ?? '',
+            tags: c.tags ?? [],
+            status: c.status as any,
+          };
+        });
+
+        setInvoices(transformedInvoices);
+        setClients(clientsLookup);
+      } catch (error: any) {
+        toast({
+          title: 'Error loading data',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
@@ -58,13 +138,28 @@ const ManageInvoiceStatusPage: React.FC = () => {
     setFilteredInvoices(matches);
   };
 
-  const handleUpdateStatus = (id: string, newStatus: Invoice["status"]) => {
-    setInvoices(prev =>
-      prev.map(inv => inv.id === id ? { ...inv, status: newStatus, lastStatusUpdate: new Date().toISOString() } : inv)
-    );
-    setFilteredInvoices(prev =>
-      prev.map(inv => inv.id === id ? { ...inv, status: newStatus, lastStatusUpdate: new Date().toISOString() } : inv)
-    );
+  const handleUpdateStatus = async (id: string, newStatus: Invoice["status"]) => {
+    try {
+      await updateInvoiceStatus(id, newStatus);
+      
+      setInvoices(prev =>
+        prev.map(inv => inv.id === id ? { ...inv, status: newStatus, lastStatusUpdate: new Date().toISOString() } : inv)
+      );
+      setFilteredInvoices(prev =>
+        prev.map(inv => inv.id === id ? { ...inv, status: newStatus, lastStatusUpdate: new Date().toISOString() } : inv)
+      );
+
+      toast({
+        title: 'Status updated',
+        description: `Invoice status changed to ${newStatus}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Update failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   // If overriding, set so and re-run search
@@ -98,7 +193,10 @@ const ManageInvoiceStatusPage: React.FC = () => {
           <Button onClick={handleSearch} data-testid="search-btn">Search</Button>
         </div>
         <div>
-          {filteredInvoices.length === 0 && (
+          {loading && (
+            <div className="text-muted-foreground py-8 text-center">Loading invoices...</div>
+          )}
+          {!loading && filteredInvoices.length === 0 && (
             <div className="text-muted-foreground py-8 text-center">No invoices found or no search performed.</div>
           )}
           <div className="flex flex-col gap-3">

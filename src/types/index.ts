@@ -37,6 +37,7 @@ export interface InvoiceItem {
 export interface Invoice {
   id: string;
   clientId: string;
+  clientName: string; // Add this field for display purposes
   date: string;
   dueDate?: string;
   invoiceNumber: string;
@@ -44,6 +45,7 @@ export interface Invoice {
   subtotal: number;
   gstAmount: number;
   total: number;
+  amount: number; // Add this as alias for total for compatibility
   status: 'draft' | 'sent' | 'paid' | 'pending' | 'overdue';
   notes?: string;
   gstType?: "regular" | "igst";

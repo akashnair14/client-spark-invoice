@@ -44,9 +44,9 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
           </BarChart>
         </ResponsiveContainer>
         <div className="flex justify-end mt-2 gap-2">
-          {data.map(d => (
+          {data.map((d, index) => (
             <button
-              key={d.clientId}
+              key={`${d.clientId}-${index}`}
               onClick={() => d.clientId && navigate(`/clients/${d.clientId}`)}
               className="text-xs px-3 py-1 border rounded hover:bg-muted"
               aria-label={`View details for ${d.name}`}
