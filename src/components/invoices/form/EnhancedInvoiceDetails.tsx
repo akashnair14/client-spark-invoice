@@ -28,14 +28,20 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 /**
- * Calculate the next incremental invoice number (1, 2, 3, ...) based on
- * all existing invoices.
- * TODO: Move to backend/edge function when invoices are stored there.
+ * Calculate the next incremental invoice number based on existing invoices.
+ * Future: This will be moved to backend/edge function when invoices are stored in Supabase.
  */
 const getNextInvoiceNumber = () => {
-  // Placeholder returns "1" always, as we can't access all existing invoices
-  // Could also make this a prop if invoices are loaded in the parent
-  return "1";
+  try {
+    const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const maxNumber = storedInvoices.reduce((max: number, invoice: any) => {
+      const num = parseInt(invoice.invoiceNumber) || 0;
+      return num > max ? num : max;
+    }, 0);
+    return (maxNumber + 1).toString();
+  } catch {
+    return "1";
+  }
 };
 
 interface EnhancedInvoiceDetailsProps {

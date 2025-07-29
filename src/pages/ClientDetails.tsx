@@ -15,7 +15,7 @@ const ClientDetails = () => {
 
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [clientInvoices, setClientInvoices] = useState<any[]>([]); // Empty for now, TODO: fetch from backend
+  const [clientInvoices, setClientInvoices] = useState<any[]>([]); // Future: Use getInvoicesByClient API
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
@@ -57,8 +57,8 @@ const ClientDetails = () => {
         });
         setLoading(false);
 
-        // INVOICE DATA REMOVED
-        setClientInvoices([]); // TODO: Replace with backend fetch
+        // Future: Load client invoices from database
+        setClientInvoices([]); // Will be replaced with: getInvoicesByClient(id)
 
         // Compute current FY
         const today = new Date();
@@ -68,7 +68,6 @@ const ClientDetails = () => {
         setCurrentYearInvoices([]);
       })
       .catch((err) => {
-        console.error("Error loading client:", err);
         setLoading(false);
         setClient(null);
       });

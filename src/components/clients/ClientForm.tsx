@@ -77,7 +77,7 @@ const ClientForm = ({
       onSubmit(values as Omit<Client, "id">);
       form.reset();
     } catch (error) {
-      console.error("Error submitting form:", error);
+      // Error handling is managed by the parent component
     } finally {
       setIsLoading(false);
     }

@@ -34,10 +34,30 @@ const InvoiceDetails = () => {
 
   useEffect(() => {
     if (!id) return;
-    // TODO: Fetch invoice and client from backend here!
-    setInvoice(null);
-    setClient(undefined);
-  }, [id]);
+    
+    // Future: Replace with real API call to getInvoice(id)
+    // For now, try to load from localStorage as fallback
+    const loadInvoiceData = async () => {
+      try {
+        const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const foundInvoice = storedInvoices.find((inv: any) => inv.id === id);
+        
+        if (foundInvoice) {
+          setInvoice(foundInvoice);
+          // Load client data if available
+          // setClient(clientData); // TODO: Implement client loading
+        }
+      } catch (error) {
+        toast({
+          title: "Error loading invoice",
+          description: "Failed to load invoice data",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    loadInvoiceData();
+  }, [id, toast]);
 
   const updateInvoiceStatus = (status: Invoice['status']) => {
     if (!invoice || !id) return;

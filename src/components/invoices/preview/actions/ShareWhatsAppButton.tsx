@@ -65,7 +65,6 @@ Thank you for your business! 🙏`;
         description: `Sharing invoice ${invoiceNumber} with enhanced details via WhatsApp.`,
       });
     } catch (error) {
-      console.error("WhatsApp sharing error:", error);
       toast({
         title: "Sharing Failed",
         description: "There was a problem opening WhatsApp. Please check the client's phone number.",

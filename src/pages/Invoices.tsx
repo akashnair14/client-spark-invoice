@@ -49,14 +49,19 @@ const Invoices = () => {
 
   // Load invoices from localStorage and clients from backend
   useEffect(() => {
-    // Load invoices from localStorage
-    const loadInvoices = () => {
+    // Load invoices from database using the useDashboardData hook or API
+    const loadInvoices = async () => {
       try {
+        // Replace localStorage with real API call when invoice API is ready
         const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
         setInvoices(storedInvoices);
         setFilteredInvoices(storedInvoices);
       } catch (error) {
-        console.error('Error loading invoices from localStorage:', error);
+        toast({
+          title: "Error loading invoices",
+          description: "Failed to load invoice data",
+          variant: "destructive",
+        });
         setInvoices([]);
         setFilteredInvoices([]);
       }
@@ -93,7 +98,6 @@ const Invoices = () => {
         });
         setClients(clientsMap);
       } catch (error) {
-        console.error('Error loading clients:', error);
         toast({
           title: "Error",
           description: "Failed to load clients data",

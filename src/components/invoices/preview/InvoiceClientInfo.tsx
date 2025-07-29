@@ -68,7 +68,6 @@ const InvoiceClientInfo = ({
       }
       return format(dateObj, "dd-MMM-yy");
     } catch (error) {
-      console.error("Date formatting error:", error);
       return "Invalid date";
     }
   };

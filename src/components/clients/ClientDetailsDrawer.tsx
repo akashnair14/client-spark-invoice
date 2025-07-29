@@ -23,12 +23,11 @@ interface ClientDetailsDrawerProps {
 const ClientDetailsDrawer = ({ client, open, onClose }: ClientDetailsDrawerProps) => {
   if (!client) return null;
 
-  // Remove invoice-specific stats, or add a TODO
-  // For now, set all stats to placeholders until backend is ready
-  const clientInvoices: any[] = []; // TODO: Fetch invoices from backend
-  const totalAmount = 0;
+  // Invoice statistics - will be populated when invoice API is integrated
+  const clientInvoices: any[] = []; // Future: Use getInvoicesByClient(client.id)
+  const totalAmount = client.totalInvoiced || 0;
   const pendingInvoices: any[] = [];
-  const lastInvoice = undefined;
+  const lastInvoice = client.lastInvoiceDate ? { date: client.lastInvoiceDate } : undefined;
 
   const getStatusColor = (status?: string) => {
     switch (status) {

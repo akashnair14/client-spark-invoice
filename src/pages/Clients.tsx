@@ -66,7 +66,6 @@ const Clients = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load clients:", err);
         setLoading(false);
         toast({
           title: "Failed to load clients",
