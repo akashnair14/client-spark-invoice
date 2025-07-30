@@ -142,6 +142,62 @@ export type Database = {
           },
         ]
       }
+      invoice_templates: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          layout_data: Json
+          margins: Json
+          orientation: string
+          owner_id: string
+          paper_size: string
+          template_name: string
+          template_type: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          layout_data?: Json
+          margins?: Json
+          orientation?: string
+          owner_id: string
+          paper_size?: string
+          template_name: string
+          template_type?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          layout_data?: Json
+          margins?: Json
+          orientation?: string
+          owner_id?: string
+          paper_size?: string
+          template_name?: string
+          template_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_invoice_templates_client_id"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           challan_date: string | null
