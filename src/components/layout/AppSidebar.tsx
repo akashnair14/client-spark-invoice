@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText } from "lucide-react";
+import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText, Palette } from "lucide-react";
 
 const sidebarItems = [
   {
@@ -39,6 +39,11 @@ const sidebarItems = [
     title: "Invoices",
     url: "/invoices",
     icon: FileText,
+  },
+  {
+    title: "Templates",
+    url: "/templates",
+    icon: Palette,
   },
 ];
 

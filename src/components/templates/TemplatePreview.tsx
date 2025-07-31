@@ -1,7 +1,7 @@
 import { TemplateLayout, DataTokens } from "@/types/template";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Print, ArrowLeft } from "lucide-react";
+import { Download, Printer, ArrowLeft } from "lucide-react";
 
 interface TemplatePreviewProps {
   layout: TemplateLayout;
@@ -232,7 +232,7 @@ export const TemplatePreview = ({ layout, onBack, data = mockData }: TemplatePre
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
-              <Print className="h-4 w-4 mr-2" />
+              <Printer className="h-4 w-4 mr-2" />
               Print
             </Button>
             <Button size="sm">

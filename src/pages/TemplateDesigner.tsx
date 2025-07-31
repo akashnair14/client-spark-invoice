@@ -33,7 +33,7 @@ const TemplateDesigner = () => {
     try {
       setIsLoading(true);
       const template = await getInvoiceTemplate(templateId);
-      setLayout(template.layout_data as TemplateLayout);
+      setLayout(template.layout_data as unknown as TemplateLayout);
       setTemplateName(template.template_name);
     } catch (error) {
       console.error('Failed to load template:', error);
@@ -52,13 +52,13 @@ const TemplateDesigner = () => {
     try {
       const templateData = {
         template_name: templateName || 'Custom Template',
-        layout_data: newLayout,
+        layout_data: newLayout as unknown as any,
         is_default: false,
         is_active: true,
         template_type: 'custom' as const,
         paper_size: 'A4' as const,
         orientation: 'portrait' as const,
-        margins: { top: 20, bottom: 20, left: 20, right: 20 },
+        margins: { top: 20, bottom: 20, left: 20, right: 20 } as unknown as any,
       };
 
       if (templateId) {

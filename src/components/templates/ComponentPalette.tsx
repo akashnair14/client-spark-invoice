@@ -180,7 +180,7 @@ export const ComponentPalette = ({ onAddComponent }: ComponentPaletteProps) => {
             <li>• Click to add components to canvas</li>
             <li>• Drag components to reposition them</li>
             <li>• Select components to edit properties</li>
-            <li>• Use data tokens like {{invoice.total}}</li>
+            <li>• Use data tokens like {`{{invoice.total}}`}</li>
           </ul>
         </CardContent>
       </Card>

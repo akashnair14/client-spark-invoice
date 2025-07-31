@@ -16,6 +16,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import { ThemeProvider } from "next-themes";
 import ManageInvoiceStatusPage from "./pages/ManageInvoiceStatus";
+import Templates from "./pages/Templates";
+import TemplateDesigner from "./pages/TemplateDesigner";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/invoices/:id" element={<InvoiceDetails />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/manage-invoice-status" element={<ManageInvoiceStatusPage />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/templates/designer" element={<TemplateDesigner />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
