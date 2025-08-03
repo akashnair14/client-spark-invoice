@@ -35,7 +35,7 @@ export const TemplateDesigner = ({
   isPreviewMode = false
 }: TemplateDesignerProps) => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("design");
+  const [activeTab, setActiveTab] = useState("components");
   const [selectedComponent, setSelectedComponent] = useState<TemplateComponent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   
@@ -234,12 +234,69 @@ export const TemplateDesigner = ({
                   <div className="p-4">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm">Theme Settings</CardTitle>
+                        <CardTitle className="text-sm">Canvas Settings</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <p className="text-sm text-muted-foreground">
-                          Theme customization coming soon...
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Show Grid</span>
+                          <Button
+                            variant={layout.settings?.showBorders ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setLayout(prev => ({
+                              ...prev,
+                              settings: {
+                                ...prev.settings,
+                                showBorders: !prev.settings?.showBorders
+                              }
+                            }))}
+                          >
+                            {layout.settings?.showBorders ? "On" : "Off"}
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          <span className="text-sm">Grid Size</span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setLayout(prev => ({
+                                ...prev,
+                                settings: {
+                                  ...prev.settings,
+                                  gridSize: 5
+                                }
+                              }))}
+                            >
+                              Fine
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setLayout(prev => ({
+                                ...prev,
+                                settings: {
+                                  ...prev.settings,
+                                  gridSize: 10
+                                }
+                              }))}
+                            >
+                              Normal
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setLayout(prev => ({
+                                ...prev,
+                                settings: {
+                                  ...prev.settings,
+                                  gridSize: 20
+                                }
+                              }))}
+                            >
+                              Coarse
+                            </Button>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>

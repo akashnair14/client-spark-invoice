@@ -19,6 +19,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { TemplateSelector } from "./form/TemplateSelector";
+import { useInvoiceTemplate } from "@/hooks/useInvoiceTemplate";
 
 const formSchema = z.object({
   clientId: z.string().min(1, { message: "Please select a client" }),
@@ -67,6 +69,7 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
     notes: false
   });
   const { toast } = useToast();
+  const { selectedTemplateId, selectTemplate } = useInvoiceTemplate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -200,6 +203,10 @@ const InvoiceForm = ({ clients, onSubmit, initialClientId }: InvoiceFormProps) =
           <InvoiceFormLayout
             sidebar={
               <div className="space-y-4">
+                <TemplateSelector
+                  selectedTemplateId={selectedTemplateId || ""}
+                  onTemplateSelect={selectTemplate}
+                />
                 <StickySummary
                   selectedClient={selectedClient}
                   invoiceNumber={form.watch("invoiceNumber")}
