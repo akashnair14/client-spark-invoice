@@ -12,6 +12,8 @@ import {
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateCanvas } from "./TemplateCanvas";
 import { ComponentPalette } from "./ComponentPalette";
@@ -23,8 +25,10 @@ import { Save, Eye, Settings, Palette } from "lucide-react";
 
 interface TemplateDesignerProps {
   initialLayout?: TemplateLayout;
-  onSave?: (layout: TemplateLayout) => void;
-  onPreview?: () => void;
+  onSave?: (layout: TemplateLayout, name?: string) => void;
+  onPreview?: (layout: TemplateLayout) => void;
+  templateName?: string;
+  onTemplateNameChange?: (name: string) => void;
   isPreviewMode?: boolean;
 }
 
@@ -32,6 +36,8 @@ export const TemplateDesigner = ({
   initialLayout,
   onSave,
   onPreview,
+  templateName = '',
+  onTemplateNameChange,
   isPreviewMode = false
 }: TemplateDesignerProps) => {
   const { toast } = useToast();
@@ -162,12 +168,16 @@ export const TemplateDesigner = ({
   }, [selectedComponent, toast]);
 
   const handleSave = useCallback(() => {
-    onSave?.(layout);
-    toast({
-      title: "Template Saved",
-      description: "Your template has been saved successfully.",
-    });
-  }, [layout, onSave, toast]);
+    if (!templateName.trim()) {
+      toast({
+        title: "Template Name Required",
+        description: "Please enter a name for your template.",
+        variant: "destructive",
+      });
+      return;
+    }
+    onSave?.(layout, templateName);
+  }, [layout, onSave, templateName, toast]);
 
   if (isPreviewMode) {
     return <TemplatePreview layout={layout} />;
@@ -177,9 +187,21 @@ export const TemplateDesigner = ({
     <div className="h-screen flex flex-col">
       <div className="border-b bg-background p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Invoice Template Designer</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold">Invoice Template Designer</h1>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="template-name" className="text-sm">Template Name:</Label>
+              <Input
+                id="template-name"
+                value={templateName}
+                onChange={(e) => onTemplateNameChange?.(e.target.value)}
+                placeholder="Enter template name"
+                className="w-48"
+              />
+            </div>
+          </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onPreview}>
+            <Button variant="outline" size="sm" onClick={() => onPreview?.(layout)}>
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>

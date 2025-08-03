@@ -48,10 +48,21 @@ const TemplateDesigner = () => {
     }
   };
 
-  const handleSave = async (newLayout: TemplateLayout) => {
+  const handleSave = async (newLayout: TemplateLayout, name?: string) => {
+    const finalTemplateName = name || templateName || 'Custom Template';
+    
+    if (!finalTemplateName.trim()) {
+      toast({
+        title: "Template Name Required",
+        description: "Please provide a name for your template.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const templateData = {
-        template_name: templateName || 'Custom Template',
+        template_name: finalTemplateName,
         layout_data: newLayout as unknown as any,
         is_default: false,
         is_active: true,
@@ -85,7 +96,8 @@ const TemplateDesigner = () => {
     }
   };
 
-  const handlePreview = () => {
+  const handlePreview = (currentLayout: TemplateLayout) => {
+    setLayout(currentLayout);
     const params = new URLSearchParams(searchParams);
     params.set('preview', 'true');
     navigate(`/templates/designer?${params.toString()}`);
@@ -117,6 +129,8 @@ const TemplateDesigner = () => {
       initialLayout={layout}
       onSave={handleSave}
       onPreview={handlePreview}
+      templateName={templateName}
+      onTemplateNameChange={setTemplateName}
     />
   );
 };
