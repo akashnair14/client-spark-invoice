@@ -21,7 +21,7 @@ import { PropertyPanel } from "./PropertyPanel";
 import { TemplatePreview } from "./TemplatePreview";
 import { TemplateComponent, TemplateLayout } from "@/types/template";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Eye, Settings, Palette } from "lucide-react";
+import { Save, Eye, Settings, Palette, Loader2 } from "lucide-react";
 
 interface TemplateDesignerProps {
   initialLayout?: TemplateLayout;
@@ -30,6 +30,7 @@ interface TemplateDesignerProps {
   templateName?: string;
   onTemplateNameChange?: (name: string) => void;
   isPreviewMode?: boolean;
+  isSaving?: boolean;
 }
 
 export const TemplateDesigner = ({
@@ -38,7 +39,8 @@ export const TemplateDesigner = ({
   onPreview,
   templateName = '',
   onTemplateNameChange,
-  isPreviewMode = false
+  isPreviewMode = false,
+  isSaving = false
 }: TemplateDesignerProps) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("components");
@@ -179,6 +181,18 @@ export const TemplateDesigner = ({
     onSave?.(layout, templateName);
   }, [layout, onSave, templateName, toast]);
 
+  const handlePreview = useCallback(() => {
+    if (layout.components.length === 0) {
+      toast({
+        title: "No Components to Preview",
+        description: "Please add at least one component to preview your template.",
+        variant: "destructive",
+      });
+      return;
+    }
+    onPreview?.(layout);
+  }, [layout, onPreview, toast]);
+
   if (isPreviewMode) {
     return <TemplatePreview layout={layout} />;
   }
@@ -197,17 +211,31 @@ export const TemplateDesigner = ({
                 onChange={(e) => onTemplateNameChange?.(e.target.value)}
                 placeholder="Enter template name"
                 className="w-48"
+                disabled={isSaving}
               />
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => onPreview?.(layout)}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handlePreview}
+              disabled={layout.components.length === 0 || isSaving}
+            >
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
-            <Button size="sm" onClick={handleSave}>
-              <Save className="h-4 w-4 mr-2" />
-              Save Template
+            <Button 
+              size="sm" 
+              onClick={handleSave}
+              disabled={!templateName.trim() || isSaving}
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {isSaving ? 'Saving...' : 'Save Template'}
             </Button>
           </div>
         </div>

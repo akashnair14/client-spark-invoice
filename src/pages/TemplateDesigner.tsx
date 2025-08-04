@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { TemplateDesigner as TemplateDesignerComponent } from "@/components/templates/TemplateDesigner";
@@ -9,6 +10,7 @@ import {
   updateInvoiceTemplate, 
   getInvoiceTemplate 
 } from "@/api/invoiceTemplates";
+import { supabase } from "@/integrations/supabase/client";
 
 const TemplateDesigner = () => {
   const navigate = useNavigate();
@@ -19,27 +21,62 @@ const TemplateDesigner = () => {
   
   const [layout, setLayout] = useState<TemplateLayout | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(!!templateId);
+  const [isSaving, setIsSaving] = useState(false);
   const [templateName, setTemplateName] = useState('');
 
   useEffect(() => {
-    if (templateId) {
-      loadTemplate();
-    }
+    checkAuthAndLoadTemplate();
   }, [templateId]);
+
+  const checkAuthAndLoadTemplate = async () => {
+    try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to create or edit templates.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      if (templateId) {
+        await loadTemplate();
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Please log in again to continue.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+    }
+  };
 
   const loadTemplate = async () => {
     if (!templateId) return;
     
     try {
       setIsLoading(true);
+      console.log('Loading template:', templateId);
       const template = await getInvoiceTemplate(templateId);
+      console.log('Template loaded:', template);
+      
       setLayout(template.layout_data as unknown as TemplateLayout);
       setTemplateName(template.template_name);
+      
+      toast({
+        title: "Template Loaded",
+        description: `Template "${template.template_name}" loaded successfully.`,
+      });
     } catch (error) {
       console.error('Failed to load template:', error);
       toast({
-        title: "Error",
-        description: "Failed to load template. Please try again.",
+        title: "Error Loading Template",
+        description: error instanceof Error ? error.message : "Failed to load template. Please try again.",
         variant: "destructive",
       });
       navigate('/templates');
@@ -61,6 +98,15 @@ const TemplateDesigner = () => {
     }
 
     try {
+      setIsSaving(true);
+      console.log('Saving template:', { finalTemplateName, components: newLayout.components.length });
+
+      // Check authentication again before saving
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const templateData = {
         template_name: finalTemplateName,
         layout_data: newLayout as unknown as any,
@@ -72,31 +118,53 @@ const TemplateDesigner = () => {
         margins: { top: 20, bottom: 20, left: 20, right: 20 } as unknown as any,
       };
 
+      console.log('Template data to save:', templateData);
+
       if (templateId) {
-        await updateInvoiceTemplate(templateId, templateData);
+        const updatedTemplate = await updateInvoiceTemplate(templateId, templateData);
+        console.log('Template updated:', updatedTemplate);
         toast({
           title: "Template Updated",
-          description: "Your template has been updated successfully.",
+          description: `Template "${finalTemplateName}" has been updated successfully.`,
         });
       } else {
-        await createInvoiceTemplate(templateData);
+        const newTemplate = await createInvoiceTemplate(templateData);
+        console.log('Template created:', newTemplate);
         toast({
           title: "Template Saved",
-          description: "Your template has been saved successfully.",
+          description: `Template "${finalTemplateName}" has been saved successfully.`,
         });
         navigate('/templates');
       }
     } catch (error) {
       console.error('Failed to save template:', error);
+      
+      let errorMessage = "Failed to save template. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('User not authenticated')) {
+          errorMessage = "Please log in again to save your template.";
+        } else if (error.message.includes('violates row-level security')) {
+          errorMessage = "You don't have permission to save this template. Please check your account.";
+        } else if (error.message.includes('duplicate key')) {
+          errorMessage = "A template with this name already exists. Please choose a different name.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to save template. Please try again.",
+        title: "Save Failed",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handlePreview = (currentLayout: TemplateLayout) => {
+    console.log('Previewing layout with components:', currentLayout.components.length);
     setLayout(currentLayout);
     const params = new URLSearchParams(searchParams);
     params.set('preview', 'true');
@@ -113,6 +181,7 @@ const TemplateDesigner = () => {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <div className="text-lg font-medium">Loading template...</div>
           <div className="text-sm text-muted-foreground">Please wait</div>
         </div>
@@ -131,6 +200,7 @@ const TemplateDesigner = () => {
       onPreview={handlePreview}
       templateName={templateName}
       onTemplateNameChange={setTemplateName}
+      isSaving={isSaving}
     />
   );
 };
