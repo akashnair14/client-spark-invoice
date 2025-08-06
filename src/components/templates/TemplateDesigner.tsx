@@ -19,9 +19,24 @@ import { TemplateCanvas } from "./TemplateCanvas";
 import { ComponentPalette } from "./ComponentPalette";
 import { PropertyPanel } from "./PropertyPanel";
 import { TemplatePreview } from "./TemplatePreview";
+import { CompanySettingsPanel } from "./CompanySettingsPanel";
+import { BrandingPanel } from "./BrandingPanel";
+import { InteractivePreview } from "./InteractivePreview";
 import { TemplateComponent, TemplateLayout } from "@/types/template";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Eye, Settings, Palette, Loader2 } from "lucide-react";
+import { Save, Eye, Settings, Palette, Loader2, Building, Play, Download, Printer } from "lucide-react";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+interface CompanySettings {
+  companyName: string;
+  address: string;
+  phone: string;
+  email: string;
+  taxId: string;
+  website: string;
+  logo?: string;
+}
 
 interface TemplateDesignerProps {
   initialLayout?: TemplateLayout;
@@ -46,15 +61,16 @@ export const TemplateDesigner = ({
   const [activeTab, setActiveTab] = useState("components");
   const [selectedComponent, setSelectedComponent] = useState<TemplateComponent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'design' | 'interactive'>('design');
   
   const [layout, setLayout] = useState<TemplateLayout>(
     initialLayout || {
       components: [],
       theme: {
-        primaryColor: "hsl(var(--primary))",
-        secondaryColor: "hsl(var(--secondary))",
-        textColor: "hsl(var(--foreground))",
-        borderColor: "hsl(var(--border))",
+        primaryColor: "#3b82f6",
+        secondaryColor: "#1e40af",
+        textColor: "#1f2937",
+        borderColor: "#e5e7eb",
       },
       settings: {
         showBorders: true,
@@ -63,6 +79,16 @@ export const TemplateDesigner = ({
       },
     }
   );
+
+  const [companySettings, setCompanySettings] = useState<CompanySettings>({
+    companyName: '',
+    address: '',
+    phone: '',
+    email: '',
+    taxId: '',
+    website: '',
+    logo: '',
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -193,6 +219,60 @@ export const TemplateDesigner = ({
     onPreview?.(layout);
   }, [layout, onPreview, toast]);
 
+  const handleExportPDF = async (invoiceData: any) => {
+    try {
+      const element = document.querySelector('.invoice-preview');
+      if (!element) return;
+
+      const canvas = await html2canvas(element as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`);
+      
+      toast({
+        title: "PDF Generated",
+        description: "Invoice has been exported as PDF successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePrint = (invoiceData: any) => {
+    window.print();
+    toast({
+      title: "Print Dialog Opened",
+      description: "Use your browser's print dialog to print the invoice.",
+    });
+  };
+
   if (isPreviewMode) {
     return <TemplatePreview layout={layout} />;
   }
@@ -216,6 +296,22 @@ export const TemplateDesigner = ({
             </div>
           </div>
           <div className="flex gap-2">
+            <Button 
+              variant={viewMode === 'design' ? 'default' : 'outline'}
+              size="sm" 
+              onClick={() => setViewMode('design')}
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Design
+            </Button>
+            <Button 
+              variant={viewMode === 'interactive' ? 'default' : 'outline'}
+              size="sm" 
+              onClick={() => setViewMode('interactive')}
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Interactive
+            </Button>
             <Button 
               variant="outline" 
               size="sm" 
@@ -242,45 +338,75 @@ export const TemplateDesigner = ({
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToParentElement]}
-        >
-          {/* Left Sidebar - Component Palette */}
-          <div className="w-80 border-r bg-background">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-              <div className="border-b p-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="components">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Components
-                  </TabsTrigger>
-                  <TabsTrigger value="properties">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Properties
-                  </TabsTrigger>
-                  <TabsTrigger value="design">
-                    Design
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+        {viewMode === 'interactive' ? (
+          <InteractivePreview
+            layout={layout}
+            companySettings={companySettings}
+            onExportPDF={handleExportPDF}
+            onPrint={handlePrint}
+          />
+        ) : (
+          <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToParentElement]}
+          >
+            {/* Left Sidebar - Component Palette */}
+            <div className="w-80 border-r bg-background">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+                <div className="border-b p-4">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="components">
+                      <Palette className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">Components</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="properties">
+                      <Settings className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">Properties</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="company">
+                      <Building className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">Company</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="branding">
+                      <span className="hidden sm:inline">Branding</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
               
-              <div className="flex-1 overflow-y-auto">
-                <TabsContent value="components" className="m-0 h-full">
-                  <ComponentPalette onAddComponent={addComponent} />
-                </TabsContent>
-                
-                <TabsContent value="properties" className="m-0 h-full">
-                  <PropertyPanel
-                    selectedComponent={selectedComponent}
-                    onUpdateComponent={updateComponent}
-                    onRemoveComponent={removeComponent}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="design" className="m-0 h-full">
+                <div className="flex-1 overflow-y-auto">
+                  <TabsContent value="components" className="m-0 h-full">
+                    <ComponentPalette onAddComponent={addComponent} />
+                  </TabsContent>
+                  
+                  <TabsContent value="properties" className="m-0 h-full">
+                    <PropertyPanel
+                      selectedComponent={selectedComponent}
+                      onUpdateComponent={updateComponent}
+                      onRemoveComponent={removeComponent}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="company" className="m-0 h-full">
+                    <div className="p-4">
+                      <CompanySettingsPanel
+                        settings={companySettings}
+                        onUpdate={setCompanySettings}
+                      />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="branding" className="m-0 h-full">
+                    <div className="p-4">
+                      <BrandingPanel
+                        theme={layout.theme}
+                        onUpdateTheme={(theme) => setLayout(prev => ({ ...prev, theme }))}
+                      />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="design" className="m-0 h-full">
                   <div className="p-4">
                     <Card>
                       <CardHeader>
@@ -350,29 +476,30 @@ export const TemplateDesigner = ({
                       </CardContent>
                     </Card>
                   </div>
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
 
-          {/* Main Canvas Area */}
-          <div className="flex-1 overflow-auto bg-muted/30">
-            <TemplateCanvas
-              layout={layout}
-              selectedComponent={selectedComponent}
-              onSelectComponent={setSelectedComponent}
-              onUpdateComponent={updateComponent}
-            />
-          </div>
+            {/* Main Canvas Area */}
+            <div className="flex-1 overflow-auto bg-muted/30">
+              <TemplateCanvas
+                layout={layout}
+                selectedComponent={selectedComponent}
+                onSelectComponent={setSelectedComponent}
+                onUpdateComponent={updateComponent}
+              />
+            </div>
 
-          <DragOverlay>
-            {activeId ? (
-              <div className="bg-primary/20 border-2 border-primary border-dashed rounded p-2">
-                Dragging...
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay>
+              {activeId ? (
+                <div className="bg-primary/20 border-2 border-primary border-dashed rounded p-2">
+                  Dragging...
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        )}
       </div>
     </div>
   );
