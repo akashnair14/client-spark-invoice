@@ -156,10 +156,19 @@ export const CompanySettingsPanel = ({ settings, onUpdate }: CompanySettingsPane
               <Input
                 id="phone"
                 value={settings.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="Phone Number"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 10) {
+                    handleInputChange('phone', value);
+                  }
+                }}
+                placeholder="10-digit mobile number"
                 className="h-8 text-sm"
+                maxLength={10}
               />
+              {settings.phone && settings.phone.length !== 10 && (
+                <p className="text-xs text-destructive">Phone number must be 10 digits</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -169,9 +178,13 @@ export const CompanySettingsPanel = ({ settings, onUpdate }: CompanySettingsPane
                 type="email"
                 value={settings.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Email Address"
+                placeholder="company@example.com"
                 className="h-8 text-sm"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
               />
+              {settings.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.email) && (
+                <p className="text-xs text-destructive">Please enter a valid email address</p>
+              )}
             </div>
           </div>
 

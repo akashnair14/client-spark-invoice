@@ -353,24 +353,17 @@ export const TemplateDesigner = ({
             modifiers={[restrictToParentElement]}
           >
             {/* Left Sidebar - Component Palette */}
-            <div className="w-80 border-r bg-background">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-                <div className="border-b p-4">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="components">
-                      <Palette className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Components</span>
+            <div className="w-80 border-r bg-background overflow-hidden">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+                <div className="border-b p-2 flex-shrink-0">
+                  <TabsList className="grid w-full grid-cols-2 text-xs">
+                    <TabsTrigger value="components" className="text-xs">
+                      <Palette className="h-3 w-3 mr-1" />
+                      Design
                     </TabsTrigger>
-                    <TabsTrigger value="properties">
-                      <Settings className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Properties</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="company">
-                      <Building className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Company</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="branding">
-                      <span className="hidden sm:inline">Branding</span>
+                    <TabsTrigger value="company" className="text-xs">
+                      <Building className="h-3 w-3 mr-1" />
+                      Settings
                     </TabsTrigger>
                   </TabsList>
                 </div>
