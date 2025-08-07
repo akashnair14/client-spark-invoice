@@ -13,6 +13,13 @@ import {
   PenTool,
   QrCode,
   Plus,
+  CreditCard,
+  Landmark,
+  AlignJustify,
+  Shield,
+  ScanLine,
+  Minus,
+  Type,
 } from "lucide-react";
 
 interface ComponentPaletteProps {
@@ -57,6 +64,15 @@ const componentDefinitions: ComponentDefinition[] = [
     description: 'Client name, address, GST number'
   },
   {
+    type: 'company-info',
+    label: 'Company Information',
+    icon: 'Building',
+    defaultSize: { width: 45, height: 20 },
+    defaultStyles: { fontSize: '12px' },
+    configurable: { fields: true, styles: true },
+    description: 'Your company details and contact info'
+  },
+  {
     type: 'items-table',
     label: 'Items Table',
     icon: 'Table',
@@ -75,13 +91,58 @@ const componentDefinitions: ComponentDefinition[] = [
     description: 'Subtotal, tax, and total amounts'
   },
   {
+    type: 'payment-terms',
+    label: 'Payment Terms',
+    icon: 'CreditCard',
+    defaultSize: { width: 50, height: 12 },
+    defaultStyles: { fontSize: '11px' },
+    configurable: { styles: true, data: true },
+    description: 'Payment methods and terms'
+  },
+  {
+    type: 'bank-details',
+    label: 'Bank Details',
+    icon: 'Landmark',
+    defaultSize: { width: 45, height: 15 },
+    defaultStyles: { fontSize: '11px' },
+    configurable: { fields: true, styles: true },
+    description: 'Bank account information for payments'
+  },
+  {
     type: 'notes',
     label: 'Notes & Terms',
     icon: 'StickyNote',
     defaultSize: { width: 60, height: 10 },
     defaultStyles: { fontSize: '10px' },
     configurable: { styles: true, data: true },
-    description: 'Payment terms and additional notes'
+    description: 'Additional notes and conditions'
+  },
+  {
+    type: 'footer',
+    label: 'Footer',
+    icon: 'AlignJustify',
+    defaultSize: { width: 100, height: 8 },
+    defaultStyles: { fontSize: '10px', textAlign: 'center' },
+    configurable: { styles: true, data: true },
+    description: 'Footer with contact info or legal text'
+  },
+  {
+    type: 'watermark',
+    label: 'Watermark',
+    icon: 'Shield',
+    defaultSize: { width: 30, height: 30 },
+    defaultStyles: { fontSize: '48px', color: '#f0f0f0' },
+    configurable: { styles: true, data: true },
+    description: 'Background watermark text or image'
+  },
+  {
+    type: 'barcode',
+    label: 'Barcode',
+    icon: 'ScanLine',
+    defaultSize: { width: 25, height: 8 },
+    defaultStyles: {},
+    configurable: { data: true },
+    description: 'Linear barcode for tracking'
   },
   {
     type: 'signature',
@@ -101,6 +162,24 @@ const componentDefinitions: ComponentDefinition[] = [
     configurable: { data: true },
     description: 'QR code for digital verification'
   },
+  {
+    type: 'line-separator',
+    label: 'Line Separator',
+    icon: 'Minus',
+    defaultSize: { width: 100, height: 2 },
+    defaultStyles: { borderColor: '#000000', borderWidth: '1px' },
+    configurable: { styles: true },
+    description: 'Horizontal line for visual separation'
+  },
+  {
+    type: 'text-block',
+    label: 'Custom Text',
+    icon: 'Type',
+    defaultSize: { width: 40, height: 10 },
+    defaultStyles: { fontSize: '12px' },
+    configurable: { styles: true, data: true },
+    description: 'Custom text block for any content'
+  },
 ];
 
 const getIcon = (iconName: string) => {
@@ -114,6 +193,13 @@ const getIcon = (iconName: string) => {
     case 'Image': return Image;
     case 'PenTool': return PenTool;
     case 'QrCode': return QrCode;
+    case 'CreditCard': return CreditCard;
+    case 'Landmark': return Landmark;
+    case 'AlignJustify': return AlignJustify;
+    case 'Shield': return Shield;
+    case 'ScanLine': return ScanLine;
+    case 'Minus': return Minus;
+    case 'Type': return Type;
     default: return FileText;
   }
 };
@@ -180,7 +266,9 @@ export const ComponentPalette = ({ onAddComponent }: ComponentPaletteProps) => {
             <li>• Click to add components to canvas</li>
             <li>• Drag components to reposition them</li>
             <li>• Select components to edit properties</li>
-            <li>• Use data tokens like {`{{invoice.total}}`}</li>
+            <li>• Resize using corner handles when selected</li>
+            <li>• Delete components using trash icon</li>
+            <li>• Toggle visibility and lock components</li>
           </ul>
         </CardContent>
       </Card>

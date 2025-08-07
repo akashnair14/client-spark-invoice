@@ -17,7 +17,15 @@ import {
   EyeOff,
   Lock,
   Unlock,
-  X
+  X,
+  Building,
+  CreditCard,
+  Landmark,
+  AlignJustify,
+  Shield,
+  ScanLine,
+  Minus,
+  Type
 } from "lucide-react";
 
 interface DraggableComponentProps {
@@ -34,11 +42,19 @@ const getComponentIcon = (type: TemplateComponent['type']) => {
     case 'logo': return Image;
     case 'invoice-details': return FileText;
     case 'client-info': return User;
+    case 'company-info': return Building;
     case 'items-table': return Table;
     case 'totals': return Calculator;
+    case 'payment-terms': return CreditCard;
+    case 'bank-details': return Landmark;
     case 'notes': return StickyNote;
+    case 'footer': return AlignJustify;
+    case 'watermark': return Shield;
+    case 'barcode': return ScanLine;
     case 'signature': return PenTool;
     case 'qr-code': return QrCode;
+    case 'line-separator': return Minus;
+    case 'text-block': return Type;
     default: return FileText;
   }
 };
@@ -53,16 +69,32 @@ const getComponentContent = (component: TemplateComponent) => {
       return 'Invoice #: 001\nDate: Today\nDue: Net 30';
     case 'client-info':
       return 'Client Company\nClient Address\nGST: 123456789';
+    case 'company-info':
+      return 'Your Company\nYour Address\nPhone: +91 9876543210';
     case 'items-table':
       return 'Description | Qty | Rate | Amount\nSample Item | 1 | 100 | 100';
     case 'totals':
       return 'Subtotal: ₹100\nGST: ₹18\nTotal: ₹118';
+    case 'payment-terms':
+      return component.data?.content || 'Payment due within 30 days\nBank transfer preferred';
+    case 'bank-details':
+      return 'Bank: State Bank of India\nA/C: 123456789\nIFSC: SBIN0001234';
     case 'notes':
-      return 'Terms & Conditions\nPayment due within 30 days';
+      return component.data?.content || 'Terms & Conditions\nPayment due within 30 days';
+    case 'footer':
+      return component.data?.content || 'Thank you for your business!';
+    case 'watermark':
+      return component.data?.content || 'CONFIDENTIAL';
+    case 'barcode':
+      return '||||| |||| ||||||';
     case 'signature':
       return 'Authorized Signature';
     case 'qr-code':
       return '[QR]';
+    case 'line-separator':
+      return '';
+    case 'text-block':
+      return component.data?.content || 'Custom Text Block';
     default:
       return 'Component';
   }
@@ -196,14 +228,35 @@ export const DraggableComponent = ({
             color: component.styles.color,
             backgroundColor: component.styles.backgroundColor,
             textAlign: component.styles.textAlign,
+            borderColor: component.styles.borderColor,
+            borderWidth: component.styles.borderWidth,
+            borderStyle: component.styles.borderStyle,
           }}
         >
-          {component.type === 'items-table' ? (
+          {component.type === 'line-separator' ? (
+            <div 
+              className="w-full h-full border-t"
+              style={{
+                borderColor: component.styles.borderColor || '#000000',
+                borderWidth: component.styles.borderWidth || '1px',
+              }}
+            />
+          ) : component.type === 'items-table' ? (
             <div className="w-full text-xs">
               <div className="border-b mb-1 pb-1 font-semibold">
                 {component.columns?.join(' | ') || 'Description | Qty | Rate | Amount'}
               </div>
               <div>Sample Item | 1 | ₹100 | ₹100</div>
+            </div>
+          ) : component.type === 'watermark' ? (
+            <div 
+              className="text-xs leading-tight whitespace-pre-line opacity-30 transform rotate-45"
+              style={{
+                fontSize: component.styles.fontSize || '48px',
+                color: component.styles.color || '#f0f0f0',
+              }}
+            >
+              {getComponentContent(component)}
             </div>
           ) : (
             <div className="text-xs leading-tight whitespace-pre-line">

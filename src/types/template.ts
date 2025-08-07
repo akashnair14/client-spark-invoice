@@ -1,6 +1,6 @@
 export interface TemplateComponent {
   id: string;
-  type: 'header' | 'invoice-details' | 'client-info' | 'items-table' | 'totals' | 'notes' | 'logo' | 'signature' | 'qr-code';
+  type: 'header' | 'invoice-details' | 'client-info' | 'company-info' | 'items-table' | 'totals' | 'payment-terms' | 'bank-details' | 'notes' | 'footer' | 'watermark' | 'barcode' | 'logo' | 'signature' | 'qr-code' | 'line-separator' | 'text-block';
   position: { x: number; y: number }; // Percentage-based positioning
   size: { width: number; height: number }; // Percentage-based sizing
   styles: {

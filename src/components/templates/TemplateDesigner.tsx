@@ -148,8 +148,14 @@ export const TemplateDesigner = ({
       newComponent.fields = ['invoiceNumber', 'date', 'dueDate'];
     } else if (type === 'client-info') {
       newComponent.fields = ['companyName', 'address', 'gstNumber'];
+    } else if (type === 'company-info') {
+      newComponent.fields = ['companyName', 'address', 'phone', 'email'];
+    } else if (type === 'bank-details') {
+      newComponent.fields = ['bankName', 'accountNumber', 'ifscCode'];
     } else if (type === 'items-table') {
       newComponent.columns = ['description', 'quantity', 'rate', 'amount'];
+    } else if (type === 'totals') {
+      newComponent.fields = ['subtotal', 'gstAmount', 'total'];
     }
 
     setLayout(prev => ({
@@ -507,17 +513,32 @@ const getDefaultSize = (type: TemplateComponent['type']) => {
       return { width: 20, height: 15 };
     case 'invoice-details':
     case 'client-info':
+    case 'company-info':
       return { width: 45, height: 20 };
     case 'items-table':
       return { width: 100, height: 40 };
     case 'totals':
       return { width: 40, height: 15 };
+    case 'payment-terms':
+      return { width: 50, height: 12 };
+    case 'bank-details':
+      return { width: 45, height: 15 };
     case 'notes':
       return { width: 60, height: 10 };
+    case 'footer':
+      return { width: 100, height: 8 };
+    case 'watermark':
+      return { width: 30, height: 30 };
+    case 'barcode':
+      return { width: 25, height: 8 };
     case 'signature':
       return { width: 30, height: 10 };
     case 'qr-code':
       return { width: 15, height: 15 };
+    case 'line-separator':
+      return { width: 100, height: 2 };
+    case 'text-block':
+      return { width: 40, height: 10 };
     default:
       return { width: 30, height: 10 };
   }
@@ -538,17 +559,43 @@ const getDefaultStyles = (type: TemplateComponent['type']) => {
         fontWeight: 'bold',
         textAlign: 'center' as const,
       };
+    case 'footer':
+      return {
+        ...baseStyles,
+        fontSize: '10px',
+        textAlign: 'center' as const,
+        color: 'hsl(var(--muted-foreground))',
+      };
     case 'totals':
       return {
         ...baseStyles,
         textAlign: 'right' as const,
         fontWeight: '500',
       };
+    case 'payment-terms':
+    case 'bank-details':
+      return {
+        ...baseStyles,
+        fontSize: '11px',
+      };
     case 'notes':
       return {
         ...baseStyles,
         fontSize: '10px',
         color: 'hsl(var(--muted-foreground))',
+      };
+    case 'watermark':
+      return {
+        ...baseStyles,
+        fontSize: '48px',
+        color: '#f0f0f0',
+        fontWeight: 'bold',
+      };
+    case 'line-separator':
+      return {
+        borderColor: '#000000',
+        borderWidth: '1px',
+        borderStyle: 'solid',
       };
     default:
       return baseStyles;

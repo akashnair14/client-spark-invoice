@@ -301,6 +301,76 @@ export const PropertyPanel = ({
                   />
                 </div>
               )}
+
+              {selectedComponent.type === 'text-block' && (
+                <div>
+                  <Label className="text-xs">Custom Text</Label>
+                  <Input
+                    value={selectedComponent.data?.content || ''}
+                    onChange={(e) => updateComponent({
+                      data: { ...selectedComponent.data, content: e.target.value }
+                    })}
+                    placeholder="Enter custom text"
+                    className="h-8 mt-1"
+                  />
+                </div>
+              )}
+
+              {selectedComponent.type === 'notes' && (
+                <div>
+                  <Label className="text-xs">Notes Content</Label>
+                  <Input
+                    value={selectedComponent.data?.content || ''}
+                    onChange={(e) => updateComponent({
+                      data: { ...selectedComponent.data, content: e.target.value }
+                    })}
+                    placeholder="Enter notes and terms"
+                    className="h-8 mt-1"
+                  />
+                </div>
+              )}
+
+              {selectedComponent.type === 'payment-terms' && (
+                <div>
+                  <Label className="text-xs">Payment Terms</Label>
+                  <Input
+                    value={selectedComponent.data?.content || ''}
+                    onChange={(e) => updateComponent({
+                      data: { ...selectedComponent.data, content: e.target.value }
+                    })}
+                    placeholder="Payment due within 30 days"
+                    className="h-8 mt-1"
+                  />
+                </div>
+              )}
+
+              {selectedComponent.type === 'footer' && (
+                <div>
+                  <Label className="text-xs">Footer Text</Label>
+                  <Input
+                    value={selectedComponent.data?.content || ''}
+                    onChange={(e) => updateComponent({
+                      data: { ...selectedComponent.data, content: e.target.value }
+                    })}
+                    placeholder="Footer content"
+                    className="h-8 mt-1"
+                  />
+                </div>
+              )}
+
+              {selectedComponent.type === 'watermark' && (
+                <div>
+                  <Label className="text-xs">Watermark Text</Label>
+                  <Input
+                    value={selectedComponent.data?.content || ''}
+                    onChange={(e) => updateComponent({
+                      data: { ...selectedComponent.data, content: e.target.value }
+                    })}
+                    placeholder="CONFIDENTIAL"
+                    className="h-8 mt-1"
+                  />
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -357,10 +427,28 @@ const getAvailableFields = (type: TemplateComponent['type']) => {
         { key: 'phone', label: 'Phone' },
         { key: 'email', label: 'Email' },
       ];
+    case 'company-info':
+      return [
+        { key: 'companyName', label: 'Company Name' },
+        { key: 'address', label: 'Address' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'email', label: 'Email' },
+        { key: 'taxId', label: 'Tax ID/GST' },
+        { key: 'website', label: 'Website' },
+      ];
+    case 'bank-details':
+      return [
+        { key: 'bankName', label: 'Bank Name' },
+        { key: 'accountNumber', label: 'Account Number' },
+        { key: 'ifscCode', label: 'IFSC Code' },
+        { key: 'accountHolder', label: 'Account Holder' },
+        { key: 'branchName', label: 'Branch Name' },
+      ];
     case 'totals':
       return [
         { key: 'subtotal', label: 'Subtotal' },
         { key: 'gstAmount', label: 'GST Amount' },
+        { key: 'discount', label: 'Discount' },
         { key: 'roundoff', label: 'Round Off' },
         { key: 'total', label: 'Total' },
       ];
@@ -370,10 +458,15 @@ const getAvailableFields = (type: TemplateComponent['type']) => {
 };
 
 const getAvailableColumns = () => [
+  { key: 'srNo', label: 'Sr. No.' },
   { key: 'description', label: 'Description' },
   { key: 'hsnCode', label: 'HSN Code' },
   { key: 'quantity', label: 'Quantity' },
+  { key: 'unit', label: 'Unit' },
   { key: 'rate', label: 'Rate' },
+  { key: 'discount', label: 'Discount' },
+  { key: 'taxableAmount', label: 'Taxable Amount' },
   { key: 'gstRate', label: 'GST Rate' },
-  { key: 'amount', label: 'Amount' },
+  { key: 'gstAmount', label: 'GST Amount' },
+  { key: 'amount', label: 'Total Amount' },
 ];
