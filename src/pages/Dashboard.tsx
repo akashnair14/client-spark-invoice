@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Client, Invoice } from "@/types";
+import PageSEO from "@/components/seo/PageSEO";
 
 // Utility functions
 const getTopClients = (clients: Client[], invoices: Invoice[], n = 3) => {
@@ -136,6 +137,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
+      <PageSEO
+        title="Dashboard | SparkInvoice"
+        description="View key metrics, recent activity, clients and invoices."
+        canonicalUrl={window.location.origin + "/dashboard"}
+      />
       <div className="pb-8">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-2">
           <div>

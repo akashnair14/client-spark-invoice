@@ -31,6 +31,7 @@ import {
   Filter,
   FileText
 } from "lucide-react";
+import PageSEO from "@/components/seo/PageSEO";
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -133,6 +134,11 @@ const Templates = () => {
 
   return (
     <Layout>
+      <PageSEO
+        title="Templates | SparkInvoice"
+        description="Design and manage beautiful invoice templates for your business."
+        canonicalUrl={window.location.origin + "/templates"}
+      />
       <div className="page-header">
         <div className="flex items-center justify-between">
           <div>

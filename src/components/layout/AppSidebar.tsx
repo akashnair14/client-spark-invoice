@@ -68,7 +68,7 @@ const AppSidebar: React.FC = () => {
       )}
       collapsible="icon"
     >
-      <SidebarTrigger className="m-2 self-end" />
+      
       <SidebarContent>
         <SidebarGroup>
           {/* Minimal brand/header */}

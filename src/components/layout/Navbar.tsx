@@ -9,9 +9,9 @@ interface NavbarProps {
 
 const Navbar = ({ className }: NavbarProps) => {
   return (
-    <header className="bg-white dark:bg-[#18181b] border-b h-16 flex items-center px-4 md:px-6">
-      {/* Always visible sidebar trigger (hidden on large) */}
-      <div className="flex md:hidden">
+    <header className="bg-white dark:bg-[#18181b] border-b h-16 flex items-center px-4 md:px-6 sticky top-0 z-40 animate-fade-in">
+      {/* Global sidebar trigger - always visible */}
+      <div className="flex">
         <SidebarTrigger />
       </div>
       <div className="flex items-center gap-2 ml-2">

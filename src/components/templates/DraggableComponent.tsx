@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { TemplateComponent } from "@/types/template";
@@ -120,6 +121,62 @@ export const DraggableComponent = ({
 
   const IconComponent = getComponentIcon(component.type);
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const startRef = useRef({ mouseX: 0, mouseY: 0, width: 0, height: 0 });
+
+  const onResizeMouseMove = (e: MouseEvent) => {
+    const parent = containerRef.current?.parentElement as HTMLElement | null;
+    if (!parent) return;
+    const parentWidth = parent.clientWidth || 1;
+    const parentHeight = parent.clientHeight || 1;
+    const dx = e.clientX - startRef.current.mouseX;
+    const dy = e.clientY - startRef.current.mouseY;
+
+    const newWidthPx = Math.max(16, startRef.current.width + dx);
+    const newHeightPx = Math.max(16, startRef.current.height + dy);
+
+    const newWidthPct = Math.min(100, Math.max(5, (newWidthPx / parentWidth) * 100));
+    const newHeightPct = Math.min(100, Math.max(5, (newHeightPx / parentHeight) * 100));
+
+    onUpdate({
+      size: {
+        ...component.size,
+        width: newWidthPct,
+        height: newHeightPct,
+      },
+    });
+  };
+
+  const endResize = () => {
+    setIsResizing(false);
+    window.removeEventListener('mousemove', onResizeMouseMove);
+    window.removeEventListener('mouseup', endResize);
+  };
+
+  const onResizeStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const el = containerRef.current;
+    if (!el) return;
+    setIsResizing(true);
+    startRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      width: el.clientWidth,
+      height: el.clientHeight,
+    };
+    window.addEventListener('mousemove', onResizeMouseMove);
+    window.addEventListener('mouseup', endResize);
+  };
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('mousemove', onResizeMouseMove);
+      window.removeEventListener('mouseup', endResize);
+    };
+  }, []);
+
   const style = {
     position: 'absolute' as const,
     left: `${component.position.x}%`,
@@ -129,6 +186,7 @@ export const DraggableComponent = ({
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
     opacity: component.isVisible ? 1 : 0.5,
+    cursor: isResizing ? 'nwse-resize' : undefined,
   };
 
   const handleToggleVisibility = (e: React.MouseEvent) => {
@@ -143,7 +201,7 @@ export const DraggableComponent = ({
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => { setNodeRef(node); containerRef.current = node; }}
       style={style}
       className={cn(
         "group transition-all duration-200",
@@ -269,7 +327,7 @@ export const DraggableComponent = ({
         {isSelected && !component.isLocked && (
           <>
             {/* Corner resize handles */}
-            <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary rounded-full cursor-nw-resize" />
+            <div onMouseDown={onResizeStart} className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full cursor-se-resize" title="Resize" />
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full cursor-ne-resize" />
             <div className="absolute -top-1 -left-1 w-2 h-2 bg-primary rounded-full cursor-nw-resize" />
             <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-primary rounded-full cursor-ne-resize" />

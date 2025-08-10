@@ -285,7 +285,7 @@ export const TemplateDesigner = ({
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="border-b bg-background p-4">
+      <div className="border-b bg-background p-4 animate-fade-in">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-semibold">Invoice Template Designer</h1>
@@ -362,14 +362,23 @@ export const TemplateDesigner = ({
             <div className="w-80 border-r bg-background overflow-hidden">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
                 <div className="border-b p-2 flex-shrink-0">
-                  <TabsList className="grid w-full grid-cols-2 text-xs">
-                    <TabsTrigger value="components" className="text-xs">
+                  <TabsList className="grid w-full grid-cols-5 text-[11px]">
+                    <TabsTrigger value="components" className="text-[11px]">
                       <Palette className="h-3 w-3 mr-1" />
-                      Design
+                      Components
                     </TabsTrigger>
-                    <TabsTrigger value="company" className="text-xs">
+                    <TabsTrigger value="properties" className="text-[11px]">
+                      Properties
+                    </TabsTrigger>
+                    <TabsTrigger value="branding" className="text-[11px]">
+                      Branding
+                    </TabsTrigger>
+                    <TabsTrigger value="design" className="text-[11px]">
+                      Canvas
+                    </TabsTrigger>
+                    <TabsTrigger value="company" className="text-[11px]">
                       <Building className="h-3 w-3 mr-1" />
-                      Settings
+                      Company
                     </TabsTrigger>
                   </TabsList>
                 </div>

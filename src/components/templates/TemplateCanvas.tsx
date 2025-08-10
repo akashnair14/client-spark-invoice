@@ -21,7 +21,7 @@ export const TemplateCanvas = ({
   });
 
   return (
-    <div className="p-8 h-full">
+    <div className="p-8 h-full animate-enter">
       <div className="max-w-4xl mx-auto">
         <div className="mb-4 text-center">
           <h2 className="text-lg font-semibold">A4 Invoice Template</h2>
