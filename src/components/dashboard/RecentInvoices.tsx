@@ -30,7 +30,7 @@ const statusIcon = {
 const RecentInvoices: React.FC<Props> = ({ invoices }) => {
   const navigate = useNavigate();
   return (
-    <Card>
+    <Card className="animate-enter">
       <CardHeader>
         <CardTitle className="text-lg">Recent Invoices</CardTitle>
       </CardHeader>

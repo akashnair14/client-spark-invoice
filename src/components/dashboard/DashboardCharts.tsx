@@ -29,7 +29,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
   };
 
   return (
-    <Card>
+    <Card className="animate-enter">
       <CardHeader>
         <CardTitle className="text-lg">Invoice Overview</CardTitle>
       </CardHeader>
@@ -40,7 +40,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
             <XAxis dataKey="name" />
             <YAxis />
             <RechartsTooltip />
-            <Bar dataKey="Amount" fill="#0e7490" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="Amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
         <div className="flex justify-end mt-2 gap-2">

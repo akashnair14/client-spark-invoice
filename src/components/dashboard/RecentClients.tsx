@@ -12,7 +12,7 @@ interface Props {
 const RecentClients: React.FC<Props> = ({ clients }) => {
   const navigate = useNavigate();
   return (
-    <Card>
+    <Card className="animate-enter">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-700" />

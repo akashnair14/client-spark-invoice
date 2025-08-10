@@ -27,26 +27,26 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ clients, invoices }) =>
     {
       label: "Clients",
       value: totalClients,
-      icon: <Users className="h-6 w-6 text-blue-700" />,
-      color: "bg-blue-100"
+      icon: <Users className="h-6 w-6 text-primary" />,
+      color: "bg-primary/15"
     },
     {
       label: "Total Invoiced",
       value: `₹${totalInvoiced.toLocaleString("en-IN")}`,
-      icon: <PieChart className="h-6 w-6 text-green-700" />,
-      color: "bg-green-100"
+      icon: <PieChart className="h-6 w-6 text-primary" />,
+      color: "bg-primary/15"
     },
     {
       label: "Invoices",
       value: totalInvoices,
-      icon: <FileText className="h-6 w-6 text-yellow-700" />,
-      color: "bg-yellow-100"
+      icon: <FileText className="h-6 w-6 text-primary" />,
+      color: "bg-primary/15"
     },
     {
       label: "Paid",
       value: paidInvoices,
-      icon: <CheckCircle2 className="h-6 w-6 text-emerald-700" />,
-      color: "bg-emerald-100"
+      icon: <CheckCircle2 className="h-6 w-6 text-primary" />,
+      color: "bg-primary/15"
     }
   ];
 
@@ -56,7 +56,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ clients, invoices }) =>
         <Card
           key={s.label}
           onClick={() => navigate(statRoutes[s.label] || "/")}
-          className="flex items-center gap-4 py-4 hover:shadow-lg hover:bg-accent/40 cursor-pointer transition"
+          className="flex items-center gap-4 py-4 hover:shadow-lg hover:bg-accent/40 cursor-pointer transition animate-enter hover-scale"
           tabIndex={0}
           aria-label={s.label}
         >
