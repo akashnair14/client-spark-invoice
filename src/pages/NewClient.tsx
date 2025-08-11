@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
 import { createClient } from "@/api/clients";
 import { getCurrentUserId } from "@/utils/authUtils";
+import PageSEO from "@/components/seo/PageSEO";
 
 // Utility function to convert Client form values to snake_case for Supabase
 function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
@@ -64,12 +65,19 @@ const NewClient = () => {
 
   return (
     <Layout>
+      <PageSEO
+        title="Add Client | SparkInvoice"
+        description="Create a new client in your system."
+        canonicalUrl={window.location.origin + "/clients/new"}
+      />
+      <div className="space-y-6 animate-fade-in">
       <div className="page-header">
         <h1 className="page-title">Add New Client</h1>
         <p className="page-description">Create a new client in your system</p>
       </div>
 
       <ClientForm open={isFormOpen} onClose={handleClose} onSubmit={handleAddClient} />
+      </div>
     </Layout>
   );
 };

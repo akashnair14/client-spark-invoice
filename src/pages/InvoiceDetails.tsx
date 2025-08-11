@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import PageSEO from "@/components/seo/PageSEO";
 
 // TODO: Fetch invoice and client data from backend in useEffect.
 
@@ -118,12 +119,19 @@ const InvoiceDetails = () => {
   if (!invoice) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center h-[60vh]">
-          <h2 className="text-xl font-semibold">Invoice not found</h2>
-          <p className="text-muted-foreground mt-2">The invoice you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate('/invoices')} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Invoices
-          </Button>
+        <PageSEO
+          title="Invoice Not Found | SparkInvoice"
+          description="The invoice you're looking for doesn't exist."
+          canonicalUrl={window.location.origin + "/invoices"}
+        />
+        <div className="animate-fade-in">
+          <div className="flex flex-col items-center justify-center h-[60vh]">
+            <h2 className="text-xl font-semibold">Invoice not found</h2>
+            <p className="text-muted-foreground mt-2">The invoice you're looking for doesn't exist.</p>
+            <Button onClick={() => navigate('/invoices')} className="mt-4">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Invoices
+            </Button>
+          </div>
         </div>
       </Layout>
     );
@@ -143,7 +151,13 @@ const InvoiceDetails = () => {
   
   return (
     <Layout>
-      <div className="page-header flex items-center justify-between mb-6">
+      <PageSEO
+        title={`Invoice ${invoice.invoiceNumber} | SparkInvoice`}
+        description={`Status: ${invoice.status}`}
+        canonicalUrl={window.location.origin + "/invoices/" + id}
+      />
+      <div className="animate-fade-in">
+        <div className="page-header flex items-center justify-between mb-6">
         <div className="flex items-center">
           <Button 
             variant="outline" 
@@ -156,9 +170,12 @@ const InvoiceDetails = () => {
           <div>
             <h1 className="page-title">Invoice {invoice.invoiceNumber}</h1>
             <p className="page-description text-sm text-muted-foreground">
-              {invoice.date && !isNaN(invoice.date.getTime())
-                ? format(invoice.date, "MMMM dd, yyyy")
-                : "No date available"}
+              {(() => {
+                const invoiceDate = invoice.date instanceof Date ? invoice.date : (invoice.date ? new Date(invoice.date) : null);
+                return invoiceDate && !isNaN(invoiceDate.getTime())
+                  ? format(invoiceDate, "MMMM dd, yyyy")
+                  : "No date available";
+              })()}
             </p>
           </div>
         </div>
@@ -216,6 +233,7 @@ const InvoiceDetails = () => {
             total={invoice.total}
           />
         )}
+      </div>
       </div>
     </Layout>
   );

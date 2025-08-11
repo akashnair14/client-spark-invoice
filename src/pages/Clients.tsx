@@ -16,6 +16,7 @@ import {
   updateClient,
   deleteClient as apiDeleteClient,
 } from "@/api/clients";
+import PageSEO from "@/components/seo/PageSEO";
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -217,7 +218,12 @@ const Clients = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <PageSEO
+        title="Clients | SparkInvoice"
+        description="Manage your client information and relationships."
+        canonicalUrl={window.location.origin + "/clients"}
+      />
+      <div className="space-y-6 animate-fade-in">
         <div className="page-header flex items-center justify-between">
           <div>
             <h1 className="page-title">Clients</h1>

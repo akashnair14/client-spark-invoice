@@ -12,6 +12,7 @@ import InvoicePreviewPlaceholder from "@/components/invoices/form/InvoicePreview
 import { Invoice, Client } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { getClients } from "@/api/clients";
+import PageSEO from "@/components/seo/PageSEO";
 
 const NewInvoice = () => {
   const location = useLocation();
@@ -230,7 +231,13 @@ const NewInvoice = () => {
     : "Design and generate professional invoices with enhanced automation";
 
   return (
-    <Layout>
+      <Layout>
+        <PageSEO
+          title={`${pageTitle} | SparkInvoice`}
+          description={pageDescription}
+          canonicalUrl={window.location.origin + "/invoices/new"}
+        />
+        <div className="space-y-6 animate-fade-in">
       <div className="page-header">
         <h1 className="page-title">{pageTitle}</h1>
         <p className="page-description">{pageDescription}</p>
@@ -280,6 +287,7 @@ const NewInvoice = () => {
           )}
         </TabsContent>
       </Tabs>
+    </div>
     </Layout>
   );
 };

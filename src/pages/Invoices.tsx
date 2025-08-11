@@ -35,6 +35,7 @@ import InvoiceBulkActions from "@/components/invoices/InvoiceBulkActions";
 import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
 import { getClients } from "@/api/clients";
+import PageSEO from "@/components/seo/PageSEO";
 
 const Invoices = () => {
   const { toast } = useToast();
@@ -373,7 +374,12 @@ const Invoices = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <PageSEO
+        title="Invoices | SparkInvoice"
+        description="View, filter, and manage invoices."
+        canonicalUrl={window.location.origin + "/invoices"}
+      />
+      <div className="space-y-6 animate-fade-in">
         <div className="page-header flex items-center justify-between">
           <div>
             <h1 className="page-title">Invoices</h1>

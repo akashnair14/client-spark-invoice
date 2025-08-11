@@ -1,8 +1,15 @@
 
 import { Link } from "react-router-dom";
+import PageSEO from "@/components/seo/PageSEO";
 
 const Index = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-100 to-blue-200 relative overflow-hidden px-2">
+  <>
+    <PageSEO
+      title="Invoicer | Cloud Invoicing"
+      description="Create, manage and send professional invoices fast."
+      canonicalUrl={window.location.origin + "/"}
+    />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-100 to-blue-200 relative overflow-hidden px-2">
     {/* Decorative background blur */}
     <div className="absolute z-0 inset-0 pointer-events-none">
       <div className="absolute top-[-80px] left-[-80px] w-[260px] h-[260px] bg-blue-300 rounded-full blur-3xl opacity-30" />
@@ -17,6 +24,7 @@ const Index = () => (
           src="https://kitwind.tailwindcomponents.com/img/logo.svg"
           alt="Invoicer logo"
           className="w-16 h-16 mb-3 drop-shadow"
+          loading="lazy"
         />
         <h1 className="font-extrabold text-4xl sm:text-5xl text-blue-700 tracking-tight mb-1">
           Invoicer
@@ -47,12 +55,14 @@ const Index = () => (
             src="https://kitwind.tailwindcomponents.com/img/logo.svg"
             className="w-7 h-7"
             alt="Tailwind Components"
+            loading="lazy"
           />
           <span className="font-medium text-base">Tailwind Components</span>
         </a>
       </div>
     </main>
   </div>
+  </>
 );
 
 export default Index;

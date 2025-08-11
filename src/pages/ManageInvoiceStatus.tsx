@@ -11,6 +11,7 @@ import { getInvoices, updateInvoiceStatus } from "@/api/invoices";
 import { getClients } from "@/api/clients";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import PageSEO from "@/components/seo/PageSEO";
 
 // Using real data from Supabase backend
 
@@ -174,7 +175,12 @@ const ManageInvoiceStatusPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-4xl mx-auto">
+      <PageSEO
+        title="Manage Invoice Status | SparkInvoice"
+        description="Search and update invoice statuses easily."
+        canonicalUrl={window.location.origin + "/manage-invoice-status"}
+      />
+      <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
         <h1 className="page-title">Manage Invoice Status</h1>
         <p className="page-description">Search for invoices and update their status easily. Only invoices with unpaid or overdue status are shown by default.</p>
         <div className="flex gap-2 max-w-lg">

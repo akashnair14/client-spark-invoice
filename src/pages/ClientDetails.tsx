@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ClientInfoCard from "@/components/clients/ClientInfoCard";
 import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
 import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
+import PageSEO from "@/components/seo/PageSEO";
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -195,7 +196,13 @@ const ClientDetails = () => {
 
   return (
     <Layout>
-      <div className="page-header flex items-center justify-between mb-6">
+      <PageSEO
+        title={`${client.companyName} | Client Details | SparkInvoice`}
+        description={`Profile and invoices for ${client.companyName}`}
+        canonicalUrl={window.location.origin + "/clients/" + client.id}
+      />
+      <div className="animate-fade-in">
+        <div className="page-header flex items-center justify-between mb-6">
         <div className="flex items-center">
           <button
             className="mr-4 p-2 rounded border"
@@ -244,6 +251,7 @@ const ClientDetails = () => {
         onSubmit={handleEditClient}
         initialData={client}
       />
+      </div>
     </Layout>
   );
 };
