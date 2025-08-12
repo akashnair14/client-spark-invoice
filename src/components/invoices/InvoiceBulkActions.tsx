@@ -88,7 +88,7 @@ const InvoiceBulkActions = ({
   if (invoices.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-4 py-2">
+    <div className="flex items-center gap-4 py-2 animate-enter">
       <div className="flex items-center gap-3">
         <Checkbox
           checked={allSelected}

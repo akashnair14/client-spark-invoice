@@ -130,12 +130,12 @@ const Invoices = () => {
 
   const getStatusBadge = (status: Invoice["status"]) => {
     const statusStyles = {
-      paid: "bg-green-100 text-green-800 border-green-200",
-      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      overdue: "bg-red-100 text-red-800 border-red-200",
-      draft: "bg-gray-100 text-gray-800 border-gray-200",
-      sent: "bg-blue-100 text-blue-800 border-blue-200",
-    };
+      paid: "bg-primary/10 text-primary border-primary/20",
+      pending: "bg-accent text-accent-foreground border-accent/50",
+      overdue: "bg-destructive/10 text-destructive border-destructive/20",
+      draft: "bg-muted text-muted-foreground border-border",
+      sent: "bg-secondary text-secondary-foreground border-border",
+    } as const;
 
     return (
       <Badge
@@ -449,7 +449,7 @@ const Invoices = () => {
                 </TableRow>
               ) : (
                 currentInvoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
+                  <TableRow key={invoice.id} className="animate-enter hover:bg-muted/40 transition-colors">
                     <TableCell>
                       <Checkbox
                         checked={selectedInvoices.includes(invoice.id)}

@@ -89,7 +89,7 @@ const InvoiceFilters = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-enter">
       <div className="flex flex-col md:flex-row md:items-center gap-2">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -134,7 +134,7 @@ const InvoiceFilters = ({
       </div>
 
       {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 border rounded-lg bg-muted/50">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 border rounded-lg bg-muted/50 animate-scale-in">
           <div>
             <label className="text-sm font-medium mb-2 block">Status</label>
             <Select value={statusFilter} onValueChange={handleStatusChange}>

@@ -50,15 +50,15 @@ const ClientTable = ({
 
   const getStatusBadge = (status: Client["status"]) => {
     const statusStyles = {
-      active: "bg-green-100 text-green-800",
-      inactive: "bg-gray-100 text-gray-800",
-      pending: "bg-yellow-100 text-yellow-800",
-    };
+      active: "bg-primary/10 text-primary border-primary/20",
+      inactive: "bg-muted text-muted-foreground border-border",
+      pending: "bg-accent text-accent-foreground border-accent/50",
+    } as const;
 
     return (
       <Badge
         variant="outline"
-        className={statusStyles[status || "active"]}
+        className={statusStyles[(status || "active") as keyof typeof statusStyles]}
       >
         {status || "active"}
       </Badge>
@@ -133,7 +133,7 @@ const ClientTable = ({
         </TableHeader>
         <TableBody>
           {clients.map((client) => (
-            <TableRow key={client.id}>
+            <TableRow key={client.id} className="animate-enter hover:bg-muted/40 transition-colors">
               <TableCell>
                 <Checkbox
                   checked={selectedClients.includes(client.id)}
@@ -147,7 +147,7 @@ const ClientTable = ({
                 <div>
                   <a
                     href={`/clients/${client.id}`}
-                    className="font-medium text-blue-600 hover:underline cursor-pointer"
+                    className="font-medium text-primary hover:underline cursor-pointer"
                     style={{ display: 'inline-block' }}
                   >
                     {client.companyName}

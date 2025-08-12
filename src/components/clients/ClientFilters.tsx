@@ -76,7 +76,7 @@ const ClientFilters = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-enter">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
         {/* Search */}
         <div className="relative flex-1">
