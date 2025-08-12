@@ -121,7 +121,7 @@ const Auth = () => {
         <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
           <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-xl animate-fade-in">
             <CardHeader className="text-center">
-              <h1 className="sr-only">Login or Sign Up</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Login or Sign Up</h1>
               <CardTitle className="text-2xl font-bold">ClientSpark</CardTitle>
               <CardDescription>
                 Professional Invoice Management

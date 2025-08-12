@@ -185,7 +185,7 @@ const AuthForm: React.FC = () => {
         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-700 to-cyan-400 flex items-center justify-center shadow-lg mb-2 animate-[fade-in_0.6s]">
           <LogIn className="text-white w-8 h-8" />
         </div>
-        <span className="font-bold text-[2rem] text-white tracking-wide drop-shadow-lg mb-1 animate-fade-in">Welcome Back</span>
+        <h1 className="font-bold text-[2rem] text-white tracking-wide drop-shadow-lg mb-1 animate-fade-in">{tab === "login" ? "Welcome Back" : "Create Your Account"}</h1>
         <span className="text-blue-100 text-md opacity-70">{tab === "login" ? "Log in to your account" : "Create your account"}</span>
       </div>
       {/* Main Login/Register Card */}
