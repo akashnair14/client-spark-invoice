@@ -29,7 +29,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
   };
 
   return (
-    <Card className="animate-enter">
+    <Card className="animate-enter hover-scale">
       <CardHeader>
         <CardTitle className="text-lg">Invoice Overview</CardTitle>
       </CardHeader>
@@ -48,7 +48,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
             <button
               key={`${d.clientId}-${index}`}
               onClick={() => d.clientId && navigate(`/clients/${d.clientId}`)}
-              className="text-xs px-3 py-1 border rounded hover:bg-muted"
+              className="text-xs px-3 py-1 border rounded hover:bg-muted transition hover-scale"
               aria-label={`View details for ${d.name}`}
             >
               {d.name}
