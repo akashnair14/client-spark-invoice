@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -142,16 +142,14 @@ const ClientTable = ({
                   }
                 />
               </TableCell>
-              {/* Make company name a clickable link */}
               <TableCell>
                 <div>
-                  <a
-                    href={`/clients/${client.id}`}
-                    className="font-medium text-primary hover:underline cursor-pointer"
-                    style={{ display: 'inline-block' }}
+                  <Link
+                    to={`/clients/${client.id}`}
+                    className="font-medium text-primary hover:underline inline-block transition-colors"
                   >
                     {client.companyName}
-                  </a>
+                  </Link>
                   <div className="text-sm text-muted-foreground">{client.email}</div>
                   {client.tags && client.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
