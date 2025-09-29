@@ -1,24 +1,21 @@
-
 import React from "react";
 
-// Animated dark tech background (radial + conic, for sleekness)
+// Modern animated gradient background with mesh effect
 const GradientBackground: React.FC = () => (
   <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none">
-    <div className="absolute inset-0 bg-[#121212]" />
-    <div className="absolute inset-0 bg-[conic-gradient(at_left,_#1a1d5c_0%,#0a1633_30%,#20206e_55%,#130d44_100%)] opacity-80 animate-gradient-rotate" />
-    <div className="absolute -inset-12 bg-gradient-radial from-blue-700/30 via-sky-400/10 to-transparent w-[110vw] h-[85vh] left-1/2 -translate-x-1/2 -top-[10%] opacity-80 blur-3xl" />
-    <div className="absolute inset-0 bg-black/60" />
-    <style>
-      {`
-      @keyframes gradient-rotate {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-      .animate-gradient-rotate {
-        animation: gradient-rotate 32s linear infinite;
-      }
-      `}
-    </style>
+    {/* Base gradient */}
+    <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted" />
+    
+    {/* Animated mesh gradient blobs */}
+    <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+    <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+    <div className="absolute top-1/3 right-1/3 w-[350px] h-[350px] bg-primary/15 rounded-full blur-[90px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+    
+    {/* Animated grid overlay */}
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20" />
+    
+    {/* Subtle noise texture */}
+    <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
   </div>
 );
 

@@ -169,7 +169,7 @@ const AuthForm: React.FC = () => {
 
   // Main auth card UI
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-2 py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-4 py-10 relative overflow-hidden">
       {/* -- Modal for confirm email step -- */}
       <ConfirmEmailDialog
         open={showConfirmPopup}
@@ -180,48 +180,74 @@ const AuthForm: React.FC = () => {
         lastRegisteredEmail={lastRegisteredEmail}
         email={email}
       />
-      {/* --- Branded App Logo/Name --- */}
-      <div className="mb-8 flex flex-col items-center">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-700 to-cyan-400 flex items-center justify-center shadow-lg mb-2 animate-[fade-in_0.6s]">
-          <LogIn className="text-white w-8 h-8" />
+      
+      {/* --- Branded App Logo/Name with smooth transition --- */}
+      <div className="mb-10 flex flex-col items-center space-y-3 animate-fade-in">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30 transform transition-transform duration-300 group-hover:scale-110">
+            <LogIn className="text-primary-foreground w-8 h-8" />
+          </div>
         </div>
-        <h1 className="font-bold text-[2rem] text-white tracking-wide drop-shadow-lg mb-1 animate-fade-in">{tab === "login" ? "Welcome Back" : "Create Your Account"}</h1>
-        <span className="text-blue-100 text-md opacity-70">{tab === "login" ? "Log in to your account" : "Create your account"}</span>
+        <div className="text-center space-y-1">
+          <h1 className="font-bold text-3xl text-foreground tracking-tight transition-all duration-500">
+            {tab === "login" ? "Welcome Back" : "Create Account"}
+          </h1>
+          <p className="text-muted-foreground text-sm transition-all duration-500">
+            {tab === "login" ? "Sign in to continue to Invoicer" : "Get started with your free account"}
+          </p>
+        </div>
       </div>
-      {/* Main Login/Register Card */}
-      <Card className="w-full max-w-sm mx-auto p-8 bg-white/10 shadow-xl border-none backdrop-blur-2xl rounded-2xl mb-4 animate-fade-in transition-all duration-500">
-        {/* Toggle Tabs */}
-        <div className="flex mb-7 justify-center gap-2 relative z-10">
-          <button
-            className={`px-6 py-2 rounded-full font-semibold focus-visible:ring-2 transition
-              ${tab === "login"
-                ? "bg-blue-600 text-white shadow shadow-blue-600/40"
-                : "bg-transparent text-blue-200 hover:bg-blue-600/30"}`}
-            onClick={() => handleTabSwitch("login")}
-            aria-selected={tab === "login"}
-            tabIndex={tab === "login" ? -1 : 0}
-            type="button"
-            disabled={loading}
-          >
-            Login
-          </button>
-          <button
-            className={`px-6 py-2 rounded-full font-semibold focus-visible:ring-2 transition
-              ${tab === "register"
-                ? "bg-blue-600 text-white shadow shadow-blue-600/40"
-                : "bg-transparent text-blue-200 hover:bg-blue-600/30"}`}
-            onClick={() => handleTabSwitch("register")}
-            aria-selected={tab === "register"}
-            tabIndex={tab === "register" ? -1 : 0}
-            type="button"
-            disabled={loading}
-          >
-            Register
-          </button>
+
+      {/* Main Login/Register Card with glassmorphism */}
+      <Card className="w-full max-w-md mx-auto p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl mb-4 animate-scale-in hover:shadow-primary/10 transition-all duration-500">
+        {/* Toggle Tabs with sliding indicator */}
+        <div className="relative mb-8">
+          <div className="flex gap-1 p-1 bg-muted/30 rounded-full backdrop-blur-sm">
+            <button
+              className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                tab === "login"
+                  ? "text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => handleTabSwitch("login")}
+              aria-selected={tab === "login"}
+              type="button"
+              disabled={loading}
+            >
+              {tab === "login" && (
+                <span className="absolute inset-0 bg-primary rounded-full -z-10 animate-scale-in" />
+              )}
+              <span className="relative z-10">Login</span>
+            </button>
+            <button
+              className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                tab === "register"
+                  ? "text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => handleTabSwitch("register")}
+              aria-selected={tab === "register"}
+              type="button"
+              disabled={loading}
+            >
+              {tab === "register" && (
+                <span className="absolute inset-0 bg-primary rounded-full -z-10 animate-scale-in" />
+              )}
+              <span className="relative z-10">Register</span>
+            </button>
+          </div>
         </div>
-        {/* --- LOGIN FORM --- */}
-        <div className="relative h-[265px] sm:h-[260px] transition-all duration-700">
-          {tab === "login" && (
+
+        {/* Forms with smooth transition */}
+        <div className="relative overflow-hidden" style={{ minHeight: '280px' }}>
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              tab === "login"
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-full absolute inset-0 pointer-events-none"
+            }`}
+          >
             <LoginForm
               email={email}
               password={password}
@@ -237,8 +263,14 @@ const AuthForm: React.FC = () => {
               }
               onResendEmail={() => setShowConfirmPopup(true)}
             />
-          )}
-          {tab === "register" && (
+          </div>
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              tab === "register"
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-full absolute inset-0 pointer-events-none"
+            }`}
+          >
             <RegisterForm
               email={email}
               password={password}
@@ -254,37 +286,40 @@ const AuthForm: React.FC = () => {
               error={error}
               onSubmit={handleSubmit}
             />
-          )}
+          </div>
         </div>
-        {/* OR divider */}
-        <div className="flex items-center my-5">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-700/40 to-transparent" />
-          <span className="mx-3 text-xs text-blue-200/80 font-medium">or</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-blue-700/40 to-transparent" />
+
+        {/* Modern OR divider */}
+        <div className="flex items-center my-6">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="mx-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">or</span>
+          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-transparent" />
         </div>
+
         {/* Social login */}
-        <SocialButton onClick={handleGoogleLogin} provider="google" className="animate-fade-in">
-          <span className="flex items-center pt-[1px]">Sign in with Google</span>
+        <SocialButton onClick={handleGoogleLogin} provider="google" className="w-full">
+          Sign in with Google
         </SocialButton>
-        {/* Switch login/register */}
-        <div className="mt-5 flex items-center justify-center text-sm text-zinc-400">
-          <span>
-            {tab === "login"
-              ? "Don't have an account?"
-              : "Already have an account?"}{" "}
+
+        {/* Switch login/register link */}
+        <div className="mt-6 text-center text-sm">
+          <span className="text-muted-foreground">
+            {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
           </span>
           <button
-            className="ml-1 font-medium underline underline-offset-4 text-blue-300 hover:text-blue-200 transition focus-visible:ring-2"
+            className="font-semibold text-primary hover:underline underline-offset-4 transition-all focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
             type="button"
             onClick={() => handleTabSwitch(tab === "login" ? "register" : "login")}
           >
-            {tab === "login" ? "Register" : "Log in"}
+            {tab === "login" ? "Sign up" : "Sign in"}
           </button>
         </div>
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs opacity-70 text-center font-inter text-blue-200/80 mt-5">
-          Powered by<span className="font-bold text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text ml-1">Invoicer</span>
-        </div>
       </Card>
+
+      {/* Footer branding */}
+      <p className="text-xs text-muted-foreground/60 mt-4 animate-fade-in">
+        Powered by <span className="font-semibold text-primary">Invoicer</span>
+      </p>
     </div>
   );
 };
