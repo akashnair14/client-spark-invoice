@@ -1,25 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { LogIn, UserPlus, Eye, EyeOff, Circle, Mail, Lock } from "lucide-react";
+import { LogIn, UserPlus, Sparkles } from "lucide-react";
 import SocialButton from "./SocialButton";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ConfirmEmailDialog from "./ConfirmEmailDialog";
 
-// A modern, clean, animated, accessible login/register form
+// Check if user prefers reduced motion
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// A highly animated, modern, accessible login/register form
 const AuthForm: React.FC = () => {
   const { user, login, signup, logout, loading } = useAuth();
   const { toast } = useToast();
@@ -28,18 +24,17 @@ const AuthForm: React.FC = () => {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState(""); // register only
+  const [confirm, setConfirm] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // New: Store registration credentials temporarily for dialog use
   const [lastRegisteredEmail, setLastRegisteredEmail] = useState<string>("");
   const [lastRegisteredPassword, setLastRegisteredPassword] = useState<string>("");
 
-  // visually reset errors on tab switch
+  // Handle tab switch with smooth transition
   const handleTabSwitch = (target: "login" | "register") => {
     setTab(target);
     setError(null);
@@ -48,11 +43,9 @@ const AuthForm: React.FC = () => {
     setConfirm("");
   };
 
-  // Social login (Google example only)
+  // Social login
   const handleGoogleLogin = async () => {
-    // Import Supabase directly and signInWithOAuth (no await)
     const { supabase } = await import("@/integrations/supabase/client");
-    // Open Google sign in in a new popup (default Supabase flow)
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -73,10 +66,9 @@ const AuthForm: React.FC = () => {
     try {
       if (tab === "register") {
         await signup(email, password);
-        // Store for potential later resends!
         setLastRegisteredEmail(email);
         setLastRegisteredPassword(password);
-        setShowConfirmPopup(true); // Show popup dialog
+        setShowConfirmPopup(true);
         setTab("login");
         setEmail("");
         setPassword("");
@@ -87,13 +79,11 @@ const AuthForm: React.FC = () => {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      // Show popup on "Email not confirmed" error
       if (
         err &&
         typeof err.message === "string" &&
         err.message.toLowerCase().includes("email not confirmed")
       ) {
-        // Allow user to trigger resend from login page too
         if (email && password) {
           setLastRegisteredEmail(email);
           setLastRegisteredPassword(password);
@@ -110,7 +100,6 @@ const AuthForm: React.FC = () => {
   const handleResendConfirmation = async () => {
     setResendLoading(true);
     setError(null);
-    // Use registration credentials if available, otherwise fallback to login form values
     const targetEmail = lastRegisteredEmail || email;
     const targetPassword = lastRegisteredPassword || password;
 
@@ -141,36 +130,61 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  // Already logged in? Show summary + sign-out
+  // Already logged in view
   if (user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center font-inter">
-        <Card className="max-w-lg w-full p-8 bg-white/10 dark:bg-[#15172a]/80 shadow-2xl border-none backdrop-blur-lg animate-fade-in">
-          <div className="flex flex-col items-center justify-center mb-5">
-            <UserPlus className="w-10 h-10 text-blue-400 mb-2 drop-shadow animate-fade-in" />
-            <div className="text-xl font-semibold text-white text-center">
-              You are logged in as <b>{user.email}</b>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen flex flex-col items-center justify-center font-inter"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+        >
+          <Card className="max-w-lg w-full p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl">
+            <div className="flex flex-col items-center justify-center mb-5">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 10, 0] }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <UserPlus className="w-10 h-10 text-primary mb-2" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-xl font-semibold text-foreground text-center"
+              >
+                Logged in as <b className="text-primary">{user.email}</b>
+              </motion.div>
             </div>
-          </div>
-          <Button
-            onClick={async () => {
-              await logout();
-              navigate("/auth");
-            }}
-            variant="secondary"
-            className="w-full mt-4 bg-blue-700/80 text-white hover:bg-blue-500/90"
-          >
-            Sign out
-          </Button>
-        </Card>
-      </div>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                onClick={async () => {
+                  await logout();
+                  navigate("/auth");
+                }}
+                variant="secondary"
+                className="w-full mt-4"
+              >
+                Sign out
+              </Button>
+            </motion.div>
+          </Card>
+        </motion.div>
+      </motion.div>
     );
   }
 
   // Main auth card UI
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-4 py-10 relative overflow-hidden">
-      {/* -- Modal for confirm email step -- */}
+      {/* Confirmation Email Dialog */}
       <ConfirmEmailDialog
         open={showConfirmPopup}
         onOpenChange={setShowConfirmPopup}
@@ -181,145 +195,229 @@ const AuthForm: React.FC = () => {
         email={email}
       />
       
-      {/* --- Branded App Logo/Name with smooth transition --- */}
-      <div className="mb-10 flex flex-col items-center space-y-3 animate-fade-in">
+      {/* Animated Logo/Brand */}
+      <motion.div
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mb-10 flex flex-col items-center space-y-3"
+      >
         <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
-          <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30 transform transition-transform duration-300 group-hover:scale-110">
-            <LogIn className="text-primary-foreground w-8 h-8" />
-          </div>
+          <motion.div
+            animate={{
+              scale: prefersReducedMotion ? 1 : [1, 1.05, 1],
+              rotate: prefersReducedMotion ? 0 : [0, 5, -5, 0]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+            className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"
+          />
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30"
+          >
+            <Sparkles className="text-primary-foreground w-8 h-8" />
+          </motion.div>
         </div>
-        <div className="text-center space-y-1">
-          <h1 className="font-bold text-3xl text-foreground tracking-tight transition-all duration-500">
-            {tab === "login" ? "Welcome Back" : "Create Account"}
-          </h1>
-          <p className="text-muted-foreground text-sm transition-all duration-500">
-            {tab === "login" ? "Sign in to continue to Invoicer" : "Get started with your free account"}
-          </p>
-        </div>
-      </div>
-
-      {/* Main Login/Register Card with glassmorphism */}
-      <Card className="w-full max-w-md mx-auto p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl mb-4 animate-scale-in hover:shadow-primary/10 transition-all duration-500">
-        {/* Toggle Tabs with sliding indicator */}
-        <div className="relative mb-8">
-          <div className="flex gap-1 p-1 bg-muted/30 rounded-full backdrop-blur-sm">
-            <button
-              className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
-                tab === "login"
-                  ? "text-primary-foreground shadow-lg"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => handleTabSwitch("login")}
-              aria-selected={tab === "login"}
-              type="button"
-              disabled={loading}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-center space-y-1"
+        >
+          <AnimatePresence mode="wait">
+            <motion.h1
+              key={tab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="font-bold text-3xl text-foreground tracking-tight"
             >
-              {tab === "login" && (
-                <span className="absolute inset-0 bg-primary rounded-full -z-10 animate-scale-in" />
-              )}
-              <span className="relative z-10">Login</span>
-            </button>
-            <button
-              className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
-                tab === "register"
-                  ? "text-primary-foreground shadow-lg"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => handleTabSwitch("register")}
-              aria-selected={tab === "register"}
-              type="button"
-              disabled={loading}
+              {tab === "login" ? "Welcome Back" : "Create Account"}
+            </motion.h1>
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={`${tab}-desc`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-muted-foreground text-sm"
             >
-              {tab === "register" && (
-                <span className="absolute inset-0 bg-primary rounded-full -z-10 animate-scale-in" />
-              )}
-              <span className="relative z-10">Register</span>
-            </button>
+              {tab === "login" ? "Sign in to continue to SparkInvoice" : "Get started with your free account"}
+            </motion.p>
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
+
+      {/* Main Auth Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+        className="w-full max-w-md mx-auto"
+      >
+        <Card className="p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl mb-4 hover:shadow-primary/10 transition-all duration-500">
+          {/* Tab Switcher with sliding indicator */}
+          <div className="relative mb-8">
+            <div className="flex gap-1 p-1 bg-muted/30 rounded-full backdrop-blur-sm">
+              <motion.button
+                whileHover={{ scale: tab === "login" ? 1 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                  tab === "login"
+                    ? "text-primary-foreground shadow-lg"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => handleTabSwitch("login")}
+                aria-selected={tab === "login"}
+                type="button"
+                disabled={loading}
+              >
+                <AnimatePresence>
+                  {tab === "login" && (
+                    <motion.span
+                      layoutId="activeTab"
+                      initial={false}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="absolute inset-0 bg-primary rounded-full -z-10"
+                    />
+                  )}
+                </AnimatePresence>
+                <span className="relative z-10">Login</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: tab === "register" ? 1 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                  tab === "register"
+                    ? "text-primary-foreground shadow-lg"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => handleTabSwitch("register")}
+                aria-selected={tab === "register"}
+                type="button"
+                disabled={loading}
+              >
+                <AnimatePresence>
+                  {tab === "register" && (
+                    <motion.span
+                      layoutId="activeTab"
+                      initial={false}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="absolute inset-0 bg-primary rounded-full -z-10"
+                    />
+                  )}
+                </AnimatePresence>
+                <span className="relative z-10">Register</span>
+              </motion.button>
+            </div>
           </div>
-        </div>
 
-        {/* Forms with smooth transition */}
-        <div className="relative overflow-hidden" style={{ minHeight: '280px' }}>
-          <div
-            className={`transition-all duration-500 ease-in-out ${
-              tab === "login"
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 -translate-x-full absolute inset-0 pointer-events-none"
-            }`}
+          {/* Forms with AnimatePresence for smooth transitions */}
+          <AnimatePresence mode="wait">
+            {tab === "login" ? (
+              <LoginForm
+                key="login-form"
+                email={email}
+                password={password}
+                showPass={showPass}
+                setEmail={setEmail}
+                setPassword={setPassword}
+                setShowPass={setShowPass}
+                loading={loading}
+                error={error}
+                onSubmit={handleSubmit}
+                onForgotPassword={() =>
+                  window.alert("Password reset flow not implemented")
+                }
+                onResendEmail={() => setShowConfirmPopup(true)}
+              />
+            ) : (
+              <RegisterForm
+                key="register-form"
+                email={email}
+                password={password}
+                confirm={confirm}
+                showPass={showPass}
+                showConfirm={showConfirm}
+                setEmail={setEmail}
+                setPassword={setPassword}
+                setConfirm={setConfirm}
+                setShowPass={setShowPass}
+                setShowConfirm={setShowConfirm}
+                loading={loading}
+                error={error}
+                onSubmit={handleSubmit}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Modern OR divider */}
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex items-center my-6"
           >
-            <LoginForm
-              email={email}
-              password={password}
-              showPass={showPass}
-              setEmail={setEmail}
-              setPassword={setPassword}
-              setShowPass={setShowPass}
-              loading={loading}
-              error={error}
-              onSubmit={handleSubmit}
-              onForgotPassword={() =>
-                window.alert("Password reset flow not implemented (ask for support!)")
-              }
-              onResendEmail={() => setShowConfirmPopup(true)}
-            />
-          </div>
-          <div
-            className={`transition-all duration-500 ease-in-out ${
-              tab === "register"
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-full absolute inset-0 pointer-events-none"
-            }`}
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+            <span className="mx-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">or</span>
+            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-transparent" />
+          </motion.div>
+
+          {/* Social login */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.3 }}
           >
-            <RegisterForm
-              email={email}
-              password={password}
-              confirm={confirm}
-              showPass={showPass}
-              showConfirm={showConfirm}
-              setEmail={setEmail}
-              setPassword={setPassword}
-              setConfirm={setConfirm}
-              setShowPass={setShowPass}
-              setShowConfirm={setShowConfirm}
-              loading={loading}
-              error={error}
-              onSubmit={handleSubmit}
-            />
-          </div>
-        </div>
+            <SocialButton onClick={handleGoogleLogin} provider="google" className="w-full">
+              Sign in with Google
+            </SocialButton>
+          </motion.div>
 
-        {/* Modern OR divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-          <span className="mx-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">or</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-transparent" />
-        </div>
-
-        {/* Social login */}
-        <SocialButton onClick={handleGoogleLogin} provider="google" className="w-full">
-          Sign in with Google
-        </SocialButton>
-
-        {/* Switch login/register link */}
-        <div className="mt-6 text-center text-sm">
-          <span className="text-muted-foreground">
-            {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
-          </span>
-          <button
-            className="font-semibold text-primary hover:underline underline-offset-4 transition-all focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
-            type="button"
-            onClick={() => handleTabSwitch(tab === "login" ? "register" : "login")}
+          {/* Switch link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.3 }}
+            className="mt-6 text-center text-sm"
           >
-            {tab === "login" ? "Sign up" : "Sign in"}
-          </button>
-        </div>
-      </Card>
+            <span className="text-muted-foreground">
+              {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
+            </span>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="font-semibold text-primary hover:underline underline-offset-4 transition-all focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
+              type="button"
+              onClick={() => handleTabSwitch(tab === "login" ? "register" : "login")}
+            >
+              {tab === "login" ? "Sign up" : "Sign in"}
+            </motion.button>
+          </motion.div>
+        </Card>
+      </motion.div>
 
       {/* Footer branding */}
-      <p className="text-xs text-muted-foreground/60 mt-4 animate-fade-in">
-        Powered by <span className="font-semibold text-primary">Invoicer</span>
-      </p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        className="text-xs text-muted-foreground/60 mt-4"
+      >
+        Powered by <span className="font-semibold text-primary">SparkInvoice</span>
+      </motion.p>
     </div>
   );
 };
