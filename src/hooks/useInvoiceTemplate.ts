@@ -36,7 +36,6 @@ export const useInvoiceTemplate = () => {
         }
       }
     } catch (error) {
-      console.error('Failed to load templates:', error);
       toast({
         title: "Error",
         description: "Failed to load invoice templates.",
@@ -54,7 +53,6 @@ export const useInvoiceTemplate = () => {
         setTemplateLayout(template.layout_data as unknown as TemplateLayout);
       }
     } catch (error) {
-      console.error('Failed to load template layout:', error);
       toast({
         title: "Error",
         description: "Failed to load template layout.",

@@ -46,7 +46,6 @@ const TemplateDesigner = () => {
         await loadTemplate();
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
       toast({
         title: "Authentication Error",
         description: "Please log in again to continue.",
@@ -61,9 +60,7 @@ const TemplateDesigner = () => {
     
     try {
       setIsLoading(true);
-      console.log('Loading template:', templateId);
       const template = await getInvoiceTemplate(templateId);
-      console.log('Template loaded:', template);
       
       setLayout(template.layout_data as unknown as TemplateLayout);
       setTemplateName(template.template_name);
@@ -73,7 +70,6 @@ const TemplateDesigner = () => {
         description: `Template "${template.template_name}" loaded successfully.`,
       });
     } catch (error) {
-      console.error('Failed to load template:', error);
       toast({
         title: "Error Loading Template",
         description: error instanceof Error ? error.message : "Failed to load template. Please try again.",
@@ -99,7 +95,6 @@ const TemplateDesigner = () => {
 
     try {
       setIsSaving(true);
-      console.log('Saving template:', { finalTemplateName, components: newLayout.components.length });
 
       // Check authentication again before saving
       const { data: { user } } = await supabase.auth.getUser();
@@ -118,18 +113,14 @@ const TemplateDesigner = () => {
         margins: { top: 20, bottom: 20, left: 20, right: 20 } as unknown as any,
       };
 
-      console.log('Template data to save:', templateData);
-
       if (templateId) {
-        const updatedTemplate = await updateInvoiceTemplate(templateId, templateData);
-        console.log('Template updated:', updatedTemplate);
+        await updateInvoiceTemplate(templateId, templateData);
         toast({
           title: "Template Updated",
           description: `Template "${finalTemplateName}" has been updated successfully.`,
         });
       } else {
-        const newTemplate = await createInvoiceTemplate(templateData);
-        console.log('Template created:', newTemplate);
+        await createInvoiceTemplate(templateData);
         toast({
           title: "Template Saved",
           description: `Template "${finalTemplateName}" has been saved successfully.`,
@@ -137,8 +128,6 @@ const TemplateDesigner = () => {
         navigate('/templates');
       }
     } catch (error) {
-      console.error('Failed to save template:', error);
-      
       let errorMessage = "Failed to save template. Please try again.";
       
       if (error instanceof Error) {
@@ -164,7 +153,6 @@ const TemplateDesigner = () => {
   };
 
   const handlePreview = (currentLayout: TemplateLayout) => {
-    console.log('Previewing layout with components:', currentLayout.components.length);
     setLayout(currentLayout);
     const params = new URLSearchParams(searchParams);
     params.set('preview', 'true');

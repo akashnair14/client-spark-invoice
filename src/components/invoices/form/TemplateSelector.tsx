@@ -46,7 +46,6 @@ export const TemplateSelector = ({
         }
       }
     } catch (error) {
-      console.error('Failed to load templates:', error);
       toast({
         title: "Error",
         description: "Failed to load invoice templates.",

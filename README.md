@@ -1,254 +1,168 @@
-
 # SparkInvoice
 
-A modern, full-stack invoice management application built with React, TypeScript, and Supabase. Designed for small businesses and freelancers to efficiently manage clients, invoices, and payments with a beautiful, responsive interface.
+A modern, full-stack invoice management application built with React, TypeScript, Vite, Tailwind CSS, and Supabase.
 
-## ✨ Key Features
+## 🚀 Features
 
-### 📊 Interactive Dashboard
-- Real-time business metrics and statistics
-- Clickable widgets for quick navigation
-- Global search functionality for clients and invoices
-- Top performing clients showcase
-- Recent activity feed with visual indicators
-- Overdue invoice highlights
-- Interactive charts powered by Recharts
+### Client Management
+- **Comprehensive Client Profiles**: Store company details, GST number, contact information, and banking details
+- **Client Dashboard**: Advanced search and filtering capabilities
+- **Client Activity Tracking**: Monitor invoice history and payment status per client
+- **Bulk Operations**: Perform actions on multiple clients simultaneously
+- **Quick Access Drawer**: View client details without leaving the current page
 
-### 👥 Client Management
-- Complete CRUD operations for client records
-- Bulk actions support (select, export, delete)
-- Advanced filtering and search capabilities
-- Client details drawer with invoice history
-- Tags and status management
-- Comprehensive client profiles with contact info, GST details, and banking information
+### Invoice Management
+- **Professional Invoice Generation**: Line items, GST calculations (CGST/SGST), HSN codes, automatic totaling
+- **Multiple Invoice Templates**: Design custom invoice layouts with drag-and-drop template designer
+- **Invoice Status Workflow**: Draft, Sent, Pending, Paid, and Overdue statuses
+- **PDF Export & Print**: Generate professional PDF invoices
+- **WhatsApp Sharing**: Share invoices via WhatsApp with one click
+- **Bulk Actions**: Manage multiple invoices at once
+- **Invoice Preview**: Real-time preview as you create
 
-### 🧾 Invoice Management
-- Professional invoice generation with GST calculations
-- Multiple invoice statuses (draft, sent, paid, pending, overdue)
-- Bulk operations (status updates, deletion, export)
-- Advanced filtering (status, date range, client, FY)
-- Quick view panel for rapid invoice review
-- PDF export and print functionality
-- Support for CGST/SGST and IGST
-- Additional details (PO number, DC number, Challan, E-way bill)
-- Customizable invoice templates
+### Template System
+- **Custom Template Designer**: Visual drag-and-drop editor for invoice layouts
+- **Template Library**: Save and reuse custom templates
+- **Default Templates**: Set default templates for quick invoice creation
+- **Multi-format Support**: A4 and Letter paper sizes
 
-### 🎨 Template Designer
-- Drag-and-drop invoice template builder
-- Live preview with real-time updates
-- Component palette with pre-built elements
-- Property panel for fine-tuning styles
-- Save and reuse custom templates
-- Paper size and orientation options
-- Custom margins and branding support
+### Dashboard & Analytics
+- **Business Overview**: Real-time metrics on clients, invoices, and revenue
+- **Interactive Charts**: Visual invoice distribution and trends
+- **Recent Activity**: Timeline of recent actions
+- **Top Clients**: Identify most valuable clients
 
-### 🔐 Authentication
-- Secure user authentication via Supabase Auth
-- Email/password registration and login
-- Row Level Security (RLS) policies for data protection
-- User-specific data isolation
+### Advanced Features
+- **Dark Mode Support**: Full theme support with system preference detection
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
+- **Global Search**: Search across clients and invoices
+- **Smart Filtering**: Advanced filter combinations
+- **Export Options**: CSV, XLSX, and PDF formats
+- **Real-time Updates**: Instant data synchronization
+- **Keyboard Shortcuts**: Quick navigation
 
-### 🎨 Modern UI/UX
-- Dark/Light mode toggle with system preference detection
-- Smooth animations and transitions
-- Fully responsive design (mobile, tablet, desktop)
-- shadcn/ui component library
-- Consistent design system with semantic color tokens
-- Accessible components built on Radix UI
-
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework:** React 18 with TypeScript
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS with custom design tokens
-- **UI Components:** shadcn/ui (Radix UI primitives)
-- **State Management:** React Query (@tanstack/react-query)
-- **Routing:** React Router v6
-- **Forms:** React Hook Form with Zod validation
-- **Charts:** Recharts
-- **Icons:** Lucide React
-- **Drag & Drop:** @dnd-kit
-- **Date Handling:** date-fns
-- **PDF Generation:** jsPDF
+- **React 18.3** with TypeScript
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling with custom design system
+- **Shadcn/ui** - Component library
+- **React Router** - Client-side routing
+- **React Hook Form** - Form management
+- **Zod** - Schema validation
+- **Recharts** - Data visualization
+- **jsPDF** - PDF generation
 
-### Backend
-- **Database:** Supabase (PostgreSQL)
-- **Authentication:** Supabase Auth
-- **Real-time:** Supabase Realtime
-- **Storage:** Supabase Storage (planned)
-- **API:** Supabase REST API with auto-generated TypeScript types
-
-### Development
-- **TypeScript:** Strict type checking
-- **ESLint:** Code linting
-- **PostCSS:** CSS processing
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+ and npm/yarn/pnpm/bun
-- Supabase account (free tier available)
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone <YOUR_GIT_URL>
-   cd sparkinvoice
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup:**
-   The project uses Lovable Cloud with Supabase. Environment variables are pre-configured:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY`
-
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser:**
-   Navigate to `http://localhost:5173`
-
-### Build for Production
-
-```bash
-npm run build
-npm run preview  # Preview production build locally
-```
+### Backend & Database
+- **Supabase** - PostgreSQL database
+- **Supabase Auth** - Authentication
+- **Row Level Security** - Database-level security
+- **Real-time Subscriptions** - Live data updates
 
 ## 📁 Project Structure
 
 ```
 src/
 ├── api/                    # API client functions
-│   ├── clients.ts         # Client CRUD operations
-│   ├── invoices.ts        # Invoice operations
-│   └── invoiceTemplates.ts # Template operations
-├── components/
-│   ├── auth/              # Authentication components
-│   ├── clients/           # Client management UI
-│   ├── dashboard/         # Dashboard widgets
-│   ├── invoices/          # Invoice components
-│   │   ├── form/         # Invoice form components
-│   │   ├── preview/      # Invoice preview/PDF
-│   │   └── template/     # Template system
-│   ├── layout/           # Layout components (Navbar, Sidebar)
-│   ├── seo/              # SEO components
-│   ├── templates/        # Template designer
-│   └── ui/               # shadcn/ui components
-├── context/              # React Context providers
+├── components/            # React components
+│   ├── auth/             # Authentication
+│   ├── clients/          # Client management
+│   ├── dashboard/        # Dashboard widgets
+│   ├── invoices/         # Invoice components
+│   ├── layout/          # App layout
+│   ├── templates/       # Template designer
+│   └── ui/              # Shadcn UI components
 ├── hooks/                # Custom React hooks
-├── integrations/         # External integrations
-│   └── supabase/        # Supabase client & types
-├── lib/                  # Utility functions
-├── pages/                # Route pages
-├── schemas/              # Zod validation schemas
-├── styles/               # Global styles & animations
-├── types/                # TypeScript type definitions
-└── utils/                # Helper utilities
+├── pages/                # Page components (routes)
+├── types/                # TypeScript definitions
+└── utils/                # Utility functions
 ```
+
+## 🚦 Getting Started
+
+### Prerequisites
+- Node.js 18+ or Bun
+- Supabase account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd sparkinvoice
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   
+   The project is pre-configured with Supabase. Environment variables are already set in the integration.
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:5173`
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+The production-ready files will be in the `dist` directory.
 
 ## 🎨 Design System
 
-The application uses a semantic design system with HSL color tokens defined in:
-- `src/index.css` - CSS custom properties
-- `tailwind.config.ts` - Tailwind theme configuration
+The application uses a comprehensive design system with:
+- Semantic color variables (HSL)
+- Dark mode support
+- Consistent spacing and typography
+- Smooth transitions and animations
+- Accessible components
 
-### Color Tokens
-- `--primary` - Brand primary color
-- `--secondary` - Secondary actions
-- `--accent` - Accent highlights
-- `--destructive` - Error/delete actions
-- `--muted` - Subtle backgrounds
-- `--border` - Border colors
+## 🔐 Authentication
 
-### Animations
-Pre-built animation utilities in `src/styles/animations.css`:
-- `animate-fade-in` - Fade in with slide up
-- `animate-scale-in` - Scale entrance
-- `animate-enter` - Combined fade + scale
-- `hover-scale` - Hover scale effect
+- Email/password authentication
+- Protected routes
+- Role-based access control
+- Secure session management
+- Row Level Security policies
 
-## 🔒 Security
+## 📊 Database Schema
 
-- Row Level Security (RLS) enabled on all tables
-- User-scoped data access
-- Secure authentication via Supabase Auth
-- SQL injection protection via parameterized queries
-- Input validation with Zod schemas
+- **clients**: Company details and contact information
+- **invoices**: Invoice data with status tracking
+- **invoice_items**: Line items with GST calculations
+- **invoice_templates**: Custom invoice layouts
+- **user_roles**: User role management
 
-## 📖 Usage Guide
+## 📝 Documentation
 
-### Dashboard
-- All widgets are clickable for quick navigation
-- Use the global search bar to find clients or invoices instantly
-- View top performing clients and recent activity
-- Monitor overdue invoices with visual highlights
-
-### Client Management
-1. Navigate to **Clients** page
-2. Click **Add Client** to create new client records
-3. Use filters to search by name, status, or tags
-4. Select multiple clients for bulk operations
-5. Click on client name to view detailed information
-
-### Invoice Creation
-1. Navigate to **Invoices** → **Create Invoice**
-2. Select a client from the dropdown
-3. Add invoice items with descriptions, HSN codes, quantities, and rates
-4. GST is calculated automatically based on item rates
-5. Add additional details (PO number, challan, etc.) as needed
-6. Preview invoice before saving
-7. Export as PDF or print directly
-
-### Template Designer
-1. Navigate to **Templates** page
-2. Create new template or edit existing ones
-3. Drag components from the palette onto the canvas
-4. Customize styles, positions, and properties
-5. Save template for future invoices
-
-## 🚀 Deployment
-
-### Lovable Platform (Recommended)
-- One-click deployment via [Lovable](https://docs.lovable.dev/user-guides/publish)
-- Automatic SSL certificates
-- Built-in CDN
-- [Custom domain setup guide](https://docs.lovable.dev/tips-tricks/custom-domain)
-
-### Manual Deployment
-The built application can be deployed to any static hosting service:
-- Vercel
-- Netlify
-- Cloudflare Pages
-- AWS S3 + CloudFront
-- GitHub Pages
-
-**Build Command:** `npm run build`  
-**Output Directory:** `dist`
+- **User Guide**: See `DOCUMENTATION.md` for detailed feature documentation
+- **Feature Roadmap**: See `FEATURE_ROADMAP.md` for planned features
+- **Production Checklist**: See `PRODUCTION_CHECKLIST.md` for deployment checklist
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please fork the repository and submit a Pull Request.
 
 ## 📄 License
 
-This project is created with [Lovable](https://lovable.dev/) and is available for use under standard terms.
+This project is licensed under the MIT License.
 
-## 📚 Documentation
+## 🙏 Acknowledgments
 
-For detailed documentation, see:
-- [DOCUMENTATION.md](./DOCUMENTATION.md) - Complete usage guide and workflows
-- [FEATURE_ROADMAP.md](./FEATURE_ROADMAP.md) - Planned features and enhancements
-- [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) - Pre-deployment checklist
+- Built with [Lovable](https://lovable.app)
+- UI components from [Shadcn/ui](https://ui.shadcn.com)
+- Icons from [Lucide](https://lucide.dev)
+- Backend powered by [Supabase](https://supabase.com)
 
-## 💙 Built With Lovable
+---
 
-Made with [Lovable](https://lovable.dev/) - The AI-powered web app builder
+**SparkInvoice** - Modern invoicing made simple ⚡

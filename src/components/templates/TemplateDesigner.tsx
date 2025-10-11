@@ -262,7 +262,6 @@ export const TemplateDesigner = ({
         description: "Invoice has been exported as PDF successfully.",
       });
     } catch (error) {
-      console.error('Error generating PDF:', error);
       toast({
         title: "Export Failed",
         description: "Failed to generate PDF. Please try again.",

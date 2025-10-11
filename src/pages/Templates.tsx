@@ -50,7 +50,6 @@ const Templates = () => {
       const data = await getInvoiceTemplates();
       setTemplates(data);
     } catch (error) {
-      console.error('Failed to load templates:', error);
       toast({
         title: "Error",
         description: "Failed to load templates. Please try again.",
@@ -70,7 +69,6 @@ const Templates = () => {
         description: "This template will now be used as default for new invoices.",
       });
     } catch (error) {
-      console.error('Failed to set default template:', error);
       toast({
         title: "Error",
         description: "Failed to set default template. Please try again.",
@@ -88,7 +86,6 @@ const Templates = () => {
         description: "A copy of the template has been created.",
       });
     } catch (error) {
-      console.error('Failed to duplicate template:', error);
       toast({
         title: "Error",
         description: "Failed to duplicate template. Please try again.",
@@ -110,7 +107,6 @@ const Templates = () => {
         description: "The template has been deleted successfully.",
       });
     } catch (error) {
-      console.error('Failed to delete template:', error);
       toast({
         title: "Error",
         description: "Failed to delete template. Please try again.",
