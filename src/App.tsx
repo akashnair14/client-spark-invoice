@@ -19,6 +19,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ManageInvoiceStatusPage = lazy(() => import("./pages/ManageInvoiceStatus"));
 const Templates = lazy(() => import("./pages/Templates"));
 const TemplateDesigner = lazy(() => import("./pages/TemplateDesigner"));
+const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
 
 const queryClient = new QueryClient();
 
@@ -31,19 +32,21 @@ const App = () => (
         <BrowserRouter>
           <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">Loading…</div>}>
             <Routes>
-              {/* Redirect / to /dashboard */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/clients" element={<Clients />} />
-              <Route path="/clients/new" element={<NewClient />} />
-              <Route path="/clients/:id" element={<ClientDetails />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/invoices/new" element={<NewInvoice />} />
-              <Route path="/invoices/:id" element={<InvoiceDetails />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/manage-invoice-status" element={<ManageInvoiceStatusPage />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/templates/designer" element={<TemplateDesigner />} />
+              {/* Login/Signup is the main entry point */}
+              <Route path="/" element={<AuthPage />} />
+              
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
+              <Route path="/clients/new" element={<ProtectedRoute><NewClient /></ProtectedRoute>} />
+              <Route path="/clients/:id" element={<ProtectedRoute><ClientDetails /></ProtectedRoute>} />
+              <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+              <Route path="/invoices/new" element={<ProtectedRoute><NewInvoice /></ProtectedRoute>} />
+              <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetails /></ProtectedRoute>} />
+              <Route path="/manage-invoice-status" element={<ProtectedRoute><ManageInvoiceStatusPage /></ProtectedRoute>} />
+              <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
+              <Route path="/templates/designer" element={<ProtectedRoute><TemplateDesigner /></ProtectedRoute>} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

@@ -39,7 +39,7 @@ const Auth = () => {
       <PageSEO
         title="SparkInvoice | Login & Sign Up"
         description="Access your SparkInvoice account to create and manage professional invoices with ease."
-        canonicalUrl={window.location.origin + "/auth"}
+        canonicalUrl={window.location.origin + "/"}
       />
       <motion.div 
         initial={{ opacity: 0 }}
