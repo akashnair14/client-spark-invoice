@@ -145,7 +145,7 @@ const AppSidebar: React.FC = () => {
           )}
           onClick={async () => {
             await logout();
-            navigate("/auth");
+            navigate("/");
           }}
           aria-label="Sign out"
         >

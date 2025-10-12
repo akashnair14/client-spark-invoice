@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             className="w-full justify-center"
             onClick={async () => {
               await logout();
-              navigate("/auth");
+              navigate("/");
             }}
             aria-label="Sign out"
           >

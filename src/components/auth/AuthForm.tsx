@@ -167,7 +167,7 @@ const AuthForm: React.FC = () => {
               <Button
                 onClick={async () => {
                   await logout();
-                  navigate("/auth");
+                  navigate("/");
                 }}
                 variant="secondary"
                 className="w-full mt-4"

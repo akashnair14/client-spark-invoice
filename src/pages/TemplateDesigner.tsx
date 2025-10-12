@@ -38,7 +38,7 @@ const TemplateDesigner = () => {
           description: "Please log in to create or edit templates.",
           variant: "destructive",
         });
-        navigate('/auth');
+        navigate('/');
         return;
       }
 
@@ -51,7 +51,7 @@ const TemplateDesigner = () => {
         description: "Please log in again to continue.",
         variant: "destructive",
       });
-      navigate('/auth');
+      navigate('/');
     }
   };
 
