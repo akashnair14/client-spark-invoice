@@ -1,157 +1,162 @@
-
 import { useEffect, useState, useCallback, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, getAuthToken, setAuthToken, removeAuthToken, getStoredUser, setStoredUser, removeStoredUser } from "@/config/api";
+import type { User, AuthResponse } from "@/types/api";
 
-// User role support
 export type AppRole = "admin" | "user" | null;
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<AppRole>(null);
+  const navigate = useNavigate();
   const { toast } = useToast();
   const sessionCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchRole = useCallback(async (uid?: string) => {
-    if (!uid) {
+  // Check token expiry and refresh if needed
+  const checkTokenExpiry = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setUser(null);
       setRole(null);
       return;
     }
-    // Get role from Supabase user_roles
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid)
-      .maybeSingle();
-    setRole((data?.role as AppRole) || "user");
-  }, []);
 
-  // Check if session is expired
-  const checkSessionExpiry = useCallback(async () => {
-    const { data: { session: currentSession } } = await supabase.auth.getSession();
-    
-    if (!currentSession) {
-      // Session no longer exists
-      if (user) {
-        setUser(null);
-        setSession(null);
-        setRole(null);
-        toast({
-          title: "Session Expired",
-          description: "Your session has expired. Please login again.",
-          variant: "destructive",
-        });
-      }
-      return;
-    }
+    try {
+      // Decode JWT to check expiration
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiresAt = payload.exp * 1000; // Convert to milliseconds
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now;
 
-    // Check if session is about to expire (within 5 minutes)
-    const expiresAt = currentSession.expires_at;
-    if (expiresAt) {
-      const expiryTime = expiresAt * 1000; // Convert to milliseconds
-      const timeUntilExpiry = expiryTime - Date.now();
-      const fiveMinutes = 5 * 60 * 1000;
-
-      if (timeUntilExpiry < fiveMinutes && timeUntilExpiry > 0) {
-        // Try to refresh the session
-        const { data, error } = await supabase.auth.refreshSession();
-        if (error) {
-          console.error("Failed to refresh session:", error);
-        } else if (data.session) {
-          setSession(data.session);
-          setUser(data.session.user);
+      // If token expires in less than 5 minutes, try to refresh
+      if (timeUntilExpiry < 5 * 60 * 1000) {
+        try {
+          const response = await apiRequest('/auth/refresh', {
+            method: 'POST',
+          });
+          setAuthToken(response.token);
+          setStoredUser(response.user);
+          setUser(response.user);
+          setRole(response.user.role || 'user');
+        } catch (error) {
+          // Refresh failed, logout
+          removeAuthToken();
+          removeStoredUser();
+          setUser(null);
+          setRole(null);
+          toast({
+            title: "Session Expired",
+            description: "Your session has expired. Please log in again.",
+            variant: "destructive",
+          });
+          navigate('/');
         }
-      } else if (timeUntilExpiry <= 0) {
-        // Session expired
+      }
+
+      // If token is expired, logout
+      if (timeUntilExpiry <= 0) {
+        removeAuthToken();
+        removeStoredUser();
         setUser(null);
-        setSession(null);
         setRole(null);
         toast({
           title: "Session Expired",
-          description: "Your session has expired. Please login again.",
+          description: "Your session has expired. Please log in again.",
           variant: "destructive",
         });
+        navigate('/');
       }
+    } catch (error) {
+      console.error('Error checking token expiry:', error);
     }
-  }, [user, toast]);
+  }, [navigate, toast]);
 
+  // Initialize auth state
   useEffect(() => {
-    // Supabase v2 returns { data: { subscription } }
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (event === 'SIGNED_OUT') {
-        setRole(null);
-        if (sessionCheckInterval.current) {
-          clearInterval(sessionCheckInterval.current);
-          sessionCheckInterval.current = null;
-        }
-      }
-      
-      if (event === 'TOKEN_REFRESHED') {
-        console.log('Session token refreshed successfully');
-      }
-      
-      if (session?.user) {
-        setTimeout(() => fetchRole(session.user.id), 0);
-      } else {
-        setRole(null);
-      }
-    });
+    const initAuth = async () => {
+      const token = getAuthToken();
+      const storedUser = getStoredUser();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchRole(session.user.id);
-    }).finally(() => setLoading(false));
+      if (token && storedUser) {
+        setUser(storedUser);
+        setRole(storedUser.role || 'user');
+      }
 
-    // Check session expiry every minute
-    sessionCheckInterval.current = setInterval(() => {
-      checkSessionExpiry();
-    }, 60 * 1000);
+      setLoading(false);
+    };
+
+    initAuth();
+
+    // Set up interval to check token expiry every minute
+    sessionCheckInterval.current = setInterval(checkTokenExpiry, 60000);
 
     return () => {
-      subscription.unsubscribe();
       if (sessionCheckInterval.current) {
         clearInterval(sessionCheckInterval.current);
       }
     };
-  }, [fetchRole, checkSessionExpiry]);
+  }, [checkTokenExpiry]);
 
-  // Login
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    // After login, fetch user, then grab role
-    const { data } = await supabase.auth.getUser();
-    const uid = data?.user?.id;
-    await fetchRole(uid);
+    try {
+      const response: AuthResponse = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      setAuthToken(response.token);
+      setStoredUser(response.user);
+      setUser(response.user);
+      setRole(response.user.role || 'user');
+
+      return { error: null };
+    } catch (error: any) {
+      return { error: { message: error.message || 'Login failed' } };
+    }
   };
 
-  // Logout
-  const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setRole(null);
-    setSession(null);
-  };
-
-  // Signup: assign user role "user"
   const signup = async (email: string, password: string) => {
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/` }
-    });
-    if (error) throw error;
-    // After signup, role assignment would require admin/manual step
-    return data;
+    try {
+      const response: AuthResponse = await apiRequest('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      setAuthToken(response.token);
+      setStoredUser(response.user);
+      setUser(response.user);
+      setRole(response.user.role || 'user');
+
+      return { error: null };
+    } catch (error: any) {
+      return { error: { message: error.message || 'Signup failed' } };
+    }
   };
 
-  return { user, session, loading, login, signup, logout, role, setRole };
+  const logout = async () => {
+    try {
+      await apiRequest('/auth/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      removeAuthToken();
+      removeStoredUser();
+      setUser(null);
+      setRole(null);
+    }
+  };
+
+  return {
+    user,
+    loading,
+    role,
+    setRole,
+    login,
+    signup,
+    logout,
+  };
 }

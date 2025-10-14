@@ -10,7 +10,7 @@ import {
   updateInvoiceTemplate, 
   getInvoiceTemplate 
 } from "@/api/invoiceTemplates";
-import { supabase } from "@/integrations/supabase/client";
+import { getAuthToken } from "@/config/api";
 
 const TemplateDesigner = () => {
   const navigate = useNavigate();
@@ -31,8 +31,8 @@ const TemplateDesigner = () => {
   const checkAuthAndLoadTemplate = async () => {
     try {
       // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const token = getAuthToken();
+      if (!token) {
         toast({
           title: "Authentication Required",
           description: "Please log in to create or edit templates.",
@@ -97,8 +97,8 @@ const TemplateDesigner = () => {
       setIsSaving(true);
 
       // Check authentication again before saving
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const token = getAuthToken();
+      if (!token) {
         throw new Error('User not authenticated');
       }
 

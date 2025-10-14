@@ -1,19 +1,14 @@
-
-import { supabase } from "@/integrations/supabase/client";
+import { getStoredUser } from "@/config/api";
 
 /**
  * Get the current authenticated user's ID
- * @returns Promise<string> - The user's UUID
+ * @returns string - The user's UUID
  * @throws Error if user is not authenticated
  */
-export async function getCurrentUserId(): Promise<string> {
-  const { data: { user }, error } = await supabase.auth.getUser();
+export function getCurrentUserId(): string {
+  const user = getStoredUser();
   
-  if (error) {
-    throw new Error(`Authentication error: ${error.message}`);
-  }
-  
-  if (!user) {
+  if (!user || !user.id) {
     throw new Error("User not authenticated");
   }
   

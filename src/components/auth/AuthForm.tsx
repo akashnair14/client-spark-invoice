@@ -43,16 +43,7 @@ const AuthForm: React.FC = () => {
     setConfirm("");
   };
 
-  // Social login
-  const handleGoogleLogin = async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/",
-      },
-    });
-  };
+  // Social login - Removed (to be implemented in .NET Core backend)
 
   // Email/password auth + confirmation state
   const handleSubmit = async (e: React.FormEvent) => {
@@ -363,28 +354,7 @@ const AuthForm: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Modern OR divider */}
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex items-center my-6"
-          >
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-            <span className="mx-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">or</span>
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-transparent" />
-          </motion.div>
-
-          {/* Social login */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.3 }}
-          >
-            <SocialButton onClick={handleGoogleLogin} provider="google" className="w-full">
-              Sign in with Google
-            </SocialButton>
-          </motion.div>
+          {/* Social login removed - will be implemented in .NET Core backend */}
 
           {/* Switch link */}
           <motion.div
