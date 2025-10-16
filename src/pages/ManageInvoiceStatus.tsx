@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import PageSEO from "@/components/seo/PageSEO";
 
-// Using real data from Supabase backend
+// Using real data from .NET Core backend
 
 const statusOrder = ["draft", "sent", "pending", "overdue", "paid"];
 

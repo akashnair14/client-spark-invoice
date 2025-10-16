@@ -9,7 +9,7 @@ import { createClient } from "@/api/clients";
 import { getCurrentUserId } from "@/utils/authUtils";
 import PageSEO from "@/components/seo/PageSEO";
 
-// Utility function to convert Client form values to snake_case for Supabase
+// Utility function to convert Client form values to snake_case for .NET Core backend
 function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
   return {
     owner_id: ownerId,

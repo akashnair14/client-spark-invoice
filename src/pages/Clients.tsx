@@ -79,7 +79,7 @@ const Clients = () => {
   const handleEditClient = async (client: Omit<Client, "id">) => {
     if (!currentClient) return;
     try {
-      // Only send snake_case keys to Supabase
+      // Send updates to .NET Core backend
       const updates = {
         company_name: client.companyName,
         contact_name: client.contactName,

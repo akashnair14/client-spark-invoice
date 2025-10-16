@@ -1,3 +1,2 @@
-
-// Deprecated: mockClients and mockInvoices removed. Use Supabase backend only.
+// Deprecated: mockClients and mockInvoices removed. Use .NET Core backend only.
 export {};

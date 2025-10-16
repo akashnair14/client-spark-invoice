@@ -29,7 +29,7 @@ import { format } from "date-fns";
 
 /**
  * Calculate the next incremental invoice number based on existing invoices.
- * Future: This will be moved to backend/edge function when invoices are stored in Supabase.
+ * Future: This will be moved to .NET Core backend.
  */
 const getNextInvoiceNumber = () => {
   try {
