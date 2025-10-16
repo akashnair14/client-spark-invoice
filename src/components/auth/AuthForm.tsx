@@ -191,7 +191,7 @@ const AuthForm: React.FC = () => {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mb-10 flex flex-col items-center space-y-3"
+        className="mb-8 flex flex-col items-center space-y-4"
       >
         <div className="relative group">
           <motion.div
@@ -204,33 +204,36 @@ const AuthForm: React.FC = () => {
               repeat: Infinity,
               repeatType: "reverse"
             }}
-            className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"
+            className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-full blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500"
           />
           <motion.div
             whileHover={{ scale: 1.1, rotate: 10 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30"
+            className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 flex items-center justify-center shadow-2xl shadow-primary/40 ring-2 ring-primary/20 ring-offset-2 ring-offset-background"
           >
-            <Sparkles className="text-primary-foreground w-8 h-8" />
+            <Sparkles className="text-primary-foreground w-10 h-10" />
           </motion.div>
         </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-center space-y-1"
+          className="text-center space-y-2"
         >
+          <h1 className="font-bold text-4xl text-foreground tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+            SparkInvoice
+          </h1>
           <AnimatePresence mode="wait">
-            <motion.h1
+            <motion.h2
               key={tab}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="font-bold text-3xl text-foreground tracking-tight"
+              className="font-semibold text-2xl text-foreground tracking-tight"
             >
               {tab === "login" ? "Welcome Back" : "Create Account"}
-            </motion.h1>
+            </motion.h2>
           </AnimatePresence>
           <AnimatePresence mode="wait">
             <motion.p
@@ -239,9 +242,11 @@ const AuthForm: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-muted-foreground text-sm"
+              className="text-muted-foreground text-sm max-w-md"
             >
-              {tab === "login" ? "Sign in to continue to SparkInvoice" : "Get started with your free account"}
+              {tab === "login" 
+                ? "Sign in to manage your invoices and grow your business" 
+                : "Start creating professional invoices in minutes"}
             </motion.p>
           </AnimatePresence>
         </motion.div>
@@ -254,16 +259,19 @@ const AuthForm: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full max-w-md mx-auto"
       >
-        <Card className="p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl mb-4 hover:shadow-primary/10 transition-all duration-500">
+        <Card className="p-8 bg-card/80 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl mb-4 hover:shadow-primary/10 transition-all duration-500 relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
           {/* Tab Switcher with sliding indicator */}
-          <div className="relative mb-8">
-            <div className="flex gap-1 p-1 bg-muted/30 rounded-full backdrop-blur-sm">
+          <div className="relative mb-8 z-10">
+            <div className="flex gap-1 p-1.5 bg-muted/50 rounded-2xl backdrop-blur-sm border border-border/50 shadow-inner">
               <motion.button
                 whileHover={{ scale: tab === "login" ? 1 : 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                className={`relative flex-1 px-6 py-3 rounded-xl font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
                   tab === "login"
-                    ? "text-primary-foreground shadow-lg"
+                    ? "text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => handleTabSwitch("login")}
@@ -279,18 +287,21 @@ const AuthForm: React.FC = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      className="absolute inset-0 bg-primary rounded-full -z-10"
+                      className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-xl shadow-lg -z-10"
                     />
                   )}
                 </AnimatePresence>
-                <span className="relative z-10">Login</span>
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: tab === "register" ? 1 : 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`relative flex-1 px-6 py-2.5 rounded-full font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
+                className={`relative flex-1 px-6 py-3 rounded-xl font-semibold text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all duration-300 ${
                   tab === "register"
-                    ? "text-primary-foreground shadow-lg"
+                    ? "text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => handleTabSwitch("register")}
@@ -306,11 +317,14 @@ const AuthForm: React.FC = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      className="absolute inset-0 bg-primary rounded-full -z-10"
+                      className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-xl shadow-lg -z-10"
                     />
                   )}
                 </AnimatePresence>
-                <span className="relative z-10">Register</span>
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Register
+                </span>
               </motion.button>
             </div>
           </div>
@@ -380,14 +394,19 @@ const AuthForm: React.FC = () => {
       </motion.div>
 
       {/* Footer branding */}
-      <motion.p
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.5 }}
-        className="text-xs text-muted-foreground/60 mt-4"
+        className="text-center mt-6 space-y-2"
       >
-        Powered by <span className="font-semibold text-primary">SparkInvoice</span>
-      </motion.p>
+        <p className="text-xs text-muted-foreground/60">
+          Secure authentication powered by <span className="font-semibold text-primary">SparkInvoice</span>
+        </p>
+        <p className="text-xs text-muted-foreground/40">
+          Your data is encrypted and protected
+        </p>
+      </motion.div>
     </div>
   );
 };

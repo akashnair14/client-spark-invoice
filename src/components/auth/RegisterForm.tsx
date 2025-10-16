@@ -78,7 +78,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             required
             type="email"
             spellCheck={false}
-            className="pl-10 h-12 bg-background/50 border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/70"
+            className="pl-10 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
           />
         </motion.div>
 
@@ -110,7 +110,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             disabled={loading}
             required
             minLength={6}
-            className="pl-10 pr-11 h-12 bg-background/50 border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/70"
+            className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
           />
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -211,7 +211,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             disabled={loading}
             required
             minLength={6}
-            className="pl-10 pr-11 h-12 bg-background/50 border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/70"
+            className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
           />
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -292,7 +292,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         >
           <Button
             type="submit"
-            className="w-full h-12 font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 rounded-xl relative overflow-hidden group"
+            className="w-full h-12 font-semibold text-base bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 rounded-xl relative overflow-hidden group"
             disabled={loading}
           >
             {loading && (
