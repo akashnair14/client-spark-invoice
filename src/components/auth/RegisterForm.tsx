@@ -88,10 +88,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <motion.div
             animate={{
               scale: focusedField === "email" ? 1.1 : 1,
-              color: focusedField === "email" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.5)"
             }}
             transition={{ duration: 0.2 }}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+              focusedField === "email" ? "text-primary" : "text-muted-foreground/50"
+            }`}
           >
             <Mail className="w-full h-full" />
           </motion.div>
@@ -118,10 +119,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <motion.div
             animate={{
               scale: focusedField === "password" ? 1.1 : 1,
-              color: focusedField === "password" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.5)"
             }}
             transition={{ duration: 0.2 }}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+              focusedField === "password" ? "text-primary" : "text-muted-foreground/50"
+            }`}
           >
             <Lock className="w-full h-full" />
           </motion.div>
@@ -217,10 +219,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <motion.div
             animate={{
               scale: focusedField === "confirm" ? 1.1 : 1,
-              color: focusedField === "confirm" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.5)"
             }}
             transition={{ duration: 0.2 }}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+              focusedField === "confirm" ? "text-primary" : "text-muted-foreground/50"
+            }`}
           >
             <Lock className="w-full h-full" />
           </motion.div>

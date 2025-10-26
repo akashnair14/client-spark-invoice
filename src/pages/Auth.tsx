@@ -45,10 +45,10 @@ const Auth = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen relative overflow-hidden"
+        className="h-screen w-screen fixed inset-0 overflow-hidden"
       >
         <GradientBackground />
-        <div className="min-h-screen relative z-10">
+        <div className="h-full w-full overflow-y-auto overflow-x-hidden relative z-10">
           <AuthForm />
         </div>
       </motion.div>
