@@ -20,6 +20,36 @@ interface RegisterFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20, y: 10 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 300,
+      damping: 24
+    }
+  }
+};
+
 const RegisterForm: React.FC<RegisterFormProps> = ({
   email,
   password,
@@ -41,10 +71,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   
   return (
     <motion.form
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       onSubmit={onSubmit}
       autoComplete="on"
       className="space-y-5 w-full"
@@ -52,9 +82,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       <div className="space-y-4">
         {/* Email Input */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
+          variants={itemVariants}
           className="relative group"
         >
           <motion.div
@@ -84,9 +112,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {/* Password Input with Strength Indicator */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
+          variants={itemVariants}
           className="relative group"
         >
           <motion.div
@@ -185,9 +211,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {/* Confirm Password Input */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
+          variants={itemVariants}
           className="relative group"
         >
           <motion.div
@@ -263,11 +287,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       <AnimatePresence mode="wait">
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -10 }}
-            transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-            className="text-destructive text-sm p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
+            initial={{ opacity: 0, scale: 0.95, height: 0 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              height: "auto",
+              transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 30
+              }
+            }}
+            exit={{ 
+              opacity: 0, 
+              scale: 0.95, 
+              height: 0,
+              transition: { duration: 0.2 }
+            }}
+            className="text-destructive text-sm p-3 bg-destructive/10 border border-destructive/20 rounded-lg overflow-hidden"
           >
             <motion.div
               initial={{ x: -5 }}
@@ -281,13 +318,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       </AnimatePresence>
 
       {/* Animated Submit Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.3 }}
-      >
+      <motion.div variants={itemVariants}>
         <motion.div
-          whileHover={{ scale: loading ? 1 : 1.02 }}
+          whileHover={{ 
+            scale: loading ? 1 : 1.02,
+            transition: { type: "spring", stiffness: 400, damping: 10 }
+          }}
           whileTap={{ scale: loading ? 1 : 0.98 }}
         >
           <Button
@@ -320,9 +356,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       </motion.div>
 
       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.3 }}
+        variants={itemVariants}
         className="text-xs text-muted-foreground text-center pt-1"
       >
         By signing up, you agree to our Terms and Privacy Policy

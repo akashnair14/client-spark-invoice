@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText } from "lucide-react";
+import { CircleUserRound, Menu, CircleCheck, LayoutDashboard, FileText, LogOut } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface SidebarProps {
   open: boolean;
@@ -96,17 +97,30 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </nav>
         <Separator className="mt-2" />
         <div className="p-4">
-          <Button
-            variant="outline"
-            className="w-full justify-center"
-            onClick={async () => {
-              await logout();
-              navigate("/");
-            }}
-            aria-label="Sign out"
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
-            Sign Out
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-center group relative overflow-hidden"
+              onClick={async () => {
+                await logout();
+                navigate("/");
+              }}
+              aria-label="Sign out"
+            >
+              <motion.div
+                className="absolute inset-0 bg-destructive/10"
+                initial={{ scale: 0, opacity: 0 }}
+                whileHover={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              <LogOut className="w-4 h-4 mr-2 relative z-10 group-hover:text-destructive transition-colors" />
+              <span className="relative z-10 group-hover:text-destructive transition-colors">Sign Out</span>
+            </Button>
+          </motion.div>
         </div>
       </SheetContent>
     </Sheet>
