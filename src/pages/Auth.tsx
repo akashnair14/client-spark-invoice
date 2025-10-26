@@ -41,17 +41,17 @@ const Auth = () => {
         description="Access your SparkInvoice account to create and manage professional invoices with ease."
         canonicalUrl={window.location.origin + "/"}
       />
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="h-screen w-screen fixed inset-0 overflow-hidden"
-      >
+      <div className="h-screen w-screen fixed inset-0 overflow-hidden">
         <GradientBackground />
-        <div className="h-full w-full overflow-y-auto overflow-x-hidden relative z-10">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="h-full w-full overflow-y-auto overflow-x-hidden relative z-10 scrollbar-hide"
+        >
           <AuthForm />
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </>
   );
 };

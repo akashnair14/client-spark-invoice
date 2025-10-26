@@ -174,7 +174,7 @@ const AuthForm: React.FC = () => {
 
   // Main auth card UI
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-4 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent font-inter px-4 py-12 w-full max-w-full overflow-hidden">
       {/* Confirmation Email Dialog */}
       <ConfirmEmailDialog
         open={showConfirmPopup}

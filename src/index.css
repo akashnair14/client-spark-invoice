@@ -57,6 +57,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Prevent overflow on auth page */
+  html, body {
+    overflow-x: hidden;
+  }
 }
 
 /* App-specific styles */
@@ -253,4 +258,14 @@
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
 }

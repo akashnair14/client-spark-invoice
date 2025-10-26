@@ -19,7 +19,7 @@ const GradientBackground: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none">
+    <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
       {/* Base gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted" />
       
