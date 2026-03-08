@@ -125,15 +125,15 @@ const InvoiceDetails = () => {
   const getStatusIcon = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
-        return <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />;
+        return <CheckCircle2 className="w-4 h-4 mr-2 text-success" />;
       case 'pending':
-        return <Clock className="w-4 h-4 mr-2 text-yellow-500" />;
+        return <Clock className="w-4 h-4 mr-2 text-warning" />;
       case 'sent':
-        return <Send className="w-4 h-4 mr-2 text-blue-500" />;
+        return <Send className="w-4 h-4 mr-2 text-info" />;
       case 'overdue':
-        return <AlertCircle className="w-4 h-4 mr-2 text-red-500" />;
+        return <AlertCircle className="w-4 h-4 mr-2 text-destructive" />;
       default:
-        return <FileWarning className="w-4 h-4 mr-2 text-gray-500" />;
+        return <FileWarning className="w-4 h-4 mr-2 text-muted-foreground" />;
     }
   };
   
