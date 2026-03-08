@@ -67,7 +67,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 }) => {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
   const passwordsMatch = password && confirm && password === confirm;
-  const passwordStrength = password.length >= 8 ? "strong" : password.length >= 6 ? "medium" : "weak";
+
+  const hasMinLength = password.length >= 6;
+  const hasMaxLength = password.length <= 10;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+  const passedRules = [hasMinLength, hasMaxLength, hasUppercase, hasNumber, hasSpecial].filter(Boolean).length;
+  const passwordStrength = passedRules >= 5 ? "strong" : passedRules >= 3 ? "medium" : "weak";
+  const strengthColor = passwordStrength === "strong" ? "text-green-500" : passwordStrength === "medium" ? "text-amber-400" : "text-red-400";
+  const strengthBarColor = passwordStrength === "strong" ? "bg-green-500" : passwordStrength === "medium" ? "bg-amber-400" : "bg-red-400";
   
   return (
     <motion.form
