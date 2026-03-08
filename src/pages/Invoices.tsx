@@ -1,41 +1,23 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, MoreHorizontal, Eye, Pencil, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-react";
@@ -57,53 +39,42 @@ import { cn } from "@/lib/utils";
 const Invoices = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
+  const queryClient = useQueryClient();
+
+  const { data: invoices = [], isLoading: invoicesLoading } = useQuery({
+    queryKey: ['invoices'],
+    queryFn: fetchInvoices,
+    select: (data) => data.map(mapDbInvoice),
+  });
+
+  const { data: clients = {}, isLoading: clientsLoading } = useQuery({
+    queryKey: ['clients'],
+    queryFn: getClients,
+    select: (data) => {
+      const map: Record<string, Client> = {};
+      data.forEach((c) => {
+        const mapped = mapDbClient(c);
+        map[mapped.id] = mapped;
+      });
+      return map;
+    },
+  });
+
+  const loading = invoicesLoading || clientsLoading;
+
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[] | null>(null);
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quickViewInvoice, setQuickViewInvoice] = useState<Invoice | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [clients, setClients] = useState<Record<string, Client>>({});
-  const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [invoicesData, clientsData] = await Promise.all([
-          fetchInvoices(),
-          getClients()
-        ]);
-
-        const transformedInvoices = invoicesData.map(mapDbInvoice);
-        setInvoices(transformedInvoices);
-        setFilteredInvoices(transformedInvoices);
-
-        const clientsMap: Record<string, Client> = {};
-        clientsData.forEach((c: any) => {
-          const mapped = mapDbClient(c);
-          clientsMap[mapped.id] = mapped;
-        });
-        setClients(clientsMap);
-      } catch (error: any) {
-        toast({
-          title: "Error loading data",
-          description: error.message || "Failed to load data",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const displayInvoices = filteredInvoices ?? invoices;
+  const totalPages = Math.ceil(displayInvoices.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentInvoices = filteredInvoices.slice(startIndex, endIndex);
+  const currentInvoices = displayInvoices.slice(startIndex, endIndex);
 
   const getClientName = (clientId: string) => clients[clientId]?.companyName || "Unknown Client";
 
@@ -130,63 +101,49 @@ const Invoices = () => {
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount);
 
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) => apiUpdateInvoiceStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onError: (err: Error) => toast({ title: "Update Failed", description: err.message, variant: "destructive" }),
+  });
+
   const handleStatusUpdate = async (invoiceId: string, newStatus: Invoice["status"]) => {
-    try {
-      await apiUpdateInvoiceStatus(invoiceId, newStatus);
-      const updatedInvoices = invoices.map((invoice) =>
-        invoice.id === invoiceId
-          ? { ...invoice, status: newStatus, lastStatusUpdate: new Date().toISOString() }
-          : invoice
-      );
-      setInvoices(updatedInvoices);
-      setFilteredInvoices(updatedInvoices);
-      toast({
-        title: "Status Updated",
-        description: `Invoice marked as ${newStatus}.`,
-      });
-    } catch (err: any) {
-      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
-    }
+    statusMutation.mutate({ id: invoiceId, status: newStatus });
+    toast({ title: "Status Updated", description: `Invoice marked as ${newStatus}.` });
   };
 
   const handleBulkStatusUpdate = async (invoiceIds: string[], status: Invoice['status']) => {
     try {
       await Promise.all(invoiceIds.map(id => apiUpdateInvoiceStatus(id, status)));
-      const updatedInvoices = invoices.map((invoice) =>
-        invoiceIds.includes(invoice.id)
-          ? { ...invoice, status, lastStatusUpdate: new Date().toISOString() }
-          : invoice
-      );
-      setInvoices(updatedInvoices);
-      setFilteredInvoices(updatedInvoices);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       setSelectedInvoices([]);
     } catch (err: any) {
       toast({ title: "Update Failed", description: err.message, variant: "destructive" });
     }
   };
 
-  const confirmDeleteInvoice = async () => {
-    if (!deleteTarget) return;
-    try {
-      await apiDeleteInvoice(deleteTarget);
-      const updatedInvoices = invoices.filter((invoice) => invoice.id !== deleteTarget);
-      setInvoices(updatedInvoices);
-      setFilteredInvoices(updatedInvoices);
-      setSelectedInvoices(selectedInvoices.filter(id => id !== deleteTarget));
+  const deleteMutation = useMutation({
+    mutationFn: apiDeleteInvoice,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({ title: "Invoice Deleted", description: "Invoice has been deleted successfully." });
-    } catch (err: any) {
-      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
-    } finally {
       setDeleteTarget(null);
-    }
+    },
+    onError: (err: Error) => {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+      setDeleteTarget(null);
+    },
+  });
+
+  const confirmDeleteInvoice = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget);
   };
 
   const handleBulkDelete = async (invoiceIds: string[]) => {
     try {
       await Promise.all(invoiceIds.map(id => apiDeleteInvoice(id)));
-      const updatedInvoices = invoices.filter((invoice) => !invoiceIds.includes(invoice.id));
-      setInvoices(updatedInvoices);
-      setFilteredInvoices(updatedInvoices);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       setSelectedInvoices([]);
     } catch (err: any) {
       toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
@@ -274,11 +231,11 @@ const Invoices = () => {
           <div>
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Invoices</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Manage and track your invoices ({filteredInvoices.length} total)
+              Manage and track your invoices ({displayInvoices.length} total)
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <InvoiceExport invoices={filteredInvoices} selectedInvoices={selectedInvoices} />
+            <InvoiceExport invoices={displayInvoices} selectedInvoices={selectedInvoices} />
             <Link to="/invoices/new">
               <Button className="gap-2 shadow-sm">
                 <Plus className="h-4 w-4" /> Create Invoice
@@ -472,10 +429,10 @@ const Invoices = () => {
         )}
 
         {/* Pagination */}
-        {filteredInvoices.length > 0 && (
+        {displayInvoices.length > 0 && (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-muted-foreground">
-              Showing {startIndex + 1}–{Math.min(endIndex, filteredInvoices.length)} of {filteredInvoices.length}
+              Showing {startIndex + 1}–{Math.min(endIndex, displayInvoices.length)} of {displayInvoices.length}
             </span>
             <div className="flex items-center gap-3">
               {!isMobile && (
@@ -503,9 +460,9 @@ const Invoices = () => {
                   <span className="hidden sm:inline ml-1">Previous</span>
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  {currentPage}/{totalPages}
+                  {currentPage}/{totalPages || 1}
                 </span>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage >= totalPages}>
                   <span className="hidden sm:inline mr-1">Next</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Layout from "@/components/layout/Layout";
 import ClientTable from "@/components/clients/ClientTable";
 import ClientForm from "@/components/clients/ClientForm";
@@ -32,46 +33,42 @@ import {
 const Clients = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [clients, setClients] = useState<Client[]>([]);
-  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const { data: clients = [], isLoading: loading } = useQuery({
+    queryKey: ['clients'],
+    queryFn: getClients,
+    select: (data) => data.map(mapDbClient),
+  });
+
+  const [filteredClients, setFilteredClients] = useState<Client[] | null>(null);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client | undefined>(undefined);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   const [detailsClient, setDetailsClient] = useState<Client | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    getClients()
-      .then((data) => {
-        const mapped = data.map(mapDbClient);
-        setClients(mapped);
-        setFilteredClients(mapped);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        toast({
-          title: "Failed to load clients",
-          description: err.message,
-          variant: "destructive",
-        });
-      });
-  }, []);
+  const displayClients = filteredClients ?? clients;
+
+  const deleteMutation = useMutation({
+    mutationFn: apiDeleteClient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      toast({ title: "Client Deleted", description: `${deleteTarget?.companyName} has been deleted.` });
+      setDeleteTarget(null);
+    },
+    onError: (err: Error) => {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+      setDeleteTarget(null);
+    },
+  });
 
   const handleEditClient = async (client: Omit<Client, "id">) => {
     if (!currentClient) return;
     try {
       await updateClient(currentClient.id, clientToDbFields(client));
-      setClients((prev) =>
-        prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
-      );
-      setFilteredClients((prev) =>
-        prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
-      );
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
         title: "Client Updated",
         description: `${client.companyName} has been updated successfully.`,
@@ -79,53 +76,25 @@ const Clients = () => {
       setIsEditClientOpen(false);
       setCurrentClient(undefined);
     } catch (err: any) {
-      toast({
-        title: "Update Failed",
-        description: err.message,
-        variant: "destructive",
-      });
+      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
     }
   };
 
-  const confirmDeleteClient = async () => {
+  const confirmDeleteClient = () => {
     if (!deleteTarget) return;
-    try {
-      await apiDeleteClient(deleteTarget.id);
-      setClients((prev) => prev.filter((c) => c.id !== deleteTarget.id));
-      setFilteredClients((prev) => prev.filter((c) => c.id !== deleteTarget.id));
-      setSelectedClients((prev) => prev.filter((id) => id !== deleteTarget.id));
-      toast({
-        title: "Client Deleted",
-        description: `${deleteTarget.companyName} has been deleted.`,
-      });
-    } catch (err: any) {
-      toast({
-        title: "Delete Failed",
-        description: err.message,
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteTarget(null);
-    }
+    deleteMutation.mutate(deleteTarget.id);
   };
 
-  const handleDeleteClient = (client: Client) => {
-    setDeleteTarget(client);
-  };
+  const handleDeleteClient = (client: Client) => setDeleteTarget(client);
 
   const handleBulkDelete = async (clientIds: string[]) => {
     try {
       await Promise.all(clientIds.map((id) => apiDeleteClient(id)));
-      setClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
-      setFilteredClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
       setSelectedClients([]);
       toast({ title: "Clients Deleted", description: `${clientIds.length} client(s) deleted.` });
     } catch (err: any) {
-      toast({
-        title: "Bulk Delete Failed",
-        description: err.message,
-        variant: "destructive",
-      });
+      toast({ title: "Bulk Delete Failed", description: err.message, variant: "destructive" });
     }
   };
 
@@ -201,7 +170,7 @@ const Clients = () => {
           <div>
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Clients</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Manage your client information and relationships ({filteredClients.length})
+              Manage your client information and relationships ({displayClients.length})
             </p>
           </div>
           <Link to="/clients/new">
@@ -216,12 +185,12 @@ const Clients = () => {
         <BulkActions
           selectedClients={selectedClients}
           onSelectionChange={setSelectedClients}
-          clients={filteredClients}
+          clients={displayClients}
           onBulkDelete={handleBulkDelete}
         />
 
         <ClientTable
-          clients={filteredClients}
+          clients={displayClients}
           onEdit={(client) => {
             setCurrentClient(client);
             setIsEditClientOpen(true);
@@ -252,7 +221,6 @@ const Clients = () => {
           client={detailsClient}
         />
 
-        {/* Delete confirmation dialog */}
         <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
