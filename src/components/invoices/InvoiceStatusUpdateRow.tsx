@@ -18,19 +18,16 @@ const statusTransitionOptions = (status: Invoice["status"]) => {
   return [];
 };
 
-const statusColors = {
-  paid: "bg-green-100 text-green-800",
-  pending: "bg-yellow-100 text-yellow-800",
-  overdue: "bg-red-100 text-red-800 animate-pulse"
+const statusColors: Record<string, string> = {
+  paid: "bg-success/15 text-success",
+  pending: "bg-warning/15 text-warning",
+  overdue: "bg-destructive/15 text-destructive animate-pulse"
 };
 
 const statusButtonColors: Record<string, string> = {
-  paid:
-    "bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700",
-  pending:
-    "bg-yellow-500 hover:bg-yellow-600 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700",
-  overdue:
-    "bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700",
+  paid: "bg-success hover:bg-success/90 text-success-foreground",
+  pending: "bg-warning hover:bg-warning/90 text-warning-foreground",
+  overdue: "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
 };
 
 const InvoiceStatusUpdateRow: React.FC<StatusUpdateRowProps> = ({ invoice, client, onUpdate }) => {
