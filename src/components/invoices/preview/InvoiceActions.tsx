@@ -30,7 +30,7 @@ const InvoiceActions = ({
 
   return (
     <div className="flex flex-wrap gap-2 justify-end print:hidden">
-      <PrintButton onClick={handlePrint} />
+      <PrintButton />
       
       <DownloadPdfButton 
         printableRef={printableRef} 
