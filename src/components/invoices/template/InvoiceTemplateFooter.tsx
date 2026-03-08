@@ -18,22 +18,26 @@ interface InvoiceTemplateFooterProps {
   notes?: string;
   companyDetails: CompanyDetails;
   isPDF?: boolean;
+  compact?: boolean;
 }
 
 const InvoiceTemplateFooter = ({ 
   notes, 
   companyDetails, 
-  isPDF = false 
+  isPDF = false,
+  compact = false
 }: InvoiceTemplateFooterProps) => {
   if (isPDF) {
+    const fontSize = compact ? '0.65rem' : '0.875rem';
+    const smallFontSize = compact ? '0.6rem' : '0.75rem';
     return (
-      <div style={{marginTop: '2rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem'}}>
+      <div style={{marginTop: compact ? '0.5rem' : '2rem', borderTop: '1px solid #e5e7eb', paddingTop: compact ? '0.5rem' : '1rem'}}>
         {notes && (
-          <div style={{marginBottom: '1.5rem'}}>
-            <h4 style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151'}}>
+          <div style={{marginBottom: compact ? '0.5rem' : '1.5rem'}}>
+            <h4 style={{fontSize: compact ? '0.75rem' : '1rem', fontWeight: '600', marginBottom: '0.25rem', color: '#111827'}}>
               Notes & Terms:
             </h4>
-            <p style={{fontSize: '0.875rem', color: '#6b7280', lineHeight: '1.5'}}>
+            <p style={{fontSize, color: '#374151', lineHeight: '1.4'}}>
               {notes}
             </p>
           </div>
@@ -42,28 +46,28 @@ const InvoiceTemplateFooter = ({
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '2rem',
-          marginBottom: '1rem'
+          gap: compact ? '1rem' : '2rem',
+          marginBottom: compact ? '0.5rem' : '1rem'
         }}>
           <div>
-            <h4 style={{fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151'}}>
+            <h4 style={{fontSize: compact ? '0.7rem' : '0.875rem', fontWeight: '600', marginBottom: '0.25rem', color: '#111827'}}>
               Payment Instructions:
             </h4>
-            <p style={{fontSize: '0.75rem', color: '#6b7280', lineHeight: '1.4'}}>
+            <p style={{fontSize: smallFontSize, color: '#374151', lineHeight: '1.4'}}>
               Please make payment within the due date. Late payments may incur additional charges.
               For any queries, contact us at {companyDetails.email}
             </p>
           </div>
           <div style={{textAlign: 'right'}}>
-            <h4 style={{fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151'}}>
+            <h4 style={{fontSize: compact ? '0.7rem' : '0.875rem', fontWeight: '600', marginBottom: '0.25rem', color: '#111827'}}>
               Authorized Signature
             </h4>
             <div style={{
-              height: '60px',
-              borderBottom: '1px solid #6b7280',
-              marginBottom: '0.5rem'
+              height: compact ? '30px' : '60px',
+              borderBottom: '1px solid #374151',
+              marginBottom: '0.25rem'
             }}></div>
-            <p style={{fontSize: '0.75rem', color: '#6b7280'}}>
+            <p style={{fontSize: smallFontSize, color: '#374151'}}>
               For {companyDetails.name}
             </p>
           </div>
@@ -71,15 +75,15 @@ const InvoiceTemplateFooter = ({
         
         <div style={{
           textAlign: 'center',
-          fontSize: '0.75rem',
-          color: '#6b7280',
+          fontSize: smallFontSize,
+          color: '#374151',
           borderTop: '1px solid #e5e7eb',
-          paddingTop: '1rem'
+          paddingTop: compact ? '0.35rem' : '1rem'
         }}>
           <p style={{margin: '0'}}>
             This is a computer generated invoice and does not require physical signature.
           </p>
-          <p style={{margin: '0.25rem 0 0 0'}}>
+          <p style={{margin: '0.125rem 0 0 0', fontWeight: '600'}}>
             Thank you for your business!
           </p>
         </div>
@@ -88,32 +92,32 @@ const InvoiceTemplateFooter = ({
   }
 
   return (
-    <div className="mt-8 border-t border-border pt-6">
+    <div className={`border-t border-border ${compact ? 'mt-4 pt-3' : 'mt-8 pt-6'}`}>
       {notes && (
-        <div className="mb-6">
-          <h4 className="text-base font-semibold mb-2 text-foreground">Notes & Terms:</h4>
-          <p className="text-sm text-foreground/8d">{notes}</p>
+        <div className={compact ? 'mb-3' : 'mb-6'}>
+          <h4 className={`font-semibold text-foreground ${compact ? 'text-xs mb-1' : 'text-base mb-2'}`}>Notes & Terms:</h4>
+          <p className={`text-foreground/80 leading-relaxed ${compact ? 'text-xs' : 'text-sm'}`}>{notes}</p>
         </div>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${compact ? 'gap-3 mb-3' : 'gap-6 mb-6'}`}>
         <div>
-          <h4 className="text-sm font-semibold mb-2 text-foreground">Payment Instructions:</h4>
-          <p className="text-xs text-slate-500 dark:tforeground/7d">
+          <h4 className={`font-semibold text-foreground ${compact ? 'text-xs mb-1' : 'text-sm mb-2'}`}>Payment Instructions:</h4>
+          <p className={`text-foreground/70 leading-relaxed ${compact ? 'text-[10px]' : 'text-xs'}`}>
             Please make payment within the due date. Late payments may incur additional charges.
             For any queries, contact us at {companyDetails.email}
           </p>
         </div>
         <div className="md:text-right">
-          <h4 className="text-sm font-semibold mb-2 text-foreground">Authorized Signature</h4>
-          <div className="h-16 border-b border-foreground/40 mb-2"></div>
-          <p className="text-xs text-foreground/70">For {companyDetails.name}</p>
+          <h4 className={`font-semibold text-foreground ${compact ? 'text-xs mb-1' : 'text-sm mb-2'}`}>Authorized Signature</h4>
+          <div className={`border-b border-foreground/40 mb-1 ${compact ? 'h-8' : 'h-16'}`}></div>
+          <p className={`text-foreground/70 ${compact ? 'text-[10px]' : 'text-xs'}`}>For {companyDetails.name}</p>
         </div>
       </div>
       
-      <div className="text-center text-xs text-foreground/70 border-t border-border pt-4">
+      <div className={`text-center text-foreground/70 border-t border-border ${compact ? 'text-[10px] pt-2' : 'text-xs pt-4'}`}>
         <p>This is a computer generated invoice and does not require physical signature.</p>
-        <p className="mt-1 font-semibold text-foreground/80">Thank you for your business!</p>
+        <p className="mt-0.5 font-semibold text-foreground/80">Thank you for your business!</p>
       </div>
     </div>
   );
