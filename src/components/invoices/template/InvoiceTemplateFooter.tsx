@@ -92,14 +92,14 @@ const InvoiceTemplateFooter = ({
       {notes && (
         <div className="mb-6">
           <h4 className="text-base font-semibold mb-2 text-foreground">Notes & Terms:</h4>
-          <p className="text-sm text-foreground/80 leading-relaxed">{notes}</p>
+          <p className="text-sm text-foreground/8d">{notes}</p>
         </div>
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
           <h4 className="text-sm font-semibold mb-2 text-foreground">Payment Instructions:</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-xs text-slate-500 dark:tforeground/7d">
             Please make payment within the due date. Late payments may incur additional charges.
             For any queries, contact us at {companyDetails.email}
           </p>
