@@ -236,17 +236,25 @@ const AuthForm: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-                  className="flex items-center gap-2.5 group"
+                  whileHover={{ x: 6 }}
+                  className="flex items-center gap-2.5 group cursor-default"
                 >
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                  <motion.div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                     style={{ background: "rgba(255,138,0,0.1)", border: "1px solid rgba(255,138,0,0.15)" }}
+                    whileHover={{
+                      scale: 1.15,
+                      rotate: [0, -8, 8, 0],
+                      boxShadow: "0 0 16px rgba(255,138,0,0.3)",
+                      background: "rgba(255,138,0,0.18)",
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
                   >
                     <f.icon className="w-4 h-4 text-[#FF8A00]" />
-                  </div>
+                  </motion.div>
                   <div>
-                    <div className="text-sm font-medium text-white/80">{f.title}</div>
-                    <div className="text-xs text-white/35">{f.desc}</div>
+                    <div className="text-sm font-medium text-white/80 transition-colors duration-200 group-hover:text-white">{f.title}</div>
+                    <div className="text-xs text-white/35 transition-colors duration-200 group-hover:text-white/50">{f.desc}</div>
                   </div>
                 </motion.div>
               ))}
