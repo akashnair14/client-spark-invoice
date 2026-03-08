@@ -64,7 +64,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="email" {...field} />
+              <Input type="email" placeholder="e.g. client@example.com" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
