@@ -158,7 +158,7 @@ const ClientDetails = () => {
   // Handlers
   const handleEditClient = async (updatedClient: Omit<Client, "id">) => {
     if (!id) return;
-    // Send updates to .NET Core backend
+    // Send updates to backend
     const updates = {
       company_name: updatedClient.companyName,
       contact_name: updatedClient.contactName,
