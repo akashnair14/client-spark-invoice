@@ -46,80 +46,52 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
                    (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
 
     return (
-      <>
-        <style>
-          {`
-            @media print {
-              @page {
-                size: A4;
-                margin: 0;
-              }
-              body { margin: 0 !important; padding: 0 !important; }
-              .print\\:hidden { display: none !important; }
-              .invoice-template-wrapper {
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
-                overflow: hidden !important;
-                page-break-inside: avoid !important;
-                padding: 12mm 14mm !important;
-                box-sizing: border-box !important;
-              }
-              .invoice-template-wrapper * {
-                color-adjust: exact !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-            }
-          `}
-        </style>
-        <div 
-          ref={ref} 
-          className="invoice-template-wrapper bg-white"
-          style={{
-            maxWidth: isPDF ? '210mm' : undefined,
-            maxHeight: isPDF ? '297mm' : undefined,
-            overflow: isPDF ? 'hidden' : undefined,
-            padding: isPDF ? '12mm 14mm' : undefined,
-            boxSizing: 'border-box',
-            fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
-            color: '#1a1a1a',
-            ...(isPDF ? { background: 'white' } : {}),
-          }}
-        >
-          <InvoiceTemplateHeader 
-            companyDetails={companyDetails}
-            invoiceNumber={invoice.invoiceNumber}
-            isPDF={isPDF}
-          />
-          
-          <InvoiceTemplateClient 
-            client={client}
-            date={invoiceDate}
-            dueDate={dueDate}
-            status={invoice.status}
-            isPDF={isPDF}
-          />
-          
-          <InvoiceTemplateItems 
-            items={invoice.items}
-            isPDF={isPDF}
-          />
-          
-          <InvoiceTemplateTotals 
-            subtotal={subtotal}
-            gstAmount={gstAmount}
-            roundoff={roundoff}
-            total={total}
-            isPDF={isPDF}
-          />
-          
-          <InvoiceTemplateFooter 
-            companyDetails={companyDetails}
-            isPDF={isPDF}
-          />
-        </div>
-      </>
+      <div 
+        ref={ref} 
+        className="invoice-template-wrapper bg-white"
+        style={{
+          maxWidth: isPDF ? '210mm' : undefined,
+          maxHeight: isPDF ? '297mm' : undefined,
+          overflow: isPDF ? 'hidden' : undefined,
+          padding: isPDF ? '12mm 14mm' : undefined,
+          boxSizing: 'border-box',
+          fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+          color: '#1a1a1a',
+          ...(isPDF ? { background: 'white' } : {}),
+        }}
+      >
+        <InvoiceTemplateHeader 
+          companyDetails={companyDetails}
+          invoiceNumber={invoice.invoiceNumber}
+          isPDF={isPDF}
+        />
+        
+        <InvoiceTemplateClient 
+          client={client}
+          date={invoiceDate}
+          dueDate={dueDate}
+          status={invoice.status}
+          isPDF={isPDF}
+        />
+        
+        <InvoiceTemplateItems 
+          items={invoice.items}
+          isPDF={isPDF}
+        />
+        
+        <InvoiceTemplateTotals 
+          subtotal={subtotal}
+          gstAmount={gstAmount}
+          roundoff={roundoff}
+          total={total}
+          isPDF={isPDF}
+        />
+        
+        <InvoiceTemplateFooter 
+          companyDetails={companyDetails}
+          isPDF={isPDF}
+        />
+      </div>
     );
   }
 );
