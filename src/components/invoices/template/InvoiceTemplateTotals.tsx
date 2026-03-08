@@ -72,13 +72,12 @@ const InvoiceTemplateTotals = ({
         <div className="bg-muted/30 border rounded-lg overflow-hidden">
           <div className="space-y-0">
             <div className="flex justify-between py-2.5 px-4 border-b border-border">
-              <span className="text-sm text-foreground/80">Subtotal:</span>
+              <span className="text-sm text-foreground/8an>
               <span className="text-sm font-semibold text-foreground">₹{subtotal.toFixed(2)}</span>
             </div>
             {cgstAmount > 0 && (
               <div className="flex justify-between py-2.5 px-4 border-b border-border">
-                <span className="text-sm text-slate-600 dark:text-slate-300">CGST:</span>
-                <span className="text-sm font-semibold text-foreground">₹{cgstAmount.toFixed(2)}</span>
+                <span className="text-sm text-slate-600 dark:tforeground/8                <span className="text-sm font-semibold text-foreground">₹{cgstAmount.toFixed(2)}</span>
               </div>
             )}
             {sgstAmount > 0 && (
