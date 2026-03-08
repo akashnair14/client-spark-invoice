@@ -32,16 +32,6 @@ const InvoiceTemplateFooter = ({
     const smallFontSize = compact ? '0.6rem' : '0.75rem';
     return (
       <div style={{marginTop: compact ? '0.5rem' : '2rem', borderTop: '1px solid #e5e7eb', paddingTop: compact ? '0.5rem' : '1rem'}}>
-        {notes && (
-          <div style={{marginBottom: compact ? '0.5rem' : '1.5rem'}}>
-            <h4 style={{fontSize: compact ? '0.75rem' : '1rem', fontWeight: '600', marginBottom: '0.25rem', color: '#111827'}}>
-              Notes & Terms:
-            </h4>
-            <p style={{fontSize, color: '#374151', lineHeight: '1.4'}}>
-              {notes}
-            </p>
-          </div>
-        )}
         
         <div style={{
           display: 'grid',
