@@ -13,61 +13,70 @@ interface ShareWhatsAppButtonProps {
   dueDate: Date;
 }
 
+/**
+ * Normalize a phone number for WhatsApp:
+ * - Strip non-digits
+ * - If it starts with 0, replace with 91 (India)
+ * - If it's 10 digits (Indian mobile), prefix with 91
+ */
+function normalizePhone(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = "91" + cleaned.slice(1);
+  } else if (cleaned.length === 10) {
+    cleaned = "91" + cleaned;
+  }
+  return cleaned;
+}
+
 const ShareWhatsAppButton = ({
   invoiceNumber,
   clientName,
   clientPhoneNumber,
   total,
-  dueDate
+  dueDate,
 }: ShareWhatsAppButtonProps) => {
   const { toast } = useToast();
 
   const handleShareWhatsApp = () => {
-    try {
-      if (!clientPhoneNumber) {
-        toast({
-          title: "Phone Number Missing",
-          description: "Client phone number is required for WhatsApp sharing.",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!clientPhoneNumber) {
+      toast({
+        title: "Phone Number Missing",
+        description: "Client phone number is required for WhatsApp sharing.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-      // Create a shareable link to the invoice (you can customize this URL)
-      const invoiceViewUrl = `${window.location.origin}/invoices/view/${invoiceNumber}`;
-      
-      // Enhanced message with more details and invoice link
+    try {
+      const cleanPhone = normalizePhone(clientPhoneNumber);
+
       const message = `🧾 *Invoice ${invoiceNumber}*
-      
-📋 *From:* Your Company Name
+
 👤 *To:* ${clientName}
-💰 *Amount:* ₹${total.toFixed(2)}
+💰 *Amount:* ₹${total.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
 📅 *Due Date:* ${format(dueDate, "dd/MM/yyyy")}
 
-📎 *View Invoice:* ${invoiceViewUrl}
-
 Thank you for your business! 🙏`;
-      
-      // Encode the message for the URL
+
       const encodedMessage = encodeURIComponent(message);
-      
-      // Clean phone number (remove non-digits)
-      const cleanPhone = clientPhoneNumber.replace(/\D/g, '');
-      
-      // Generate WhatsApp link
       const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
-      
-      // Open WhatsApp in a new tab
-      window.open(whatsappUrl, '_blank');
-      
+
+      // Use location.href as fallback if window.open is blocked (e.g., in iframes)
+      const win = window.open(whatsappUrl, "_blank");
+      if (!win) {
+        window.location.href = whatsappUrl;
+      }
+
       toast({
         title: "WhatsApp Opened",
-        description: `Sharing invoice ${invoiceNumber} with enhanced details via WhatsApp.`,
+        description: `Sharing invoice ${invoiceNumber} via WhatsApp.`,
       });
     } catch (error) {
       toast({
         title: "Sharing Failed",
-        description: "There was a problem opening WhatsApp. Please check the client's phone number.",
+        description:
+          "There was a problem opening WhatsApp. Please check the client's phone number.",
         variant: "destructive",
       });
     }

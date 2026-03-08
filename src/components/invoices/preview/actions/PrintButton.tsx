@@ -4,27 +4,25 @@ import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-interface PrintButtonProps {
-  onClick: () => void;
-}
-
-const PrintButton = ({ onClick }: PrintButtonProps) => {
+const PrintButton = () => {
   const { toast } = useToast();
 
   const handlePrint = () => {
     try {
-      // Add a small delay to ensure content is rendered
+      // Attempt window.print — works on published sites but may be blocked in iframe previews
       setTimeout(() => {
         window.print();
-        toast({
-          title: "Print Dialog Opened",
-          description: "Your invoice is ready to print.",
-        });
-      }, 300);
+      }, 200);
+
+      toast({
+        title: "Print Dialog",
+        description: "Opening the print dialog for your invoice.",
+      });
     } catch (error) {
       toast({
-        title: "Print Error",
-        description: "Unable to open print dialog. Please try again.",
+        title: "Print Unavailable",
+        description:
+          "Printing is not supported in the preview. Please publish or use Download PDF instead.",
         variant: "destructive",
       });
     }
