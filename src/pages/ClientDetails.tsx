@@ -7,6 +7,15 @@ import { useToast } from "@/components/ui/use-toast";
 import ClientInfoCard from "@/components/clients/ClientInfoCard";
 import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
 import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
+import { getInvoices } from "@/api/invoices";
+import PageSEO from "@/components/seo/PageSEO";
+import Layout from "@/components/layout/Layout";
+import { Client } from "@/types";
+import ClientForm from "@/components/clients/ClientForm";
+import { useToast } from "@/components/ui/use-toast";
+import ClientInfoCard from "@/components/clients/ClientInfoCard";
+import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
+import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
 import PageSEO from "@/components/seo/PageSEO";
 
 const ClientDetails = () => {
