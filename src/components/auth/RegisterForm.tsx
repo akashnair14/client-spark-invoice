@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, UserPlus, Mail, Lock, Loader2, Check } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Mail, Lock, Loader2, Check, X } from "lucide-react";
 
 interface RegisterFormProps {
   email: string;
