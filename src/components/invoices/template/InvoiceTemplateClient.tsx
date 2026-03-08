@@ -114,15 +114,15 @@ const InvoiceTemplateClient = ({
         <h3 className="text-base font-semibold mb-3 text-foreground">Invoice Details:</h3>
         <div className="space-y-2">
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Date:</span>
+            <span className="text-sm text-foreground/70">Date:</span>
             <span className="text-sm font-semibold text-foreground">{formatDate(date)}</span>
           </div>
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Due Date:</span>
+            <span className="text-sm text-foreground/70">Due Date:</span>
             <span className="text-sm font-semibold text-foreground">{formatDate(dueDate)}</span>
           </div>
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Status:</span>
+            <span className="text-sm text-foreground/70">Status:</span>
             <span className="text-sm font-semibold capitalize text-foreground">{status}</span>
           </div>
         </div>

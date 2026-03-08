@@ -111,9 +111,9 @@ const InvoiceTemplateFooter = ({
         </div>
       </div>
       
-      <div className="text-center text-xs text-slate-500 dark:text-slate-400 border-t border-border pt-4">
+      <div className="text-center text-xs text-foreground/70 border-t border-border pt-4">
         <p>This is a computer generated invoice and does not require physical signature.</p>
-        <p className="mt-1 font-semibold text-slate-600 dark:text-slate-300">Thank you for your business!</p>
+        <p className="mt-1 font-semibold text-foreground/80">Thank you for your business!</p>
       </div>
     </div>
   );
