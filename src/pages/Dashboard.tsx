@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
             <p className="text-sm text-muted-foreground mb-5">Start by adding a client or creating an invoice.</p>
             <div className="flex gap-2">
               <Button size="sm" onClick={() => navigate("/clients/new")}><Users className="w-4 h-4 mr-1" /> Add Client</Button>
-              <Button size="sm" variant="outline" onClick={() => navigate("/invoices/new")}><FileText className="w-4 h-4 mr-1" /> New Invoice</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate("/invoices/new")} disabled={clients.length === 0} title={clients.length === 0 ? "Add a client first" : ""}><FileText className="w-4 h-4 mr-1" /> New Invoice</Button>
             </div>
           </div>
         )}
