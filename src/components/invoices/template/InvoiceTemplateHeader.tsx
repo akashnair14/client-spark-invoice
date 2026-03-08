@@ -1,4 +1,3 @@
-
 import React from "react";
 
 interface CompanyDetails {
@@ -18,66 +17,48 @@ interface InvoiceTemplateHeaderProps {
   companyDetails: CompanyDetails;
   invoiceNumber: string;
   isPDF?: boolean;
+  compact?: boolean;
 }
 
 const InvoiceTemplateHeader = ({ 
   companyDetails, 
   invoiceNumber, 
-  isPDF = false 
+  isPDF = false,
+  compact = false
 }: InvoiceTemplateHeaderProps) => {
-  const headerStyle = isPDF ? {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '2rem',
-    borderBottom: '2px solid #e5e7eb',
-    paddingBottom: '1rem'
-  } : {};
-
-  const logoStyle = isPDF ? {
-    maxWidth: '120px',
-    height: 'auto'
-  } : {};
-
-  const titleStyle = isPDF ? {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#3b82f6',
-    margin: '0 0 0.5rem 0'
-  } : {};
-
-  const invoiceNoStyle = isPDF ? {
-    fontSize: '1rem',
-    color: '#6b7280',
-    margin: '0'
-  } : {};
-
   if (isPDF) {
     return (
-      <div style={headerStyle}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: compact ? '0.75rem' : '2rem',
+        borderBottom: '2px solid #e5e7eb',
+        paddingBottom: compact ? '0.5rem' : '1rem'
+      }}>
         <div>
           <img 
             src={companyDetails.logo} 
             alt={companyDetails.name}
-            style={logoStyle}
+            style={{ maxWidth: compact ? '80px' : '120px', height: 'auto' }}
           />
-          <div style={{marginTop: '1rem'}}>
-            <h1 style={titleStyle}>{companyDetails.name}</h1>
-            <p style={{margin: '0', fontSize: '0.875rem', color: '#6b7280'}}>
+          <div style={{marginTop: compact ? '0.5rem' : '1rem'}}>
+            <h1 style={{ fontSize: compact ? '1.25rem' : '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '0 0 0.25rem 0' }}>{companyDetails.name}</h1>
+            <p style={{margin: '0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#374151'}}>
               {companyDetails.address}
             </p>
-            <p style={{margin: '0', fontSize: '0.875rem', color: '#6b7280'}}>
+            <p style={{margin: '0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#374151'}}>
               {companyDetails.city}, {companyDetails.state} {companyDetails.postalCode}
             </p>
-            <p style={{margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#6b7280'}}>
+            <p style={{margin: '0.25rem 0 0 0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#111827', fontWeight: '600'}}>
               GST: {companyDetails.gstNumber}
             </p>
           </div>
         </div>
         <div style={{textAlign: 'right'}}>
-          <h2 style={titleStyle}>TAX INVOICE</h2>
-          <p style={invoiceNoStyle}>Invoice #{invoiceNumber}</p>
-          <div style={{marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280'}}>
+          <h2 style={{ fontSize: compact ? '1.25rem' : '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '0 0 0.25rem 0' }}>TAX INVOICE</h2>
+          <p style={{ fontSize: compact ? '0.8rem' : '1rem', color: '#374151', margin: '0' }}>Invoice #{invoiceNumber}</p>
+          <div style={{marginTop: compact ? '0.5rem' : '1rem', fontSize: compact ? '0.7rem' : '0.875rem', color: '#374151'}}>
             <p style={{margin: '0'}}>Email: {companyDetails.email}</p>
             <p style={{margin: '0'}}>Phone: {companyDetails.phone}</p>
             <p style={{margin: '0'}}>Web: {companyDetails.website}</p>
@@ -88,16 +69,16 @@ const InvoiceTemplateHeader = ({
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start mb-8 border-b-2 border-primary/20 pb-4">
+    <div className={`flex flex-col md:flex-row justify-between items-start border-b-2 border-primary/20 ${compact ? 'mb-4 pb-2' : 'mb-8 pb-4'}`}>
       <div className="flex items-start space-x-4">
         <img 
           src={companyDetails.logo} 
           alt={companyDetails.name}
-          className="w-20 h-20 object-contain"
+          className={compact ? "w-14 h-14 object-contain" : "w-20 h-20 object-contain"}
         />
         <div>
-          <h1 className="text-3xl font-bold text-primary mb-2">{companyDetails.name}</h1>
-          <div className="text-sm text-foreground/80 space-y-1">
+          <h1 className={`font-bold text-primary ${compact ? 'text-xl mb-1' : 'text-3xl mb-2'}`}>{companyDetails.name}</h1>
+          <div className={`text-foreground/80 space-y-0.5 ${compact ? 'text-xs' : 'text-sm'}`}>
             <p>{companyDetails.address}</p>
             <p>{companyDetails.city}, {companyDetails.state} {companyDetails.postalCode}</p>
             <p className="font-semibold text-foreground">GST: {companyDetails.gstNumber}</p>
@@ -106,9 +87,9 @@ const InvoiceTemplateHeader = ({
       </div>
       
       <div className="mt-4 md:mt-0 text-right">
-        <h2 className="text-2xl font-bold text-primary mb-1">TAX INVOICE</h2>
-        <p className="text-lg text-foreground/80 mb-4">Invoice #{invoiceNumber}</p>
-        <div className="text-sm text-foreground/80 space-y-1">
+        <h2 className={`font-bold text-primary ${compact ? 'text-xl mb-0.5' : 'text-2xl mb-1'}`}>TAX INVOICE</h2>
+        <p className={`text-foreground/80 ${compact ? 'text-sm mb-2' : 'text-lg mb-4'}`}>Invoice #{invoiceNumber}</p>
+        <div className={`text-foreground/80 space-y-0.5 ${compact ? 'text-xs' : 'text-sm'}`}>
           <p>Email: {companyDetails.email}</p>
           <p>Phone: {companyDetails.phone}</p>
           <p>Web: {companyDetails.website}</p>

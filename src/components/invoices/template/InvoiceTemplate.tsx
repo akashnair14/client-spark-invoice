@@ -46,22 +46,32 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
     const dueDate = invoice.dueDate instanceof Date ? invoice.dueDate : 
                    (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
 
+    const isCompact = invoice.items.length > 8;
+    const isVeryCompact = invoice.items.length > 15;
+
     return (
       <>
         <style>
           {`
             @media print {
+              @page {
+                size: A4;
+                margin: 10mm;
+              }
               body { margin: 0 !important; }
               .print\\:hidden { display: none !important; }
+              .invoice-template {
+                width: 190mm !important;
+                max-height: 277mm !important;
+                overflow: hidden !important;
+                page-break-inside: avoid !important;
+              }
               .invoice-template * {
                 background: white !important;
                 color: black !important;
               }
               .invoice-template .text-primary {
                 color: #3b82f6 !important;
-              }
-              .invoice-template .text-muted-foreground {
-                color: #6b7280 !important;
               }
               .invoice-template .border {
                 border-color: #e5e7eb !important;
@@ -74,45 +84,53 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
         </style>
         <div 
           ref={ref} 
-          className={`invoice-template bg-white text-black ${isPDF ? 'p-8' : 'p-6 md:p-8'}`}
-          style={isPDF ? { background: 'white', color: 'black' } : {}}
+          className={`invoice-template bg-white text-black ${isPDF ? 'p-6' : 'p-6 md:p-8'}`}
+          style={{
+            width: isPDF ? '210mm' : '100%',
+            maxWidth: '210mm',
+            maxHeight: isPDF ? '277mm' : undefined,
+            overflow: isPDF ? 'hidden' : undefined,
+            margin: '0 auto',
+            ...(isPDF ? { background: 'white', color: 'black' } : {}),
+          }}
         >
-          {/* Header Section */}
           <InvoiceTemplateHeader 
             companyDetails={companyDetails}
             invoiceNumber={invoice.invoiceNumber}
             isPDF={isPDF}
+            compact={isCompact}
           />
           
-          {/* Client Information */}
           <InvoiceTemplateClient 
             client={client}
             date={invoiceDate}
             dueDate={dueDate}
             status={invoice.status}
             isPDF={isPDF}
+            compact={isCompact}
           />
           
-          {/* Items Table */}
           <InvoiceTemplateItems 
             items={invoice.items}
             isPDF={isPDF}
+            compact={isCompact}
+            veryCompact={isVeryCompact}
           />
           
-          {/* Totals Section */}
           <InvoiceTemplateTotals 
             subtotal={subtotal}
             gstAmount={gstAmount}
             roundoff={roundoff}
             total={total}
             isPDF={isPDF}
+            compact={isCompact}
           />
           
-          {/* Footer with Notes */}
           <InvoiceTemplateFooter 
             notes={invoice.notes}
             companyDetails={companyDetails}
             isPDF={isPDF}
+            compact={isCompact}
           />
         </div>
       </>
