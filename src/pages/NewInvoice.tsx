@@ -173,7 +173,7 @@ const NewInvoice = () => {
     });
   };
 
-  const handleFinalizeInvoice = () => {
+  const handleFinalizeInvoice = async () => {
     if (!invoiceData || !selectedClient) {
       toast({
         title: "Error",
@@ -183,28 +183,78 @@ const NewInvoice = () => {
       return;
     }
 
+    setIsSaving(true);
     try {
-      // Update invoice status to 'sent' in localStorage
-      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-      const updatedInvoices = existingInvoices.map((inv: any) => 
-        inv.invoiceNumber === invoiceData.invoiceNumber 
-          ? { ...inv, status: 'sent', lastStatusUpdate: new Date().toISOString() }
-          : inv
-      );
-      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+      const invoicePayload = {
+        invoice_number: invoiceData.invoiceNumber,
+        client_id: selectedClient.id,
+        date: invoiceData.date instanceof Date
+          ? invoiceData.date.toISOString().split("T")[0]
+          : invoiceData.date || new Date().toISOString().split("T")[0],
+        due_date: invoiceData.dueDate instanceof Date
+          ? invoiceData.dueDate.toISOString().split("T")[0]
+          : invoiceData.dueDate || null,
+        subtotal: subtotal,
+        gst_amount: gstAmount,
+        total: total,
+        status: "sent" as const,
+        notes: invoiceData.notes || null,
+        gst_type: invoiceData.gstType === "igst" ? "inter-state" : "intra-state",
+        po_number: invoiceData.poNumber || null,
+        po_date: invoiceData.poDate instanceof Date
+          ? invoiceData.poDate.toISOString().split("T")[0]
+          : invoiceData.poDate || null,
+        dc_number: invoiceData.dcNumber || null,
+        dc_date: invoiceData.dcDate instanceof Date
+          ? invoiceData.dcDate.toISOString().split("T")[0]
+          : invoiceData.dcDate || null,
+        challan_number: invoiceData.challanNumber || null,
+        challan_date: invoiceData.challanDate instanceof Date
+          ? invoiceData.challanDate.toISOString().split("T")[0]
+          : invoiceData.challanDate || null,
+        ewb_number: invoiceData.ewbNumber || null,
+      };
 
-      toast({
-        title: "Invoice Finalized",
-        description: `Invoice ${invoiceData.invoiceNumber} has been finalized and marked as sent.`,
-      });
+      const itemsPayload = (invoiceData.items || []).map((item: any) => ({
+        description: item.description,
+        hsn_code: item.hsnCode || "",
+        quantity: Number(item.quantity),
+        rate: Number(item.rate),
+        gst_rate: Number(item.gstRate || 0),
+        cgst_rate: Number(item.cgstRate || 0),
+        sgst_rate: Number(item.sgstRate || 0),
+        amount: Number(item.amount || item.quantity * item.rate),
+        invoice_id: "", // will be set by createInvoice
+      }));
 
-      // Don't auto-close, let user decide when to leave
-    } catch (error) {
+      if (isEditMode && invoiceData.id) {
+        await updateInvoice(invoiceData.id, invoicePayload, itemsPayload);
+        toast({
+          title: "Invoice Updated",
+          description: `Invoice ${invoiceData.invoiceNumber} has been updated successfully.`,
+        });
+      } else {
+        await createInvoice(invoicePayload, itemsPayload);
+        toast({
+          title: "Invoice Saved",
+          description: `Invoice ${invoiceData.invoiceNumber} has been saved and marked as sent.`,
+        });
+      }
+
+      // Invalidate queries so lists refresh
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+
+      // Navigate to invoices list
+      navigate("/invoices");
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to finalize invoice. Please try again.",
+        title: "Save Failed",
+        description: error.message || "Failed to save invoice. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
