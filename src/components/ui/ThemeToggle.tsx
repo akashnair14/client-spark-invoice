@@ -1,12 +1,9 @@
-
-import React from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { ToggleRight, ToggleLeft } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 
 export default function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
-
   const isDark = (resolvedTheme ?? theme) === "dark";
 
   return (
@@ -15,12 +12,12 @@ export default function ThemeToggle() {
       size="icon"
       aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="transition-colors"
+      className="text-muted-foreground hover:text-foreground transition-colors"
     >
       {isDark ? (
-        <ToggleLeft className="w-5 h-5" aria-hidden />
+        <Sun className="h-[18px] w-[18px]" aria-hidden />
       ) : (
-        <ToggleRight className="w-5 h-5" aria-hidden />
+        <Moon className="h-[18px] w-[18px]" aria-hidden />
       )}
       <span className="sr-only">Toggle dark or light theme</span>
     </Button>

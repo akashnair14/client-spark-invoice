@@ -95,16 +95,17 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow: hidden;
   }
-  html, body {
-    overflow-x: hidden;
+  html {
+    overflow: hidden;
   }
 }
 
 /* Mobile bottom nav spacing */
 @media (max-width: 767px) {
   .main-content {
-    padding-bottom: 5rem;
+    padding-bottom: 4.25rem;
   }
 }
 
