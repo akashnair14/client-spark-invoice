@@ -229,25 +229,25 @@ const InvoiceDetails = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => updateInvoiceStatus('paid')}>
-                <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> 
+                <CheckCircle2 className="w-4 h-4 mr-2 text-success" /> 
                 Mark as Paid
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => updateInvoiceStatus('pending')}>
-                <Clock className="w-4 h-4 mr-2 text-yellow-500" /> 
+                <Clock className="w-4 h-4 mr-2 text-warning" /> 
                 Mark as Pending
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => updateInvoiceStatus('sent')}>
-                <Send className="w-4 h-4 mr-2 text-blue-500" /> 
+                <Send className="w-4 h-4 mr-2 text-info" /> 
                 Mark as Sent
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => updateInvoiceStatus('overdue')}>
-                <AlertCircle className="w-4 h-4 mr-2 text-red-500" /> 
+                <AlertCircle className="w-4 h-4 mr-2 text-destructive" /> 
                 Mark as Overdue
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => updateInvoiceStatus('draft')}>
-                <FileWarning className="w-4 h-4 mr-2 text-gray-500" /> 
+                <FileWarning className="w-4 h-4 mr-2 text-muted-foreground" /> 
                 Set as Draft
               </DropdownMenuItem>
             </DropdownMenuContent>

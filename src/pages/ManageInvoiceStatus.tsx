@@ -224,7 +224,7 @@ const ManageInvoiceStatusPage: React.FC = () => {
             </DialogHeader>
             <div>
               <p>
-                <span className="font-bold">{showPaidPrompt.invoice?.invoiceNumber}</span> billed for <span className="font-bold">{clients[showPaidPrompt.invoice?.clientId||""]?.companyName}</span> is marked as <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Paid</Badge>.<br />
+                <span className="font-bold">{showPaidPrompt.invoice?.invoiceNumber}</span> billed for <span className="font-bold">{clients[showPaidPrompt.invoice?.clientId||""]?.companyName}</span> is marked as <Badge variant="outline" className="bg-success/15 text-success border-success/30">Paid</Badge>.<br />
                 Do you want to change its status?
               </p>
             </div>
