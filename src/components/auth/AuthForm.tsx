@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -11,12 +11,8 @@ import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ConfirmEmailDialog from "./ConfirmEmailDialog";
 
-const prefersReducedMotion = typeof window !== 'undefined' 
-  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-  : false;
-
 const AuthForm: React.FC = () => {
-  const { user, login, signup, logout, loading, resetPassword } = useAuth();
+  const { user, login, signup, logout, resetPassword } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -138,7 +134,7 @@ const AuthForm: React.FC = () => {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         className="min-h-screen flex flex-col items-center justify-center">
-        <Card className="max-w-lg w-full p-8 bg-card/50 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl">
+        <Card className="max-w-lg w-full p-8 glass shadow-elevated-lg rounded-2xl">
           <div className="flex flex-col items-center justify-center mb-5">
             <UserPlus className="w-10 h-10 text-primary mb-2" />
             <div className="text-xl font-semibold text-foreground text-center">
@@ -167,52 +163,52 @@ const AuthForm: React.FC = () => {
 
       {/* Logo */}
       <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }} className="mb-8 flex flex-col items-center space-y-4">
+        transition={{ duration: 0.6 }} className="mb-10 flex flex-col items-center space-y-5">
         <div className="relative">
           <motion.div
-            whileHover={{ scale: 1.1, rotate: 10 }}
+            whileHover={{ scale: 1.05, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 flex items-center justify-center shadow-2xl shadow-primary/40"
+            className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 flex items-center justify-center shadow-glow-lg"
           >
             <Sparkles className="text-primary-foreground w-10 h-10" />
           </motion.div>
         </div>
         <div className="text-center space-y-2">
-          <h1 className="font-bold text-4xl text-foreground tracking-tight">
+          <h1 className="font-bold text-4xl md:text-5xl text-foreground tracking-tight">
             Spark<span className="text-primary">Invoice</span>
           </h1>
           <AnimatePresence mode="wait">
             <motion.h2 key={tab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }} className="font-semibold text-2xl text-foreground">
+              exit={{ opacity: 0, y: -20 }} className="font-display font-semibold text-2xl text-foreground">
               {tab === "login" ? "Welcome Back" : "Create Account"}
             </motion.h2>
           </AnimatePresence>
-          <p className="text-muted-foreground text-sm max-w-md">
+          <p className="text-muted-foreground text-sm max-w-md font-medium">
             {tab === "login" ? "Sign in to manage your invoices" : "Start creating professional invoices"}
           </p>
         </div>
       </motion.div>
 
       {/* Card */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }} className="w-full max-w-md mx-auto">
-        <Card className="p-6 sm:p-8 bg-card/80 backdrop-blur-xl shadow-2xl border border-border/50 rounded-3xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
+        <Card className="p-6 sm:p-8 glass shadow-elevated-lg rounded-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-[60px]" />
           
           {/* Tabs */}
           <div className="relative mb-8 z-10">
-            <div className="flex gap-1 p-1.5 bg-muted/50 rounded-2xl border border-border/50">
+            <div className="flex gap-1 p-1.5 bg-surface-2 rounded-xl border border-border/40">
               {(["login", "register"] as const).map((t) => (
                 <motion.button key={t} whileTap={{ scale: 0.98 }}
-                  className={`relative flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                    tab === t ? "text-primary-foreground shadow-md" : "text-muted-foreground hover:text-foreground"
+                  className={`relative flex-1 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300 ${
+                    tab === t ? "text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => handleTabSwitch(t)} type="button" disabled={submitting}
                   aria-selected={tab === t} role="tab"
                 >
                   <AnimatePresence>
                     {tab === t && (
-                      <motion.span layoutId="activeTab" className="absolute inset-0 bg-primary rounded-xl shadow-lg -z-10"
+                      <motion.span layoutId="activeTab" className="absolute inset-0 bg-primary rounded-lg -z-10"
                         transition={{ type: "spring", stiffness: 500, damping: 30 }} />
                     )}
                   </AnimatePresence>
@@ -254,8 +250,8 @@ const AuthForm: React.FC = () => {
         </Card>
       </motion.div>
 
-      <p className="text-xs text-muted-foreground/60 mt-6 text-center">
-        Secure authentication powered by <span className="font-semibold text-primary">SparkInvoice</span>
+      <p className="text-xs text-muted-foreground/50 mt-8 text-center font-medium">
+        Secure authentication powered by <span className="font-bold text-primary/70">SparkInvoice</span>
       </p>
     </div>
   );

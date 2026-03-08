@@ -3,7 +3,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, LogOut, Settings, User } from "lucide-react";
+import { Bell, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,7 +21,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useMemo } from "react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
@@ -34,13 +33,13 @@ const Navbar = () => {
     : "SI";
 
   return (
-    <header className="bg-background/80 backdrop-blur-xl border-b border-border/60 h-14 flex items-center px-3 md:px-5 sticky top-0 z-40 shrink-0">
+    <header className="glass h-14 flex items-center px-3 md:px-5 sticky top-0 z-40 shrink-0">
       {/* Left: sidebar trigger + logo */}
       <div className="flex items-center gap-1">
         {!isMobile && <SidebarTrigger className="text-muted-foreground hover:text-foreground" />}
-        <div className="flex items-center gap-2 ml-1">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-            <span className="text-primary-foreground font-bold text-sm">S</span>
+        <div className="flex items-center gap-2.5 ml-1">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow">
+            <span className="text-primary-foreground font-bold text-sm tracking-tight">S</span>
           </div>
           <span className={cn("font-bold tracking-tight text-foreground select-none", isMobile ? "text-base" : "text-lg")}>
             Spark<span className="text-primary">Invoice</span>
@@ -49,18 +48,16 @@ const Navbar = () => {
       </div>
 
       {/* Right actions */}
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-0.5">
         <ThemeToggle />
-
-        {/* Notifications popover */}
         <NotificationBell />
 
         {/* Profile dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="focus:outline-none">
-              <Avatar className="h-8 w-8 border border-border/50 ml-1 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+            <button className="focus:outline-none ml-1">
+              <Avatar className="h-8 w-8 border border-border/50 cursor-pointer hover:ring-2 hover:ring-primary/30 transition-all">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -69,7 +66,7 @@ const Navbar = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Account</p>
+                <p className="text-sm font-semibold leading-none">Account</p>
                 <p className="text-xs leading-none text-muted-foreground truncate">
                   {user?.email || "Not signed in"}
                 </p>
@@ -118,12 +115,12 @@ function NotificationBell() {
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative" aria-label="Notifications">
           <Bell className="h-[18px] w-[18px]" />
           {hasAlerts && (
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-0" align="end">
-        <div className="p-3 border-b border-border">
+        <div className="p-3 border-b border-border/60">
           <p className="text-sm font-semibold">Notifications</p>
         </div>
         <div className="p-2 max-h-64 overflow-y-auto">
@@ -134,14 +131,19 @@ function NotificationBell() {
               <div
                 key={i}
                 className={cn(
-                  "flex items-center gap-2 p-2 rounded-md text-sm",
+                  "flex items-center gap-2 p-2.5 rounded-lg text-sm mb-0.5 transition-colors",
                   n.type === "destructive" && "bg-destructive/5 text-destructive",
                   n.type === "warning" && "bg-warning/5 text-warning",
                   n.type === "success" && "bg-success/5 text-success"
                 )}
               >
-                <Bell className="h-3.5 w-3.5 shrink-0" />
-                <span>{n.text}</span>
+                <span className={cn(
+                  "h-1.5 w-1.5 rounded-full shrink-0",
+                  n.type === "destructive" && "bg-destructive",
+                  n.type === "warning" && "bg-warning",
+                  n.type === "success" && "bg-success"
+                )} />
+                <span className="font-medium">{n.text}</span>
               </div>
             ))
           )}

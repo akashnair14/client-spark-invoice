@@ -14,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col h-screen w-full overflow-hidden">
+      <div className="app-background flex flex-col h-screen w-full overflow-hidden">
         <Navbar />
         <div className="flex flex-1 min-h-0 w-full">
           {!isMobile && <AppSidebar />}
