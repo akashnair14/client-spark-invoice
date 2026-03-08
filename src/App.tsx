@@ -22,6 +22,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ManageInvoiceStatusPage = lazy(() => import("./pages/ManageInvoiceStatus"));
 const Templates = lazy(() => import("./pages/Templates"));
 const TemplateDesigner = lazy(() => import("./pages/TemplateDesigner"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
