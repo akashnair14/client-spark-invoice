@@ -8,10 +8,9 @@ import { Client } from "@/types";
 import { createClient } from "@/api/clients";
 import PageSEO from "@/components/seo/PageSEO";
 
-// Utility function to convert Client form values to snake_case for .NET Core backend
-function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
+// Utility function to convert Client form values to snake_case for database
+function mapClientToDbInput(client: Omit<Client, "id">) {
   return {
-    owner_id: ownerId,
     company_name: client.companyName,
     contact_name: client.contactName,
     gst_number: client.gstNumber,
@@ -26,7 +25,6 @@ function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
     tags: client.tags,
     status: client.status,
     email: client.email,
-    // last_invoice_date, total_invoiced, pending_invoices, fy_invoices are optional and not part of the form
   };
 }
 
