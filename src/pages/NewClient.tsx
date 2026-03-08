@@ -35,11 +35,7 @@ const NewClient = () => {
 
   const handleAddClient = async (client: Omit<Client, "id">) => {
     try {
-      // Get the current authenticated user's ID
-      const ownerId = await getCurrentUserId();
-      
-      // Use the authenticated user's ID as owner_id
-      const dbInput = mapClientToDbInput(client, ownerId);
+      const dbInput = mapClientToDbInput(client);
       await createClient(dbInput);
       
       toast({
