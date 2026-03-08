@@ -39,16 +39,28 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
         <head>
           <title>Invoice ${invoiceNumber}</title>
           <style>
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
             @media print {
               body { margin: 0; }
               .no-print { display: none; }
+              html, body {
+                width: 210mm;
+                height: 297mm;
+              }
             }
             body { 
               font-family: Arial, sans-serif; 
               margin: 0;
-              padding: 20px;
+              padding: 10mm;
               background: white !important;
               color: black !important;
+              width: 210mm;
+              max-height: 277mm;
+              overflow: hidden;
+              box-sizing: border-box;
             }
             * {
               background: white !important;
@@ -56,7 +68,6 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
             }
             .bg-primary { color: #3b82f6 !important; }
             .text-primary { color: #3b82f6 !important; }
-            .text-muted-foreground { color: #6b7280 !important; }
             .border { border: 1px solid #e5e7eb !important; }
             .border-border { border-color: #e5e7eb !important; }
             .bg-primary-foreground { background: #f8fafc !important; }
