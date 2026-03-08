@@ -27,10 +27,8 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
       description: "Please wait while we generate your invoice PDF...",
     });
 
-    // Get the invoice content
     const invoiceContent = printableRef.current.innerHTML;
     
-    // Create a new window for printing/PDF generation
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       const htmlContent = `
@@ -44,33 +42,26 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
               margin: 0;
             }
             @media print {
-              body { margin: 0; }
-              .no-print { display: none; }
               html, body {
                 width: 210mm;
                 height: 297mm;
+                margin: 0;
+                padding: 0;
               }
+              body { overflow: hidden; }
+              .no-print { display: none; }
             }
             body { 
-              font-family: Arial, sans-serif; 
+              font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
               margin: 0;
-              padding: 10mm;
-              background: white !important;
-              color: black !important;
+              padding: 0;
+              background: white;
+              color: #1a1a1a;
               width: 210mm;
-              max-height: 277mm;
+              height: 297mm;
               overflow: hidden;
               box-sizing: border-box;
             }
-            * {
-              background: white !important;
-              color: black !important;
-            }
-            .bg-primary { color: #3b82f6 !important; }
-            .text-primary { color: #3b82f6 !important; }
-            .border { border: 1px solid #e5e7eb !important; }
-            .border-border { border-color: #e5e7eb !important; }
-            .bg-primary-foreground { background: #f8fafc !important; }
           </style>
         </head>
         <body>
@@ -82,11 +73,8 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
       printWindow.document.write(htmlContent);
       printWindow.document.close();
       
-      // Wait for content to load, then trigger print
       setTimeout(() => {
         printWindow.print();
-        
-        // Close window after print dialog
         setTimeout(() => {
           printWindow.close();
           toast({
