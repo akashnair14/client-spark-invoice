@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/", { replace: true });
+      navigate("/auth", { replace: true });
     }
   }, [user, loading, navigate]);
 

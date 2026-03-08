@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -16,7 +15,19 @@ import {
   updateClient,
   deleteClient as apiDeleteClient,
 } from "@/api/clients";
+import { mapDbClient, clientToDbFields } from "@/utils/transformers";
 import PageSEO from "@/components/seo/PageSEO";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -25,45 +36,20 @@ const Clients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
-  const [currentClient, setCurrentClient] = useState<Client | undefined>(
-    undefined
-  );
+  const [currentClient, setCurrentClient] = useState<Client | undefined>(undefined);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
-  const [detailsClient, setDetailsClient] = useState<Client | undefined>(
-    undefined
-  );
+  const [detailsClient, setDetailsClient] = useState<Client | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
 
   useEffect(() => {
     setLoading(true);
     getClients()
       .then((data) => {
-        // Transform DB schema to Client type
-        const mapClient = (c: any): Client => ({
-          id: c.id,
-          companyName: c.company_name,
-          contactName: c.contact_name ?? "",
-          gstNumber: c.gst_number ?? "",
-          phoneNumber: c.phone_number ?? "",
-          phone: c.phone_number ?? "",
-          email: c.email ?? "",
-          bankAccountNumber: c.bank_account_number ?? "",
-          bankDetails: c.bank_details ?? "",
-          address: c.address ?? "",
-          city: c.city ?? "",
-          state: c.state ?? "",
-          postalCode: c.postal_code ?? "",
-          website: c.website ?? "",
-          tags: c.tags ?? [],
-          status: c.status as any,
-          lastInvoiceDate: c.last_invoice_date ?? undefined,
-          totalInvoiced: c.total_invoiced ?? undefined,
-          pendingInvoices: c.pending_invoices ?? undefined,
-          fyInvoices: c.fy_invoices ?? undefined,
-        });
-        setClients(data.map(mapClient));
-        setFilteredClients(data.map(mapClient));
+        const mapped = data.map(mapDbClient);
+        setClients(mapped);
+        setFilteredClients(mapped);
         setLoading(false);
       })
       .catch((err) => {
@@ -79,24 +65,7 @@ const Clients = () => {
   const handleEditClient = async (client: Omit<Client, "id">) => {
     if (!currentClient) return;
     try {
-      // Send updates to backend
-      const updates = {
-        company_name: client.companyName,
-        contact_name: client.contactName,
-        gst_number: client.gstNumber,
-        phone_number: client.phoneNumber,
-        bank_account_number: client.bankAccountNumber,
-        bank_details: client.bankDetails,
-        address: client.address,
-        city: client.city,
-        state: client.state,
-        postal_code: client.postalCode,
-        website: client.website,
-        tags: client.tags,
-        status: client.status,
-        email: client.email,
-      };
-      await updateClient(currentClient.id, updates);
+      await updateClient(currentClient.id, clientToDbFields(client));
       setClients((prev) =>
         prev.map((c) => (c.id === currentClient.id ? { ...c, ...client } : c))
       );
@@ -118,15 +87,16 @@ const Clients = () => {
     }
   };
 
-  const handleDeleteClient = async (client: Client) => {
+  const confirmDeleteClient = async () => {
+    if (!deleteTarget) return;
     try {
-      await apiDeleteClient(client.id);
-      setClients((prev) => prev.filter((c) => c.id !== client.id));
-      setFilteredClients((prev) => prev.filter((c) => c.id !== client.id));
-      setSelectedClients((prev) => prev.filter((id) => id !== client.id));
+      await apiDeleteClient(deleteTarget.id);
+      setClients((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      setFilteredClients((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      setSelectedClients((prev) => prev.filter((id) => id !== deleteTarget.id));
       toast({
         title: "Client Deleted",
-        description: `${client.companyName} has been deleted.`,
+        description: `${deleteTarget.companyName} has been deleted.`,
       });
     } catch (err: any) {
       toast({
@@ -134,25 +104,22 @@ const Clients = () => {
         description: err.message,
         variant: "destructive",
       });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClient = (client: Client) => {
+    setDeleteTarget(client);
   };
 
   const handleBulkDelete = async (clientIds: string[]) => {
     try {
-      await Promise.all(
-        clientIds.map((id) =>
-          apiDeleteClient(id).catch((err) => {
-            toast({
-              title: "Delete Failed",
-              description: `Could not delete some clients: ${err.message}`,
-              variant: "destructive",
-            });
-          })
-        )
-      );
+      await Promise.all(clientIds.map((id) => apiDeleteClient(id)));
       setClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
       setFilteredClients((prev) => prev.filter((c) => !clientIds.includes(c.id)));
       setSelectedClients([]);
+      toast({ title: "Clients Deleted", description: `${clientIds.length} client(s) deleted.` });
     } catch (err: any) {
       toast({
         title: "Bulk Delete Failed",
@@ -178,7 +145,6 @@ const Clients = () => {
     tagFilter: string
   ) => {
     let filtered = clients;
-
     if (searchTerm) {
       filtered = filtered.filter(
         (client) =>
@@ -187,30 +153,37 @@ const Clients = () => {
           client.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (statusFilter && statusFilter !== "all") {
       filtered = filtered.filter((client) => client.status === statusFilter);
     }
-
     if (stateFilter && stateFilter !== "all") {
       filtered = filtered.filter((client) => client.state === stateFilter);
     }
-
     if (tagFilter && tagFilter !== "all") {
       filtered = filtered.filter(
         (client) => client.tags && client.tags.includes(tagFilter)
       );
     }
-
     setFilteredClients(filtered);
   };
 
-  // Optionally show spinner/skeletons for loading
   if (loading) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center h-[60vh]">
-          <h2 className="text-xl font-semibold">Loading clients…</h2>
+        <div className="space-y-6 p-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-8 w-32 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+            <Skeleton className="h-10 w-28" />
+          </div>
+          <Skeleton className="h-10 w-full" />
+          <div className="space-y-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-lg" />
+            ))}
+          </div>
         </div>
       </Layout>
     );
@@ -223,16 +196,16 @@ const Clients = () => {
         description="Manage your client information and relationships."
         canonicalUrl={window.location.origin + "/clients"}
       />
-      <div className="space-y-6 animate-fade-in">
-        <div className="page-header flex items-center justify-between">
+      <div className="space-y-4 md:space-y-6 animate-fade-in">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="page-title">Clients</h1>
-            <p className="page-description">
-              Manage your client information and relationships
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Clients</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Manage your client information and relationships ({filteredClients.length})
             </p>
           </div>
           <Link to="/clients/new">
-            <Button className="gap-2">
+            <Button className="gap-2 shadow-sm">
               <Plus className="h-4 w-4" /> Add Client
             </Button>
           </Link>
@@ -278,10 +251,27 @@ const Clients = () => {
           }}
           client={detailsClient}
         />
+
+        {/* Delete confirmation dialog */}
+        <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Client</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete <span className="font-semibold">{deleteTarget?.companyName}</span>? This action cannot be undone and will remove all associated data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteClient} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );
 };
 
 export default Clients;
-
