@@ -242,7 +242,7 @@ const AuthForm: React.FC = () => {
                     className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                     style={{ background: "rgba(255,138,0,0.1)", border: "1px solid rgba(255,138,0,0.15)" }}
                   >
-                    <f.icon class5 h-4.5 h-4.5 text-[#FF8A00]" />
+                    <f.icon className="w-5 h-5 text-[#FF8A00]" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-white/80">{f.title}</div>
