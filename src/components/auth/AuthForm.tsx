@@ -173,7 +173,7 @@ const AuthForm: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-transparent px-4 w-full overflow-hidden">
+    <div className="h-screen flex items-center justify-center bg-transparent px-4 w-full overflow-hidden-hidden">
       <ConfirmEmailDialog
         open={showConfirmPopup}
         onOpenChange={setShowConfirmPopup}
@@ -192,7 +192,7 @@ const AuthForm: React.FC = () => {
         className="w-full max-w-[90%] lg:max-w-[75%] xl:max-w-[70%] mx-auto"
       >
         <div className="rounded-3xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-elevated-lg overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[560px]">
+          <div className="grid grid-cols-1 lg:grid-h-[min(560px,85vh)-[560px]">
 
             {/* Left Panel — Branding (hidden on mobile) */}
             <motion.div
