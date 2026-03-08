@@ -72,21 +72,25 @@ const InvoiceTemplateTotals = ({
         <div className="bg-muted/30 border rounded-lg overflow-hidden">
           <div className="space-y-0">
             <div className="flex justify-between py-2.5 px-4 border-b border-border">
-              <span className="text-sm text-foreground/8e="text-sm font-semibold text-foreground">₹{subtotal.toFixed(2)}</span>
+              <span className="text-sm text-foreground/80">Subtotal:</span>
+              <span className="text-sm font-semibold text-foreground">₹{subtotal.toFixed(2)}</span>
             </div>
             {cgstAmount > 0 && (
               <div className="flex justify-between py-2.5 px-4 border-b border-border">
-                <span className="text-sm text-slate-600 dark:tforeground/8    foreground/8"texforeground/8ground">₹{cgstAmount.toFixed(2)}</span>
+                <span className="text-sm text-foreground/80">CGST:</span>
+                <span className="text-sm font-semibold text-foreground">₹{cgstAmount.toFixed(2)}</span>
               </div>
             )}
             {sgstAmount > 0 && (
               <div className="flex justify-between py-2.5 px-4 border-b border-border">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Sforeground/8<span className="texforeground/8ground">₹{sgstAmount.toFixed(2)}</span>
+                <span className="text-sm text-foreground/80">SGST:</span>
+                <span className="text-sm font-semibold text-foreground">₹{sgstAmount.toFixed(2)}</span>
               </div>
             )}
             {roundoff !== 0 && (
               <div className="flex justify-between py-2.5 px-4 border-b border-border">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Round Off:</span>foreground/8Name="text-sm font-semibold text-foreground">₹{roundoff.toFixed(2)}</span>
+                <span className="text-sm text-foreground/80">Round Off:</span>
+                <span className="text-sm font-semibold text-foreground">₹{roundoff.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between py-3 px-4 bg-primary text-primary-foreground">
