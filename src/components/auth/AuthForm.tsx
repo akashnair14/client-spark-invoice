@@ -32,7 +32,6 @@ const AuthForm: React.FC = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   const [lastRegisteredEmail, setLastRegisteredEmail] = useState("");
   const [lastRegisteredPassword, setLastRegisteredPassword] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -65,7 +64,6 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
-
     try {
       if (tab === "register") {
         if (password !== confirm) {
@@ -111,11 +109,7 @@ const AuthForm: React.FC = () => {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      toast({
-        title: "Enter your email",
-        description: "Please enter your email address first, then click forgot password.",
-        variant: "destructive",
-      });
+      toast({ title: "Enter your email", description: "Please enter your email address first, then click forgot password.", variant: "destructive" });
       return;
     }
     try {
@@ -123,10 +117,7 @@ const AuthForm: React.FC = () => {
       if (result?.error) {
         toast({ title: "Error", description: result.error.message, variant: "destructive" });
       } else {
-        toast({
-          title: "Password reset email sent",
-          description: "Check your inbox for a password reset link.",
-        });
+        toast({ title: "Password reset email sent", description: "Check your inbox for a password reset link." });
       }
     } catch {
       toast({ title: "Error", description: "Failed to send reset email.", variant: "destructive" });
@@ -152,11 +143,9 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  // Already logged in
   if (user) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        className="min-h-screen flex flex-col items-center justify-center">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-screen flex flex-col items-center justify-center">
         <div className="max-w-lg w-full p-8 glass shadow-elevated-lg rounded-2xl">
           <div className="flex flex-col items-center justify-center mb-5">
             <UserPlus className="w-10 h-10 text-primary mb-2" />
@@ -173,7 +162,7 @@ const AuthForm: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-transparent px-4 w-full overflow-hidden-hidden-hidden">
+    <div className="h-screen flex items-center justify-center bg-transparent px-4 w-full overflow-hidden">
       <ConfirmEmailDialog
         open={showConfirmPopup}
         onOpenChange={setShowConfirmPopup}
@@ -184,30 +173,22 @@ const AuthForm: React.FC = () => {
         email={email}
       />
 
-      {/* Wide horizontal card — 75% on desktop */}
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-[90%] lg:max-w-[75%] xl:max-w-[70%] mx-auto"
+        className="w-full max-w-[92%] lg:max-w-[75%] xl:max-w-[70%] mx-auto"
       >
         <div className="rounded-3xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-elevated-lg overflow-hidden">
-          <div className="grid grid-cols-1 lh-[min(560px,85vh)n(560px,85vh)-[560px]">
+          <div className="grid grid-cols-1 lg:grid-cols-5" style={{ height: "min(600px, 88vh)" }}>
 
-            {/* Left Panel — Branding (hidden on mobile) */}
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="hidden lg:flex lg:col-span-2 flex-col justify-between p-10 xl:p-12 relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"
-            >
-              {/* Decorative elements */}
+            {/* Left Panel — Branding */}
+            <div className="hidden lg:flex lg:col-span-2 flex-col justify-between p-10 xl:p-12 relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
               <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
               <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-primary/8 rounded-full blur-[60px]" />
               <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.05)_1px,transparent_1px)] bg-[size:2rem_2rem]" />
 
               <div className="relative z-10 space-y-8">
-                {/* Logo */}
                 <motion.div
                   whileHover={{ scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
@@ -221,7 +202,6 @@ const AuthForm: React.FC = () => {
                   </h1>
                 </motion.div>
 
-                {/* Tagline */}
                 <div className="space-y-3 pt-4">
                   <h2 className="font-display text-3xl xl:text-4xl font-bold text-foreground leading-tight tracking-tight">
                     Professional invoicing,{" "}
@@ -233,7 +213,6 @@ const AuthForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Feature list */}
               <div className="relative z-10 space-y-5 pt-6">
                 {features.map((f, i) => (
                   <motion.div
@@ -257,15 +236,15 @@ const AuthForm: React.FC = () => {
               <p className="relative z-10 text-xs text-muted-foreground/40 pt-6">
                 © {new Date().getFullYear()} SparkInvoice. All rights reserved.
               </p>
-            </motion.div>
+            </div>
 
             {/* Right Panel — Form */}
-            <div className="lg:col-span-3 flex flex-col justify-cen8 xl:p-10 overflow-y-auto:p-10 xl:p-14">
+            <div className="lg:col-span-3 flex flex-col justify-center p-6 sm:p-8 xl:p-10 overflow-y-auto">
               {/* Mobile logo */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="lg:hidden flex items-center gap-3 mb-8"
+                className="lg:hidden flex items-center gap-3 mb-6"
               >
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-glow">
                   <Sparkles className="text-primary-foreground w-5 h-5" />
@@ -276,7 +255,7 @@ const AuthForm: React.FC = () => {
               </motion.div>
 
               {/* Header */}
-              <div className="mb-8 space-y-1.5">
+              <div className="mb-6 space-y-1">
                 <AnimatePresence mode="wait">
                   <motion.h2
                     key={tab}
@@ -290,14 +269,12 @@ const AuthForm: React.FC = () => {
                   </motion.h2>
                 </AnimatePresence>
                 <p className="text-muted-foreground text-sm">
-                  {tab === "login"
-                    ? "Sign in to your account to continue"
-                    : "Create a free account to start invoicing"}
+                  {tab === "login" ? "Sign in to your account to continue" : "Create a free account to start invoicing"}
                 </p>
               </div>
 
               {/* Tabs */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <div className="flex gap-1 p-1 bg-muted rounded-xl border border-border/30 w-full sm:w-auto sm:inline-flex">
                   {(["login", "register"] as const).map((t) => (
                     <button
@@ -314,15 +291,7 @@ const AuthForm: React.FC = () => {
                       role="tab"
                     >
                       <span className="flex items-center justify-center gap-2">
-                        {t === "login" ? (
-                          <>
-                            <LogIn className="w-4 h-4" /> Sign In
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus className="w-4 h-4" /> Register
-                          </>
-                        )}
+                        {t === "login" ? <><LogIn className="w-4 h-4" /> Sign In</> : <><UserPlus className="w-4 h-4" /> Register</>}
                       </span>
                     </button>
                   ))}
@@ -335,41 +304,27 @@ const AuthForm: React.FC = () => {
                   {tab === "login" ? (
                     <LoginForm
                       key="login"
-                      email={email}
-                      password={password}
-                      showPass={showPass}
-                      setEmail={setEmail}
-                      setPassword={setPassword}
-                      setShowPass={setShowPass}
-                      loading={submitting}
-                      error={error}
-                      onSubmit={handleSubmit}
+                      email={email} password={password} showPass={showPass}
+                      setEmail={setEmail} setPassword={setPassword} setShowPass={setShowPass}
+                      loading={submitting} error={error} onSubmit={handleSubmit}
                       onForgotPassword={handleForgotPassword}
                       onResendEmail={() => setShowConfirmPopup(true)}
                     />
                   ) : (
                     <RegisterForm
                       key="register"
-                      email={email}
-                      password={password}
-                      confirm={confirm}
-                      showPass={showPass}
-                      showConfirm={showConfirm}
-                      setEmail={setEmail}
-                      setPassword={setPassword}
-                      setConfirm={setConfirm}
-                      setShowPass={setShowPass}
-                      setShowConfirm={setShowConfirm}
-                      loading={submitting}
-                      error={error}
-                      onSubmit={handleSubmit}
+                      email={email} password={password} confirm={confirm}
+                      showPass={showPass} showConfirm={showConfirm}
+                      setEmail={setEmail} setPassword={setPassword} setConfirm={setConfirm}
+                      setShowPass={setShowPass} setShowConfirm={setShowConfirm}
+                      loading={submitting} error={error} onSubmit={handleSubmit}
                     />
                   )}
                 </AnimatePresence>
               </div>
 
               {/* Divider */}
-              <div className="max-w-md flex items-center gap-3 my-5">
+              <div className="max-w-md flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-border/50" />
                 <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">or</span>
                 <div className="flex-1 h-px bg-border/50" />
@@ -380,7 +335,7 @@ const AuthForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 rounded-xl font-semibold text-sm gap-3 border-border/60 hover:bg-muted/50 transition-all"
+                  className="w-full h-11 rounded-xl font-semibold text-sm gap-3 border-border/60 hover:bg-muted/50 transition-all"
                   disabled={submitting || googleLoading}
                   onClick={handleGoogleSignIn}
                 >
@@ -399,7 +354,7 @@ const AuthForm: React.FC = () => {
               </div>
 
               {/* Switch link */}
-              <div className="mt-6 text-sm">
+              <div className="mt-4 text-sm">
                 <span className="text-muted-foreground">
                   {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
                 </span>
