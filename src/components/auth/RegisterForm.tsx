@@ -124,20 +124,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         {/* Password Input with Strength Indicator */}
         <motion.div
           variants={itemVariants}
-          className="relative group"
+          className="group"
         >
-          <motion.div
-            animate={{
-              scale: focusedField === "password" ? 1.1 : 1,
-            }}
-            transition={{ duration: 0.2 }}
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-              focusedField === "password" ? "text-primary" : "text-muted-foreground/50"
-            }`}
-          >
-            <Lock className="w-full h-full" />
-          </motion.div>
-           <Input
+          <div className="relative">
+            <motion.div
+              animate={{
+                scale: focusedField === "password" ? 1.1 : 1,
+              }}
+              transition={{ duration: 0.2 }}
+              className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                focusedField === "password" ? "text-primary" : "text-muted-foreground/50"
+              }`}
+            >
+              <Lock className="w-full h-full" />
+            </motion.div>
+            <Input
               placeholder="Password (6–10 characters)"
               type={showPass ? "text" : "password"}
               autoComplete="new-password"
@@ -172,6 +173,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 </motion.div>
               </AnimatePresence>
             </motion.button>
+          </div>
             
             {/* Password Strength & Validation */}
             <AnimatePresence>
