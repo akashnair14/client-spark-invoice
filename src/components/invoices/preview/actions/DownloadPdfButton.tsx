@@ -41,7 +41,7 @@ const DownloadPdfButton = ({ printableRef, invoiceNumber }: DownloadPdfButtonPro
           <style>
             @page {
               size: A4;
-              margin: 10mm;
+              margin: 0;
             }
             @media print {
               body { margin: 0; }
