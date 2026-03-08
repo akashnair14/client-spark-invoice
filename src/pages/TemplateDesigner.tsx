@@ -28,29 +28,8 @@ const TemplateDesigner = () => {
   }, [templateId]);
 
   const checkAuthAndLoadTemplate = async () => {
-    try {
-      // Check if user is authenticated
-      const token = getAuthToken();
-      if (!token) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to create or edit templates.",
-          variant: "destructive",
-        });
-        navigate('/');
-        return;
-      }
-
-      if (templateId) {
-        await loadTemplate();
-      }
-    } catch (error) {
-      toast({
-        title: "Authentication Error",
-        description: "Please log in again to continue.",
-        variant: "destructive",
-      });
-      navigate('/');
+    if (templateId) {
+      await loadTemplate();
     }
   };
 
