@@ -6,6 +6,7 @@ import InvoiceTemplateClient from "./InvoiceTemplateClient";
 import InvoiceTemplateItems from "./InvoiceTemplateItems";
 import InvoiceTemplateTotals from "./InvoiceTemplateTotals";
 import InvoiceTemplateFooter from "./InvoiceTemplateFooter";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 
 interface InvoiceTemplateProps {
   invoice: {
@@ -26,17 +27,19 @@ interface InvoiceTemplateProps {
 
 const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
   ({ invoice, client, subtotal, gstAmount, roundoff = 0, total, isPDF = false }, ref) => {
+    const { profile } = useCompanyProfile();
+
     const companyDetails = {
-      name: "Your Company Name",
-      logo: "/placeholder.svg",
-      address: "123 Business Street",
-      city: "Business City",
-      state: "Business State",
-      postalCode: "12345",
-      gstNumber: "27AAPFU0939F1ZV",
-      email: "contact@yourcompany.com",
-      phone: "+91-9876543210",
-      website: "www.yourcompany.com"
+      name: profile.company_name || "Your Company Name",
+      logo: profile.company_logo_url || "/placeholder.svg",
+      address: profile.company_address || "123 Business Street",
+      city: profile.company_city || "Business City",
+      state: profile.company_state || "Business State",
+      postalCode: profile.company_postal_code || "12345",
+      gstNumber: profile.company_gst_number || "27AAPFU0939F1ZV",
+      email: profile.company_email || "contact@yourcompany.com",
+      phone: profile.company_phone || "+91-9876543210",
+      website: profile.company_website || "www.yourcompany.com",
     };
 
     const invoiceDate = invoice.date instanceof Date ? invoice.date : 

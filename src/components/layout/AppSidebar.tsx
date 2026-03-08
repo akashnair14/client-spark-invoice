@@ -23,6 +23,7 @@ import {
   LayoutDashboard,
   FileText,
   Palette,
+  Settings,
 } from "lucide-react";
 
 const sidebarItems = [
@@ -31,6 +32,7 @@ const sidebarItems = [
   { title: "Clients", url: "/clients", icon: CircleUserRound },
   { title: "Invoices", url: "/invoices", icon: FileText },
   { title: "Templates", url: "/templates", icon: Palette },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 const AppSidebar: React.FC = () => {
