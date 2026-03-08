@@ -15,7 +15,6 @@ interface InvoiceActionsProps {
 }
 
 const InvoiceActions = ({
-  invoiceRef,
   printableRef,
   invoiceNumber,
   clientName,
@@ -23,11 +22,6 @@ const InvoiceActions = ({
   total,
   dueDate,
 }: InvoiceActionsProps) => {
-  
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="flex flex-wrap gap-2 justify-end print:hidden">
       <PrintButton />
