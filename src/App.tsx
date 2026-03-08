@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import PremiumLoader from "@/components/ui/PremiumLoader";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -32,16 +33,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="flex flex-col items-center gap-4">
-      <div className="h-9 w-9 rounded-lg bg-primary/20 flex items-center justify-center animate-pulse">
-        <span className="text-primary font-bold text-sm">S</span>
-      </div>
-      <span className="text-sm text-muted-foreground font-medium">Loading…</span>
-    </div>
-  </div>
-);
+const LoadingFallback = () => <PremiumLoader variant="inline" />;
 
 const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>{children}</ProtectedRoute>
