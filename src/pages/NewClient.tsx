@@ -6,13 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
 import { createClient } from "@/api/clients";
-import { getCurrentUserId } from "@/utils/authUtils";
 import PageSEO from "@/components/seo/PageSEO";
 
-// Utility function to convert Client form values to snake_case for .NET Core backend
-function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
+// Utility function to convert Client form values to snake_case for database
+function mapClientToDbInput(client: Omit<Client, "id">) {
   return {
-    owner_id: ownerId,
     company_name: client.companyName,
     contact_name: client.contactName,
     gst_number: client.gstNumber,
@@ -27,7 +25,6 @@ function mapClientToDbInput(client: Omit<Client, "id">, ownerId: string) {
     tags: client.tags,
     status: client.status,
     email: client.email,
-    // last_invoice_date, total_invoiced, pending_invoices, fy_invoices are optional and not part of the form
   };
 }
 
@@ -38,11 +35,7 @@ const NewClient = () => {
 
   const handleAddClient = async (client: Omit<Client, "id">) => {
     try {
-      // Get the current authenticated user's ID
-      const ownerId = await getCurrentUserId();
-      
-      // Use the authenticated user's ID as owner_id
-      const dbInput = mapClientToDbInput(client, ownerId);
+      const dbInput = mapClientToDbInput(client);
       await createClient(dbInput);
       
       toast({

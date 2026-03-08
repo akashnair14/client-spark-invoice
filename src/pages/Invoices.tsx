@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import InvoiceBulkActions from "@/components/invoices/InvoiceBulkActions";
 import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
 import { getClients } from "@/api/clients";
+import { getInvoices as fetchInvoices, deleteInvoice as apiDeleteInvoice, updateInvoiceStatus as apiUpdateInvoiceStatus } from "@/api/invoices";
 import PageSEO from "@/components/seo/PageSEO";
 
 const Invoices = () => {
@@ -48,30 +50,48 @@ const Invoices = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [clients, setClients] = useState<Record<string, Client>>({});
 
-  // Load invoices from localStorage and clients from backend
+  // Load invoices and clients from database
   useEffect(() => {
-    // Load invoices from database using the useDashboardData hook or API
-    const loadInvoices = async () => {
+    const loadData = async () => {
       try {
-        // Replace localStorage with real API call when invoice API is ready
-        const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        setInvoices(storedInvoices);
-        setFilteredInvoices(storedInvoices);
-      } catch (error) {
-        toast({
-          title: "Error loading invoices",
-          description: "Failed to load invoice data",
-          variant: "destructive",
-        });
-        setInvoices([]);
-        setFilteredInvoices([]);
-      }
-    };
+        const [invoicesData, clientsData] = await Promise.all([
+          fetchInvoices(),
+          getClients()
+        ]);
 
-    // Load clients from backend
-    const loadClients = async () => {
-      try {
-        const clientsData = await getClients();
+        // Transform invoices
+        const transformedInvoices = invoicesData.map((i: any) => ({
+          id: i.id,
+          invoiceNumber: i.invoice_number,
+          clientId: i.client_id,
+          clientName: i.clients?.company_name || 'Unknown Client',
+          date: i.date,
+          dueDate: i.due_date,
+          amount: Number(i.total),
+          status: i.status,
+          subtotal: Number(i.subtotal),
+          gstAmount: Number(i.gst_amount),
+          total: Number(i.total),
+          gstType: i.gst_type,
+          notes: i.notes,
+          lastStatusUpdate: i.last_status_update,
+          items: i.invoice_items?.map((item: any) => ({
+            id: item.id,
+            description: item.description,
+            hsnCode: item.hsn_code,
+            quantity: Number(item.quantity),
+            rate: Number(item.rate),
+            gstRate: Number(item.gst_rate),
+            cgstRate: Number(item.cgst_rate),
+            sgstRate: Number(item.sgst_rate),
+            amount: Number(item.amount),
+          })) || [],
+        }));
+
+        setInvoices(transformedInvoices);
+        setFilteredInvoices(transformedInvoices);
+
+        // Transform clients
         const clientsMap: Record<string, Client> = {};
         clientsData.forEach((c: any) => {
           clientsMap[c.id] = {
@@ -91,24 +111,19 @@ const Invoices = () => {
             website: c.website ?? "",
             tags: c.tags ?? [],
             status: c.status as any,
-            lastInvoiceDate: c.last_invoice_date ?? undefined,
-            totalInvoiced: c.total_invoiced ?? undefined,
-            pendingInvoices: c.pending_invoices ?? undefined,
-            fyInvoices: c.fy_invoices ?? undefined,
           };
         });
         setClients(clientsMap);
-      } catch (error) {
+      } catch (error: any) {
         toast({
-          title: "Error",
-          description: "Failed to load clients data",
+          title: "Error loading data",
+          description: error.message || "Failed to load data",
           variant: "destructive",
         });
       }
     };
 
-    loadInvoices();
-    loadClients();
+    loadData();
   }, [toast]);
 
   // Pagination
@@ -154,61 +169,67 @@ const Invoices = () => {
     }).format(amount);
   };
 
-  const handleStatusUpdate = (invoiceId: string, newStatus: Invoice["status"]) => {
-    const updatedInvoices = invoices.map((invoice) =>
-      invoice.id === invoiceId 
-        ? { ...invoice, status: newStatus, lastStatusUpdate: new Date().toISOString() }
-        : invoice
-    );
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-    
-    toast({
-      title: "Status Updated",
-      description: `Invoice ${invoices.find(i => i.id === invoiceId)?.invoiceNumber} marked as ${newStatus}.`,
-    });
+  const handleStatusUpdate = async (invoiceId: string, newStatus: Invoice["status"]) => {
+    try {
+      await apiUpdateInvoiceStatus(invoiceId, newStatus);
+      const updatedInvoices = invoices.map((invoice) =>
+        invoice.id === invoiceId 
+          ? { ...invoice, status: newStatus, lastStatusUpdate: new Date().toISOString() }
+          : invoice
+      );
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      toast({
+        title: "Status Updated",
+        description: `Invoice ${invoices.find(i => i.id === invoiceId)?.invoiceNumber} marked as ${newStatus}.`,
+      });
+    } catch (err: any) {
+      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleBulkStatusUpdate = (invoiceIds: string[], status: Invoice['status']) => {
-    const updatedInvoices = invoices.map((invoice) =>
-      invoiceIds.includes(invoice.id)
-        ? { ...invoice, status, lastStatusUpdate: new Date().toISOString() }
-        : invoice
-    );
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices([]);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+  const handleBulkStatusUpdate = async (invoiceIds: string[], status: Invoice['status']) => {
+    try {
+      await Promise.all(invoiceIds.map(id => apiUpdateInvoiceStatus(id, status)));
+      const updatedInvoices = invoices.map((invoice) =>
+        invoiceIds.includes(invoice.id)
+          ? { ...invoice, status, lastStatusUpdate: new Date().toISOString() }
+          : invoice
+      );
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices([]);
+    } catch (err: any) {
+      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleDeleteInvoice = (invoiceId: string) => {
-    const updatedInvoices = invoices.filter((invoice) => invoice.id !== invoiceId);
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices(selectedInvoices.filter(id => id !== invoiceId));
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-    
-    toast({
-      title: "Invoice Deleted",
-      description: "Invoice has been deleted successfully.",
-    });
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    try {
+      await apiDeleteInvoice(invoiceId);
+      const updatedInvoices = invoices.filter((invoice) => invoice.id !== invoiceId);
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices(selectedInvoices.filter(id => id !== invoiceId));
+      toast({
+        title: "Invoice Deleted",
+        description: "Invoice has been deleted successfully.",
+      });
+    } catch (err: any) {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleBulkDelete = (invoiceIds: string[]) => {
-    const updatedInvoices = invoices.filter((invoice) => !invoiceIds.includes(invoice.id));
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices([]);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+  const handleBulkDelete = async (invoiceIds: string[]) => {
+    try {
+      await Promise.all(invoiceIds.map(id => apiDeleteInvoice(id)));
+      const updatedInvoices = invoices.filter((invoice) => !invoiceIds.includes(invoice.id));
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices([]);
+    } catch (err: any) {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleSelectInvoice = (invoiceId: string, checked: boolean) => {

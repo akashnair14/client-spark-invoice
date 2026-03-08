@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import InvoicePreview from "@/components/invoices/InvoicePreview";
 import { Client, Invoice } from "@/types";
-import { format, parseISO } from "date-fns";
+import { getInvoice } from "@/api/invoices";
+import { getClient } from "@/api/clients";
+import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -36,18 +38,52 @@ const InvoiceDetails = () => {
   useEffect(() => {
     if (!id) return;
     
-    // Future: Replace with real API call to getInvoice(id)
-    // For now, try to load from localStorage as fallback
     const loadInvoiceData = async () => {
       try {
-        const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        const foundInvoice = storedInvoices.find((inv: any) => inv.id === id);
-        
-        if (foundInvoice) {
-          setInvoice(foundInvoice);
-          // Load client data if available
-          // setClient(clientData); // TODO: Implement client loading
-        }
+        const data = await getInvoice(id);
+        const transformedInvoice = {
+          id: data.id,
+          invoiceNumber: data.invoice_number,
+          clientId: data.client_id,
+          clientName: (data as any).clients?.company_name || 'Unknown Client',
+          date: data.date,
+          dueDate: data.due_date,
+          amount: Number(data.total),
+          status: data.status,
+          subtotal: Number(data.subtotal),
+          gstAmount: Number(data.gst_amount),
+          total: Number(data.total),
+          gstType: data.gst_type,
+          notes: data.notes,
+          items: (data as any).invoice_items?.map((item: any) => ({
+            id: item.id,
+            description: item.description,
+            hsnCode: item.hsn_code,
+            quantity: Number(item.quantity),
+            rate: Number(item.rate),
+            gstRate: Number(item.gst_rate),
+            cgstRate: Number(item.cgst_rate),
+            sgstRate: Number(item.sgst_rate),
+            amount: Number(item.amount),
+          })) || [],
+        };
+        setInvoice(transformedInvoice);
+
+        // Load client
+        const clientData = await getClient(data.client_id);
+        setClient({
+          id: clientData.id,
+          companyName: clientData.company_name,
+          contactName: clientData.contact_name ?? "",
+          gstNumber: clientData.gst_number ?? "",
+          phoneNumber: clientData.phone_number ?? "",
+          phone: clientData.phone_number ?? "",
+          email: clientData.email ?? "",
+          address: clientData.address ?? "",
+          city: clientData.city ?? "",
+          state: clientData.state ?? "",
+          postalCode: clientData.postal_code ?? "",
+        });
       } catch (error) {
         toast({
           title: "Error loading invoice",

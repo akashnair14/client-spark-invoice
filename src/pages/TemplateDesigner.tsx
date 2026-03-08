@@ -10,7 +10,6 @@ import {
   updateInvoiceTemplate, 
   getInvoiceTemplate 
 } from "@/api/invoiceTemplates";
-import { getAuthToken } from "@/config/api";
 
 const TemplateDesigner = () => {
   const navigate = useNavigate();
@@ -29,29 +28,8 @@ const TemplateDesigner = () => {
   }, [templateId]);
 
   const checkAuthAndLoadTemplate = async () => {
-    try {
-      // Check if user is authenticated
-      const token = getAuthToken();
-      if (!token) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to create or edit templates.",
-          variant: "destructive",
-        });
-        navigate('/');
-        return;
-      }
-
-      if (templateId) {
-        await loadTemplate();
-      }
-    } catch (error) {
-      toast({
-        title: "Authentication Error",
-        description: "Please log in again to continue.",
-        variant: "destructive",
-      });
-      navigate('/');
+    if (templateId) {
+      await loadTemplate();
     }
   };
 
@@ -95,12 +73,6 @@ const TemplateDesigner = () => {
 
     try {
       setIsSaving(true);
-
-      // Check authentication again before saving
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('User not authenticated');
-      }
 
       const templateData = {
         template_name: finalTemplateName,

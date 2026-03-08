@@ -1,71 +1,55 @@
-import { apiRequest } from "@/config/api";
-import type { Client, CreateClient, UpdateClient } from "@/types/api";
-import { isValidUUID } from "@/utils/authUtils";
+import { supabase } from "@/integrations/supabase/client";
 
-/**
- * CRUD operations on "clients" with validation and error handling
- */
-
-export async function getClients(): Promise<Client[]> {
-  return apiRequest('/clients', {
-    method: 'GET',
-  });
+export async function getClients() {
+  const { data, error } = await supabase
+    .from('clients')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw new Error(error.message);
+  return data || [];
 }
 
-export async function getClient(id: string): Promise<Client> {
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid client ID format");
-  }
+export async function getClient(id: string) {
+  const { data, error } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('id', id)
+    .single();
   
-  return apiRequest(`/clients/${id}`, {
-    method: 'GET',
-  });
+  if (error) throw new Error(error.message);
+  return data;
 }
 
-export async function createClient(client: CreateClient): Promise<Client> {
-  // Validation
-  if (!client.company_name?.trim()) {
-    throw new Error("Company name is required");
-  }
-
-  return apiRequest('/clients', {
-    method: 'POST',
-    body: JSON.stringify(client),
-  });
+export async function createClient(client: any) {
+  const { data, error } = await supabase
+    .from('clients')
+    .insert(client)
+    .select()
+    .single();
+  
+  if (error) throw new Error(error.message);
+  return data;
 }
 
-export async function updateClient(id: string, updates: UpdateClient): Promise<Client> {
-  if (!id) {
-    throw new Error("Client ID is required");
-  }
+export async function updateClient(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('clients')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
   
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid client ID format");
-  }
-  
-  // Validate that we're not trying to update with empty required fields
-  if (updates.company_name !== undefined && !updates.company_name?.trim()) {
-    throw new Error("Company name cannot be empty");
-  }
-
-  return apiRequest(`/clients/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(updates),
-  });
+  if (error) throw new Error(error.message);
+  return data;
 }
 
-export async function deleteClient(id: string): Promise<boolean> {
-  if (!id) {
-    throw new Error("Client ID is required");
-  }
+export async function deleteClient(id: string) {
+  const { error } = await supabase
+    .from('clients')
+    .delete()
+    .eq('id', id);
   
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid client ID format");
-  }
-
-  await apiRequest(`/clients/${id}`, {
-    method: 'DELETE',
-  });
-  
+  if (error) throw new Error(error.message);
   return true;
 }
