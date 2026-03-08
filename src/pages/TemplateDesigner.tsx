@@ -74,12 +74,6 @@ const TemplateDesigner = () => {
     try {
       setIsSaving(true);
 
-      // Check authentication again before saving
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('User not authenticated');
-      }
-
       const templateData = {
         template_name: finalTemplateName,
         layout_data: newLayout as unknown as any,
