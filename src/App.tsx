@@ -63,6 +63,7 @@ const App = () => (
                   <Route path="/manage-invoice-status" element={<ProtectedPage><ManageInvoiceStatusPage /></ProtectedPage>} />
                   <Route path="/templates" element={<ProtectedPage><Templates /></ProtectedPage>} />
                   <Route path="/templates/designer" element={<ProtectedPage><TemplateDesigner /></ProtectedPage>} />
+                  <Route path="/settings" element={<ProtectedPage><Settings /></ProtectedPage>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
