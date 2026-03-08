@@ -11,7 +11,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user && !loading) {
       navigate("/dashboard");
@@ -20,17 +19,13 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="min-h-screen flex items-center justify-center bg-background"
-      >
+      <div className="h-screen flex items-center justify-center" style={{ background: "#0B0F19" }}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="rounded-full h-12 w-12 border-4 border-primary border-t-transparent"
+          className="rounded-full h-12 w-12 border-4 border-[#FF8A00] border-t-transparent"
         />
-      </motion.div>
+      </div>
     );
   }
 
@@ -41,13 +36,13 @@ const Auth = () => {
         description="Access your SparkInvoice account to create and manage professional invoices with ease."
         canonicalUrl={window.location.origin + "/"}
       />
-      <div className="h-screen w-screen fixed inset-0 overflow-hidden">
+      <div className="h-screen w-screen fixed inset-0 overflow-hidden" style={{ background: "#0B0F19" }}>
         <GradientBackground />
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="h-full w-full overflow-hidden relative z-10"
+          className="h-full w-full relative z-10"
         >
           <AuthForm />
         </motion.div>

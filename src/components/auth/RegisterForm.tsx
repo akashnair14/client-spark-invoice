@@ -20,50 +20,19 @@ interface RegisterFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    }
-  },
-  exit: {
-    opacity: 0,
-    y: -20,
-    transition: { duration: 0.3 }
-  }
-};
-
 const itemVariants = {
-  hidden: { opacity: 0, x: -20, y: 10 },
-  visible: {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
     opacity: 1,
-    x: 0,
     y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 24
-    }
-  }
+    transition: { delay: 0.6 + i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  }),
 };
 
 const RegisterForm: React.FC<RegisterFormProps> = ({
-  email,
-  password,
-  confirm,
-  showPass,
-  showConfirm,
-  setEmail,
-  setPassword,
-  setConfirm,
-  setShowPass,
-  setShowConfirm,
-  loading,
-  error,
-  onSubmit
+  email, password, confirm, showPass, showConfirm,
+  setEmail, setPassword, setConfirm, setShowPass, setShowConfirm,
+  loading, error, onSubmit,
 }) => {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
   const passwordsMatch = password && confirm && password === confirm;
@@ -75,329 +44,204 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const hasSpecial = /[^A-Za-z0-9]/.test(password);
 
   const passedRules = [hasMinLength, hasMaxLength, hasUppercase, hasNumber, hasSpecial].filter(Boolean).length;
-  const passwordStrength = passedRules >= 5 ? "strong" : passedRules >= 3 ? "medium" : "weak";
-  const strengthColor = passwordStrength === "strong" ? "text-green-500" : passwordStrength === "medium" ? "text-amber-400" : "text-red-400";
-  const strengthBarColor = passwordStrength === "strong" ? "bg-green-500" : passwordStrength === "medium" ? "bg-amber-400" : "bg-red-400";
-  
+  const strengthLabel = passedRules >= 5 ? "Strong" : passedRules >= 3 ? "Medium" : "Weak";
+  const strengthColor = passedRules >= 5 ? "#22c55e" : passedRules >= 3 ? "#FFB347" : "#ef4444";
+
+  const inputClasses = (field: string) =>
+    `pl-10 pr-11 h-[52px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]`;
+
+  const glowStyle = (field: string) =>
+    focusedField === field ? { boxShadow: "0 0 20px rgba(255,138,0,0.08)" } : {};
+
   return (
     <motion.form
-      variants={containerVariants}
       initial="hidden"
       animate="visible"
-      exit="exit"
+      exit={{ opacity: 0, y: -15, transition: { duration: 0.25 } }}
       onSubmit={onSubmit}
       autoComplete="on"
-      className="space-y-5 w-full"
+      className="space-y-4 w-full"
     >
-      <div className="space-y-4">
-        {/* Email Input */}
-        <motion.div
-          variants={itemVariants}
-          className="relative group"
-        >
-          <motion.div
-            animate={{
-              scale: focusedField === "email" ? 1.1 : 1,
-            }}
-            transition={{ duration: 0.2 }}
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-              focusedField === "email" ? "text-primary" : "text-muted-foreground/50"
-            }`}
-          >
-            <Mail className="w-full h-full" />
-          </motion.div>
+      {/* Email */}
+      <motion.div variants={itemVariants} custom={0} className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-white/50">Email</label>
+        <div className="relative">
+          <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "email" ? "text-[#FF8A00]" : "text-white/30"}`} />
           <Input
-            placeholder="Email address"
+            placeholder="you@company.com"
             autoComplete="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             disabled={loading}
             required
             type="email"
-            spellCheck={false}
-            className="pl-10 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
+            className={inputClasses("email")}
+            style={glowStyle("email")}
           />
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Password Input with Strength Indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="group"
-        >
-          <div className="relative">
+      {/* Password */}
+      <motion.div variants={itemVariants} custom={1} className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-white/50">Password</label>
+        <div className="relative">
+          <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "password" ? "text-[#FF8A00]" : "text-white/30"}`} />
+          <Input
+            placeholder="6–10 characters"
+            type={showPass ? "text" : "password"}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => { if (e.target.value.length <= 10) setPassword(e.target.value); }}
+            onFocus={() => setFocusedField("password")}
+            onBlur={() => setFocusedField(null)}
+            disabled={loading}
+            required
+            minLength={6}
+            maxLength={10}
+            className={inputClasses("password")}
+            style={glowStyle("password")}
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1"
+            onClick={() => setShowPass((v) => !v)}
+          >
+            {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Strength */}
+        <AnimatePresence>
+          {password && (
             <motion.div
-              animate={{
-                scale: focusedField === "password" ? 1.1 : 1,
-              }}
-              transition={{ duration: 0.2 }}
-              className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-                focusedField === "password" ? "text-primary" : "text-muted-foreground/50"
-              }`}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-2 overflow-hidden pt-1"
             >
-              <Lock className="w-full h-full" />
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((level) => (
+                  <div key={level} className="h-1 flex-1 rounded-full bg-white/[0.06] overflow-hidden">
+                    <motion.div
+                      initial={{ width: "0%" }}
+                      animate={{ width: passedRules >= level ? "100%" : "0%" }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: strengthColor }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] font-semibold" style={{ color: strengthColor }}>{strengthLabel}</span>
+                <span className="text-[11px] text-white/30">{password.length}/10</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                {[
+                  { label: "6–10 chars", met: hasMinLength && hasMaxLength },
+                  { label: "Uppercase", met: hasUppercase },
+                  { label: "Number", met: hasNumber },
+                  { label: "Special char", met: hasSpecial },
+                ].map((rule) => (
+                  <div key={rule.label} className="flex items-center gap-1.5">
+                    {rule.met ? <Check className="w-3 h-3 text-green-400" /> : <X className="w-3 h-3 text-white/20" />}
+                    <span className={`text-[11px] ${rule.met ? "text-green-400" : "text-white/30"}`}>{rule.label}</span>
+                  </div>
+                ))}
+              </div>
             </motion.div>
-            <Input
-              placeholder="Password (6–10 characters)"
-              type={showPass ? "text" : "password"}
-              autoComplete="new-password"
-              value={password}
-              onChange={e => { if (e.target.value.length <= 10) setPassword(e.target.value); }}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
-              disabled={loading}
-              required
-              minLength={6}
-              maxLength={10}
-              className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
-            />
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-              tabIndex={0}
-              aria-label={showPass ? "Hide password" : "Show password"}
-              onClick={() => setShowPass(v => !v)}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={showPass ? "hide" : "show"}
-                  initial={{ opacity: 0, rotate: -90 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </motion.div>
-              </AnimatePresence>
-            </motion.button>
-          </div>
-            
-            {/* Password Strength & Validation */}
-            <AnimatePresence>
-              {password && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-3 space-y-2.5 overflow-hidden"
-                >
-                  {/* Strength bar */}
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <motion.div
-                        key={level}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: level * 0.05 }}
-                        className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden"
-                      >
-                        <motion.div
-                          initial={{ width: "0%" }}
-                          animate={{ width: passedRules >= level ? "100%" : "0%" }}
-                          transition={{ duration: 0.3 }}
-                          className={`h-full rounded-full ${strengthBarColor}`}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${strengthColor}`}>
-                      {passwordStrength === "strong" ? "Strong" : passwordStrength === "medium" ? "Medium" : "Weak"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{password.length}/10</span>
-                  </div>
-
-                  {/* Validation checklist */}
-                  <div className="grid grid-cols-1 gap-1">
-                    {[
-                      { label: "6–10 characters", met: hasMinLength && hasMaxLength },
-                      { label: "One uppercase letter", met: hasUppercase },
-                      { label: "One number", met: hasNumber },
-                      { label: "One special character", met: hasSpecial },
-                    ].map((rule) => (
-                      <motion.div
-                        key={rule.label}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-2"
-                      >
-                        {rule.met ? (
-                          <Check className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
-                        )}
-                        <span className={`text-xs ${rule.met ? "text-green-500" : "text-muted-foreground/70"}`}>
-                          {rule.label}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
+      {/* Confirm Password */}
+      <motion.div variants={itemVariants} custom={2} className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-white/50">Confirm Password</label>
+        <div className="relative">
+          <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "confirm" ? "text-[#FF8A00]" : "text-white/30"}`} />
+          <Input
+            placeholder="••••••••"
+            type={showConfirm ? "text" : "password"}
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            onFocus={() => setFocusedField("confirm")}
+            onBlur={() => setFocusedField(null)}
+            disabled={loading}
+            required
+            minLength={6}
+            className={inputClasses("confirm")}
+            style={glowStyle("confirm")}
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1"
+            onClick={() => setShowConfirm((v) => !v)}
+          >
+            {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+        <AnimatePresence>
+          {confirm && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-1.5 pt-0.5">
+              {passwordsMatch ? (
+                <><Check className="w-3 h-3 text-green-400" /><span className="text-[11px] text-green-400">Passwords match</span></>
+              ) : (
+                <><X className="w-3 h-3 text-red-400" /><span className="text-[11px] text-red-400">Passwords do not match</span></>
               )}
-            </AnimatePresence>
-          </motion.div>
-
-        {/* Confirm Password Input */}
-        <motion.div
-          variants={itemVariants}
-          className="group"
-        >
-          <div className="relative">
-            <motion.div
-              animate={{
-                scale: focusedField === "confirm" ? 1.1 : 1,
-              }}
-              transition={{ duration: 0.2 }}
-              className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-                focusedField === "confirm" ? "text-primary" : "text-muted-foreground/50"
-              }`}
-            >
-              <Lock className="w-full h-full" />
             </motion.div>
-            <Input
-              placeholder="Confirm password"
-              type={showConfirm ? "text" : "password"}
-              autoComplete="new-password"
-              value={confirm}
-              onChange={e => setConfirm(e.target.value)}
-              onFocus={() => setFocusedField("confirm")}
-              onBlur={() => setFocusedField(null)}
-              disabled={loading}
-              required
-              minLength={6}
-              className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
-            />
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-              tabIndex={0}
-              aria-label={showConfirm ? "Hide password" : "Show password"}
-              onClick={() => setShowConfirm(v => !v)}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={showConfirm ? "hide" : "show"}
-                  initial={{ opacity: 0, rotate: -90 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </motion.div>
-              </AnimatePresence>
-            </motion.button>
-          </div>
-          
-          {/* Password Match Indicator */}
-          <AnimatePresence>
-            {confirm && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 overflow-hidden"
-              >
-                <div className="flex items-center gap-2">
-                  {passwordsMatch ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                      <span className="text-xs text-green-500">Passwords match</span>
-                    </>
-                  ) : (
-                    <>
-                      <X className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                      <span className="text-xs text-red-400">Passwords do not match</span>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-      {/* Animated Error Message */}
-      <AnimatePresence mode="wait">
+      {/* Error */}
+      <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, height: 0 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              height: "auto",
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 30
-              }
-            }}
-            exit={{ 
-              opacity: 0, 
-              scale: 0.95, 
-              height: 0,
-              transition: { duration: 0.2 }
-            }}
-            className="text-destructive text-sm p-3 bg-destructive/10 border border-destructive/20 rounded-lg overflow-hidden"
+            initial={{ opacity: 0, height: 0, scale: 0.95 }}
+            animate={{ opacity: 1, height: "auto", scale: 1, x: [0, -6, 6, -6, 6, 0] }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-red-400 text-sm p-3 bg-red-500/10 border border-red-500/20 rounded-xl overflow-hidden"
           >
-            <motion.div
-              initial={{ x: -5 }}
-              animate={{ x: [0, -5, 5, -5, 5, 0] }}
-              transition={{ duration: 0.5 }}
-            >
-              {error}
-            </motion.div>
+            {error}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Animated Submit Button */}
-      <motion.div variants={itemVariants}>
-        <motion.div
-          whileHover={{ 
-            scale: loading ? 1 : 1.02,
-            transition: { type: "spring", stiffness: 400, damping: 10 }
-          }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-        >
+      {/* Submit */}
+      <motion.div variants={itemVariants} custom={3}>
+        <motion.div whileHover={{ scale: loading ? 1 : 1.02, y: loading ? 0 : -2 }} whileTap={{ scale: loading ? 1 : 0.97 }}>
           <Button
             type="submit"
-            className="w-full h-12 font-semibold text-base bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 rounded-xl relative overflow-hidden group"
             disabled={loading}
+            className="w-full h-[52px] font-semibold text-base rounded-xl text-white relative overflow-hidden border-0"
+            style={{
+              background: "linear-gradient(135deg, #FF8A00 0%, #FFB347 100%)",
+              boxShadow: "0 8px 32px rgba(255,138,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+            }}
           >
             {loading && (
               <motion.div
-                className="absolute inset-0 bg-primary/20"
-                animate={{ x: ["-100%", "100%"] }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               />
             )}
-            <span className="relative z-10 flex items-center justify-center">
+            <span className="relative z-10 flex items-center justify-center gap-2">
               {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  <span>Creating account...</span>
-                </>
+                <><Loader2 className="w-5 h-5 animate-spin" /> Creating account...</>
               ) : (
-                <>
-                  <UserPlus className="w-4 h-4 mr-2 transition-transform group-hover:-translate-y-0.5" />
-                  Create Account
-                </>
+                <><UserPlus className="w-5 h-5" /> Create Account</>
               )}
             </span>
           </Button>
         </motion.div>
       </motion.div>
 
-      <motion.p
-        variants={itemVariants}
-        className="text-xs text-muted-foreground text-center pt-1"
-      >
+      <motion.p variants={itemVariants} custom={4} className="text-[11px] text-white/25 text-center">
         By signing up, you agree to our Terms and Privacy Policy
       </motion.p>
     </motion.form>
