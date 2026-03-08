@@ -28,7 +28,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
   ({ invoice, client, subtotal, gstAmount, roundoff = 0, total, isPDF = false }, ref) => {
     const companyDetails = {
       name: "Your Company Name",
-      logo: "/placeholder.svg", // You can customize this
+      logo: "/placeholder.svg",
       address: "123 Business Street",
       city: "Business City",
       state: "Business State",
@@ -39,15 +39,11 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
       website: "www.yourcompany.com"
     };
 
-    // Ensure we have valid date objects
     const invoiceDate = invoice.date instanceof Date ? invoice.date : 
                        (invoice.date ? new Date(invoice.date) : new Date());
     
     const dueDate = invoice.dueDate instanceof Date ? invoice.dueDate : 
                    (invoice.dueDate ? new Date(invoice.dueDate) : new Date());
-
-    const isCompact = invoice.items.length > 8;
-    const isVeryCompact = invoice.items.length > 15;
 
     return (
       <>
@@ -56,52 +52,45 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
             @media print {
               @page {
                 size: A4;
-                margin: 10mm;
-                /* Remove browser default header and footer (date, URL, title, page number) */
-                margin-top: 0;
-                margin-bottom: 0;
+                margin: 0;
               }
-              body { margin: 0 !important; }
+              body { margin: 0 !important; padding: 0 !important; }
               .print\\:hidden { display: none !important; }
-              .invoice-template {
-                width: 190mm !important;
-                max-height: 277mm !important;
+              .invoice-template-wrapper {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
                 overflow: hidden !important;
                 page-break-inside: avoid !important;
+                padding: 12mm 14mm !important;
+                box-sizing: border-box !important;
               }
-              .invoice-template * {
-                background: white !important;
-                color: black !important;
-              }
-              .invoice-template .text-primary {
-                color: #3b82f6 !important;
-              }
-              .invoice-template .border {
-                border-color: #e5e7eb !important;
-              }
-              .invoice-template .bg-primary-foreground {
-                background: #f8fafc !important;
+              .invoice-template-wrapper * {
+                color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
               }
             }
           `}
         </style>
         <div 
           ref={ref} 
-          className={`invoice-template bg-white text-black ${isPDF ? 'p-6' : 'p-6 md:p-8'}`}
+          className="invoice-template-wrapper bg-white"
           style={{
-            width: isPDF ? '210mm' : '100%',
-            maxWidth: '210mm',
-            maxHeight: isPDF ? '277mm' : undefined,
+            maxWidth: isPDF ? '210mm' : undefined,
+            maxHeight: isPDF ? '297mm' : undefined,
             overflow: isPDF ? 'hidden' : undefined,
-            margin: '0 auto',
-            ...(isPDF ? { background: 'white', color: 'black' } : {}),
+            padding: isPDF ? '12mm 14mm' : undefined,
+            boxSizing: 'border-box',
+            fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+            color: '#1a1a1a',
+            ...(isPDF ? { background: 'white' } : {}),
           }}
         >
           <InvoiceTemplateHeader 
             companyDetails={companyDetails}
             invoiceNumber={invoice.invoiceNumber}
             isPDF={isPDF}
-            compact={isCompact}
           />
           
           <InvoiceTemplateClient 
@@ -110,14 +99,11 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
             dueDate={dueDate}
             status={invoice.status}
             isPDF={isPDF}
-            compact={isCompact}
           />
           
           <InvoiceTemplateItems 
             items={invoice.items}
             isPDF={isPDF}
-            compact={isCompact}
-            veryCompact={isVeryCompact}
           />
           
           <InvoiceTemplateTotals 
@@ -126,14 +112,11 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
             roundoff={roundoff}
             total={total}
             isPDF={isPDF}
-            compact={isCompact}
           />
           
           <InvoiceTemplateFooter 
-            notes={invoice.notes}
             companyDetails={companyDetails}
             isPDF={isPDF}
-            compact={isCompact}
           />
         </div>
       </>

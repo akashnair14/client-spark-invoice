@@ -7,7 +7,6 @@ interface InvoiceTemplateTotalsProps {
   roundoff?: number;
   total: number;
   isPDF?: boolean;
-  compact?: boolean;
 }
 
 const InvoiceTemplateTotals = ({ 
@@ -15,91 +14,78 @@ const InvoiceTemplateTotals = ({
   gstAmount, 
   roundoff = 0, 
   total, 
-  isPDF = false,
-  compact = false
+  isPDF = false
 }: InvoiceTemplateTotalsProps) => {
   const cgstAmount = gstAmount / 2;
   const sgstAmount = gstAmount / 2;
 
   if (isPDF) {
-    const cellPad = compact ? '0.25rem 0.75rem' : '0.5rem 1rem';
-    const fontSize = compact ? '0.75rem' : '0.875rem';
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        marginBottom: compact ? '0.75rem' : '2rem'
-      }}>
-        <div style={{
-          width: '280px',
-          border: '1px solid #e5e7eb',
-          backgroundColor: '#f9fafb'
-        }}>
-          <table style={{width: '100%', fontSize}}>
-            <tbody>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '14px' }}>
+        <table style={{ width: '220px', fontSize: '11px', borderCollapse: 'collapse' }}>
+          <tbody>
+            <tr>
+              <td style={{ padding: '4px 0', color: '#6b7280' }}>Subtotal</td>
+              <td style={{ padding: '4px 0', textAlign: 'right', fontWeight: '500', color: '#111827' }}>₹{subtotal.toFixed(2)}</td>
+            </tr>
+            {cgstAmount > 0 && (
               <tr>
-                <td style={{padding: cellPad, borderBottom: '1px solid #e5e7eb', color: '#374151'}}>Subtotal:</td>
-                <td style={{padding: cellPad, textAlign: 'right', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#111827'}}>₹{subtotal.toFixed(2)}</td>
+                <td style={{ padding: '4px 0', color: '#6b7280' }}>CGST</td>
+                <td style={{ padding: '4px 0', textAlign: 'right', fontWeight: '500', color: '#111827' }}>₹{cgstAmount.toFixed(2)}</td>
               </tr>
-              {cgstAmount > 0 && (
-                <tr>
-                  <td style={{padding: cellPad, borderBottom: '1px solid #e5e7eb', color: '#374151'}}>CGST:</td>
-                  <td style={{padding: cellPad, textAlign: 'right', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#111827'}}>₹{cgstAmount.toFixed(2)}</td>
-                </tr>
-              )}
-              {sgstAmount > 0 && (
-                <tr>
-                  <td style={{padding: cellPad, borderBottom: '1px solid #e5e7eb', color: '#374151'}}>SGST:</td>
-                  <td style={{padding: cellPad, textAlign: 'right', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#111827'}}>₹{sgstAmount.toFixed(2)}</td>
-                </tr>
-              )}
-              {roundoff !== 0 && (
-                <tr>
-                  <td style={{padding: cellPad, borderBottom: '1px solid #e5e7eb', color: '#374151'}}>Round Off:</td>
-                  <td style={{padding: cellPad, textAlign: 'right', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#111827'}}>₹{roundoff.toFixed(2)}</td>
-                </tr>
-              )}
-              <tr style={{backgroundColor: '#3b82f6', color: 'white'}}>
-                <td style={{padding: compact ? '0.35rem 0.75rem' : '0.75rem 1rem', fontSize: compact ? '0.85rem' : '1rem', fontWeight: 'bold'}}>Total:</td>
-                <td style={{padding: compact ? '0.35rem 0.75rem' : '0.75rem 1rem', textAlign: 'right', fontSize: compact ? '0.85rem' : '1rem', fontWeight: 'bold'}}>₹{total.toFixed(2)}</td>
+            )}
+            {sgstAmount > 0 && (
+              <tr>
+                <td style={{ padding: '4px 0', color: '#6b7280' }}>SGST</td>
+                <td style={{ padding: '4px 0', textAlign: 'right', fontWeight: '500', color: '#111827' }}>₹{sgstAmount.toFixed(2)}</td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+            )}
+            {roundoff !== 0 && (
+              <tr>
+                <td style={{ padding: '4px 0', color: '#6b7280' }}>Round Off</td>
+                <td style={{ padding: '4px 0', textAlign: 'right', fontWeight: '500', color: '#111827' }}>₹{roundoff.toFixed(2)}</td>
+              </tr>
+            )}
+            <tr style={{ borderTop: '2px solid #4f46e5' }}>
+              <td style={{ padding: '8px 0 0 0', fontSize: '13px', fontWeight: '800', color: '#4f46e5' }}>Total</td>
+              <td style={{ padding: '8px 0 0 0', textAlign: 'right', fontSize: '13px', fontWeight: '800', color: '#4f46e5' }}>₹{total.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
   }
 
   return (
-    <div className={`flex justify-end ${compact ? 'mb-4' : 'mb-8'}`}>
-      <div className="w-full max-w-sm">
-        <div className="bg-muted/30 border rounded-lg overflow-hidden">
-          <div className="space-y-0">
-            <div className={`flex justify-between px-4 border-b border-border ${compact ? 'py-1.5' : 'py-2.5'}`}>
-              <span className={`text-foreground/80 ${compact ? 'text-xs' : 'text-sm'}`}>Subtotal:</span>
-              <span className={`font-semibold text-foreground ${compact ? 'text-xs' : 'text-sm'}`}>₹{subtotal.toFixed(2)}</span>
+    <div className="flex justify-end mb-6">
+      <div className="w-full max-w-[240px]">
+        <div className="space-y-1">
+          <div className="flex justify-between">
+            <span className="text-xs text-foreground/60">Subtotal</span>
+            <span className="text-xs font-medium text-foreground">₹{subtotal.toFixed(2)}</span>
+          </div>
+          {cgstAmount > 0 && (
+            <div className="flex justify-between">
+              <span className="text-xs text-foreground/60">CGST</span>
+              <span className="text-xs font-medium text-foreground">₹{cgstAmount.toFixed(2)}</span>
             </div>
-            {cgstAmount > 0 && (
-              <div className={`flex justify-between px-4 border-b border-border ${compact ? 'py-1.5' : 'py-2.5'}`}>
-                <span className={`text-foreground/80 ${compact ? 'text-xs' : 'text-sm'}`}>CGST:</span>
-                <span className={`font-semibold text-foreground ${compact ? 'text-xs' : 'text-sm'}`}>₹{cgstAmount.toFixed(2)}</span>
-              </div>
-            )}
-            {sgstAmount > 0 && (
-              <div className={`flex justify-between px-4 border-b border-border ${compact ? 'py-1.5' : 'py-2.5'}`}>
-                <span className={`text-foreground/80 ${compact ? 'text-xs' : 'text-sm'}`}>SGST:</span>
-                <span className={`font-semibold text-foreground ${compact ? 'text-xs' : 'text-sm'}`}>₹{sgstAmount.toFixed(2)}</span>
-              </div>
-            )}
-            {roundoff !== 0 && (
-              <div className={`flex justify-between px-4 border-b border-border ${compact ? 'py-1.5' : 'py-2.5'}`}>
-                <span className={`text-foreground/80 ${compact ? 'text-xs' : 'text-sm'}`}>Round Off:</span>
-                <span className={`font-semibold text-foreground ${compact ? 'text-xs' : 'text-sm'}`}>₹{roundoff.toFixed(2)}</span>
-              </div>
-            )}
-            <div className={`flex justify-between px-4 bg-primary text-primary-foreground ${compact ? 'py-2' : 'py-3'}`}>
-              <span className="font-bold">Total:</span>
-              <span className={`font-bold ${compact ? 'text-base' : 'text-lg'}`}>₹{total.toFixed(2)}</span>
+          )}
+          {sgstAmount > 0 && (
+            <div className="flex justify-between">
+              <span className="text-xs text-foreground/60">SGST</span>
+              <span className="text-xs font-medium text-foreground">₹{sgstAmount.toFixed(2)}</span>
+            </div>
+          )}
+          {roundoff !== 0 && (
+            <div className="flex justify-between">
+              <span className="text-xs text-foreground/60">Round Off</span>
+              <span className="text-xs font-medium text-foreground">₹{roundoff.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="border-t-2 border-primary pt-2 mt-1">
+            <div className="flex justify-between">
+              <span className="text-sm font-extrabold text-primary">Total</span>
+              <span className="text-sm font-extrabold text-primary">₹{total.toFixed(2)}</span>
             </div>
           </div>
         </div>
