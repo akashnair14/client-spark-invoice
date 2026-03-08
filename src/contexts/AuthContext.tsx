@@ -32,12 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
-        .single();
-      if (data) setProfile(data as UserProfile);
+        .maybeSingle();
+      if (data && !error) setProfile(data as UserProfile);
     } catch {
       // Profile may not exist yet
     }
