@@ -65,10 +65,10 @@ const InvoiceTemplateItems = ({ items, isPDF = false }: InvoiceTemplateItemsProp
               <tr key={item.id} className="border-b border-border hover:bg-muted/50">
                 <td className="py-3 px-4 text-sm text-foreground">{index + 1}</td>
                 <td className="py-3 px-4 text-sm font-medium text-foreground">{item.description}</td>
-                <td className="py-3 px-4 text-sm text-center text-slate-600 dark:text-slate-300">{item.hsnCode}</td>
+                <td className="py-3 px-4 text-sm text-center text-foreground/80">{item.hsnCode}</td>
                 <td className="py-3 px-4 text-sm text-right text-foreground">{item.quantity}</td>
                 <td className="py-3 px-4 text-sm text-right text-foreground">₹{item.rate.toFixed(2)}</td>
-                <td className="py-3 px-4 text-sm text-right text-slate-600 dark:text-slate-300">{item.gstRate}%</td>
+                <td className="py-3 px-4 text-sm text-right text-foreground/80">{item.gstRate}%</td>
                 <td className="py-3 px-4 text-sm text-right font-semibold text-foreground">₹{item.amount.toFixed(2)}</td>
               </tr>
             ))}

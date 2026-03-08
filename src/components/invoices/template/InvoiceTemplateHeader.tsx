@@ -97,18 +97,18 @@ const InvoiceTemplateHeader = ({
         />
         <div>
           <h1 className="text-3xl font-bold text-primary mb-2">{companyDetails.name}</h1>
-          <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+          <div className="text-sm text-foreground/80 space-y-1">
             <p>{companyDetails.address}</p>
             <p>{companyDetails.city}, {companyDetails.state} {companyDetails.postalCode}</p>
-            <p className="font-semibold text-slate-700 dark:text-slate-200">GST: {companyDetails.gstNumber}</p>
+            <p className="font-semibold text-foreground">GST: {companyDetails.gstNumber}</p>
           </div>
         </div>
       </div>
       
       <div className="mt-4 md:mt-0 text-right">
         <h2 className="text-2xl font-bold text-primary mb-1">TAX INVOICE</h2>
-        <p className="text-lg text-slate-600 dark:text-slate-300 mb-4">Invoice #{invoiceNumber}</p>
-        <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+        <p className="text-lg text-foreground/80 mb-4">Invoice #{invoiceNumber}</p>
+        <div className="text-sm text-foreground/80 space-y-1">
           <p>Email: {companyDetails.email}</p>
           <p>Phone: {companyDetails.phone}</p>
           <p>Web: {companyDetails.website}</p>

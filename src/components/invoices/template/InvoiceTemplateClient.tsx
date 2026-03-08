@@ -99,14 +99,14 @@ const InvoiceTemplateClient = ({
         <h3 className="text-base font-semibold mb-3 text-foreground">Bill To:</h3>
         <div className="border-l-4 border-primary pl-4">
           <h4 className="text-lg font-bold mb-1 text-foreground">{client.companyName}</h4>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{client.contactName}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{client.address}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
+          <p className="text-sm text-foreground/80">{client.contactName}</p>
+          <p className="text-sm text-foreground/80 mt-1">{client.address}</p>
+          <p className="text-sm text-foreground/80">
             {client.city}, {client.state} {client.postalCode}
           </p>
           <p className="text-sm font-semibold mt-2 text-foreground">GST: {client.gstNumber}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Email: {client.email}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Phone: {client.phoneNumber}</p>
+          <p className="text-sm text-foreground/80 mt-1">Email: {client.email}</p>
+          <p className="text-sm text-foreground/80">Phone: {client.phoneNumber}</p>
         </div>
       </div>
       
@@ -114,15 +114,15 @@ const InvoiceTemplateClient = ({
         <h3 className="text-base font-semibold mb-3 text-foreground">Invoice Details:</h3>
         <div className="space-y-2">
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Date:</span>
+            <span className="text-sm text-foreground/70">Date:</span>
             <span className="text-sm font-semibold text-foreground">{formatDate(date)}</span>
           </div>
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Due Date:</span>
+            <span className="text-sm text-foreground/70">Due Date:</span>
             <span className="text-sm font-semibold text-foreground">{formatDate(dueDate)}</span>
           </div>
           <div className="flex justify-between md:justify-end md:gap-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Status:</span>
+            <span className="text-sm text-foreground/70">Status:</span>
             <span className="text-sm font-semibold capitalize text-foreground">{status}</span>
           </div>
         </div>
