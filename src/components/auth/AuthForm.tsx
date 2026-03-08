@@ -150,7 +150,7 @@ const AuthForm: React.FC = () => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-[1200px] relative"
-        style={{ height: "min(88vh, 750px)" }}
+        style={{ height: tab === "register" ? "min(92vh, 820px)" : "min(88vh, 750px)", transition: "height 0.4s ease" }}
       >
         {/* Outer glow */}
         <div
@@ -254,7 +254,7 @@ const AuthForm: React.FC = () => {
           </div>
 
           {/* ─── RIGHT: Form Panel ─── */}
-          <div className="flex flex-col h-full relative min-h-0 overflow-hidden">
+          <div className="flex flex-col h-full relative min-h-0">
             {/* Separator line on desktop */}
             <div className="hidden lg:block absolute left-0 top-8 bottom-8 w-px bg-white/[0.06]" />
 
