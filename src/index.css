@@ -365,6 +365,18 @@
   }
 }
 
+/* ── Force light text for invoice preview on white background ── */
+.force-light-text {
+  --foreground: 220 25% 10%;
+  --primary: 28 78% 56%;
+  --primary-foreground: 40 20% 99%;
+  --muted-foreground: 220 10% 46%;
+  --border: 220 14% 89%;
+  --muted: 220 12% 95%;
+  --background: 0 0% 100%;
+  color: hsl(220 25% 10%);
+}
+
 /* ── Premium glass effect ── */
 .glass {
   background: hsl(var(--card) / 0.6);
