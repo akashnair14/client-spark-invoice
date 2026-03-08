@@ -229,23 +229,23 @@ const AuthForm: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div className="relative z-10 space-y-3">
+            <div className="relative z-10 space-y-2">
               {features.map((f, i) => (
                 <motion.div
                   key={f.title}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-                  className="flex items-center gap-3 group"
+                  className="flex items-center gap-2.5 group"
                 >
                   <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                     style={{ background: "rgba(255,138,0,0.1)", border: "1px solid rgba(255,138,0,0.15)" }}
                   >
                     <f.icon className="w-4 h-4 text-[#FF8A00]" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-white/80">{f.title}</div>
+                    <div className="text-sm font-medium text-white/80">{f.title}</div>
                     <div className="text-xs text-white/35">{f.desc}</div>
                   </div>
                 </motion.div>
