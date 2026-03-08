@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface CompanyDetails {
@@ -17,14 +18,12 @@ interface InvoiceTemplateHeaderProps {
   companyDetails: CompanyDetails;
   invoiceNumber: string;
   isPDF?: boolean;
-  compact?: boolean;
 }
 
 const InvoiceTemplateHeader = ({ 
   companyDetails, 
   invoiceNumber, 
-  isPDF = false,
-  compact = false
+  isPDF = false
 }: InvoiceTemplateHeaderProps) => {
   if (isPDF) {
     return (
@@ -32,36 +31,39 @@ const InvoiceTemplateHeader = ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: compact ? '0.75rem' : '2rem',
-        borderBottom: '2px solid #e5e7eb',
-        paddingBottom: compact ? '0.5rem' : '1rem'
+        marginBottom: '16px',
+        paddingBottom: '14px',
+        borderBottom: '3px solid #4f46e5'
       }}>
         <div>
-          <img 
-            src={companyDetails.logo} 
-            alt={companyDetails.name}
-            style={{ maxWidth: compact ? '80px' : '120px', height: 'auto' }}
-          />
-          <div style={{marginTop: compact ? '0.5rem' : '1rem'}}>
-            <h1 style={{ fontSize: compact ? '1.25rem' : '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '0 0 0.25rem 0' }}>{companyDetails.name}</h1>
-            <p style={{margin: '0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#374151'}}>
-              {companyDetails.address}
-            </p>
-            <p style={{margin: '0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#374151'}}>
-              {companyDetails.city}, {companyDetails.state} {companyDetails.postalCode}
-            </p>
-            <p style={{margin: '0.25rem 0 0 0', fontSize: compact ? '0.75rem' : '0.875rem', color: '#111827', fontWeight: '600'}}>
-              GST: {companyDetails.gstNumber}
-            </p>
+          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#111827', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
+            {companyDetails.name}
+          </h1>
+          <div style={{ fontSize: '11px', color: '#4b5563', lineHeight: '1.5' }}>
+            <p style={{ margin: '0' }}>{companyDetails.address}</p>
+            <p style={{ margin: '0' }}>{companyDetails.city}, {companyDetails.state} - {companyDetails.postalCode}</p>
+            <p style={{ margin: '2px 0 0 0', fontWeight: '600', color: '#111827' }}>GSTIN: {companyDetails.gstNumber}</p>
           </div>
         </div>
-        <div style={{textAlign: 'right'}}>
-          <h2 style={{ fontSize: compact ? '1.25rem' : '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '0 0 0.25rem 0' }}>TAX INVOICE</h2>
-          <p style={{ fontSize: compact ? '0.8rem' : '1rem', color: '#374151', margin: '0' }}>Invoice #{invoiceNumber}</p>
-          <div style={{marginTop: compact ? '0.5rem' : '1rem', fontSize: compact ? '0.7rem' : '0.875rem', color: '#374151'}}>
-            <p style={{margin: '0'}}>Email: {companyDetails.email}</p>
-            <p style={{margin: '0'}}>Phone: {companyDetails.phone}</p>
-            <p style={{margin: '0'}}>Web: {companyDetails.website}</p>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{
+            display: 'inline-block',
+            backgroundColor: '#4f46e5',
+            color: 'white',
+            padding: '6px 16px',
+            fontSize: '13px',
+            fontWeight: '700',
+            letterSpacing: '2px',
+            marginBottom: '6px'
+          }}>
+            TAX INVOICE
+          </div>
+          <p style={{ fontSize: '13px', color: '#111827', margin: '4px 0 0 0', fontWeight: '600' }}>
+            #{invoiceNumber}
+          </p>
+          <div style={{ fontSize: '10px', color: '#6b7280', lineHeight: '1.5', marginTop: '6px' }}>
+            <p style={{ margin: '0' }}>{companyDetails.email}</p>
+            <p style={{ margin: '0' }}>{companyDetails.phone}</p>
           </div>
         </div>
       </div>
@@ -69,30 +71,26 @@ const InvoiceTemplateHeader = ({
   }
 
   return (
-    <div className={`flex flex-col md:flex-row justify-between items-start border-b-2 border-primary/20 ${compact ? 'mb-4 pb-2' : 'mb-8 pb-4'}`}>
-      <div className="flex items-start space-x-4">
-        <img 
-          src={companyDetails.logo} 
-          alt={companyDetails.name}
-          className={compact ? "w-14 h-14 object-contain" : "w-20 h-20 object-contain"}
-        />
-        <div>
-          <h1 className={`font-bold text-primary ${compact ? 'text-xl mb-1' : 'text-3xl mb-2'}`}>{companyDetails.name}</h1>
-          <div className={`text-foreground/80 space-y-0.5 ${compact ? 'text-xs' : 'text-sm'}`}>
-            <p>{companyDetails.address}</p>
-            <p>{companyDetails.city}, {companyDetails.state} {companyDetails.postalCode}</p>
-            <p className="font-semibold text-foreground">GST: {companyDetails.gstNumber}</p>
-          </div>
+    <div className="flex flex-col md:flex-row justify-between items-start mb-6 pb-4 border-b-[3px] border-primary">
+      <div>
+        <h1 className="text-2xl font-extrabold text-foreground tracking-tight mb-1">
+          {companyDetails.name}
+        </h1>
+        <div className="text-xs text-foreground/70 leading-relaxed space-y-0.5">
+          <p>{companyDetails.address}</p>
+          <p>{companyDetails.city}, {companyDetails.state} - {companyDetails.postalCode}</p>
+          <p className="font-semibold text-foreground">GSTIN: {companyDetails.gstNumber}</p>
         </div>
       </div>
       
-      <div className="mt-4 md:mt-0 text-right">
-        <h2 className={`font-bold text-primary ${compact ? 'text-xl mb-0.5' : 'text-2xl mb-1'}`}>TAX INVOICE</h2>
-        <p className={`text-foreground/80 ${compact ? 'text-sm mb-2' : 'text-lg mb-4'}`}>Invoice #{invoiceNumber}</p>
-        <div className={`text-foreground/80 space-y-0.5 ${compact ? 'text-xs' : 'text-sm'}`}>
-          <p>Email: {companyDetails.email}</p>
-          <p>Phone: {companyDetails.phone}</p>
-          <p>Web: {companyDetails.website}</p>
+      <div className="mt-3 md:mt-0 text-right">
+        <span className="inline-block bg-primary text-primary-foreground px-4 py-1.5 text-xs font-bold tracking-[2px] mb-1.5">
+          TAX INVOICE
+        </span>
+        <p className="text-sm font-semibold text-foreground">#{invoiceNumber}</p>
+        <div className="text-[11px] text-foreground/60 mt-1.5 space-y-0.5">
+          <p>{companyDetails.email}</p>
+          <p>{companyDetails.phone}</p>
         </div>
       </div>
     </div>
