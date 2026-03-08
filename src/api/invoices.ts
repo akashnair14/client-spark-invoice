@@ -1,105 +1,102 @@
-import { apiRequest } from "@/config/api";
-import type { Invoice, InvoiceItem, CreateInvoice, UpdateInvoice } from "@/types/api";
-import { isValidUUID } from "@/utils/authUtils";
+import { supabase } from "@/integrations/supabase/client";
 
-/**
- * CRUD operations on "invoices" and "invoice_items"
- */
-
-export async function getInvoices(): Promise<Invoice[]> {
-  return apiRequest('/invoices', {
-    method: 'GET',
-  });
+export async function getInvoices() {
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*, clients(company_name), invoice_items(*)')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw new Error(error.message);
+  return data || [];
 }
 
-export async function getInvoice(id: string): Promise<Invoice> {
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid invoice ID format");
-  }
+export async function getInvoice(id: string) {
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*, clients(company_name), invoice_items(*)')
+    .eq('id', id)
+    .single();
   
-  return apiRequest(`/invoices/${id}`, {
-    method: 'GET',
-  });
+  if (error) throw new Error(error.message);
+  return data;
 }
 
-export async function createInvoice(
-  invoice: CreateInvoice,
-  items: Omit<InvoiceItem, "invoice_id" | "id">[]
-): Promise<Invoice> {
-  // Validation
-  if (!invoice.invoice_number?.trim()) {
-    throw new Error("Invoice number is required");
+export async function createInvoice(invoice: any, items: any[]) {
+  // Insert invoice
+  const { data: invoiceData, error: invoiceError } = await supabase
+    .from('invoices')
+    .insert(invoice)
+    .select()
+    .single();
+  
+  if (invoiceError) throw new Error(invoiceError.message);
+  
+  // Insert items
+  if (items && items.length > 0) {
+    const itemsWithInvoiceId = items.map((item, index) => ({
+      ...item,
+      invoice_id: invoiceData.id,
+      sort_order: index,
+    }));
+    
+    const { error: itemsError } = await supabase
+      .from('invoice_items')
+      .insert(itemsWithInvoiceId);
+    
+    if (itemsError) throw new Error(itemsError.message);
   }
   
-  if (!invoice.client_id) {
-    throw new Error("Client is required");
-  }
-  
-  if (!isValidUUID(invoice.client_id)) {
-    throw new Error("Invalid client ID format");
-  }
-  
-  if (!items || items.length === 0) {
-    throw new Error("At least one invoice item is required");
-  }
-
-  return apiRequest('/invoices', {
-    method: 'POST',
-    body: JSON.stringify({ invoice, items }),
-  });
+  return invoiceData;
 }
 
-export async function updateInvoice(
-  id: string,
-  updates: UpdateInvoice,
-  items?: Omit<InvoiceItem, "invoice_id" | "id">[]
-): Promise<Invoice> {
-  if (!id) {
-    throw new Error("Invoice ID is required");
+export async function updateInvoice(id: string, updates: any, items?: any[]) {
+  const { data, error } = await supabase
+    .from('invoices')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) throw new Error(error.message);
+  
+  if (items) {
+    // Delete existing items and re-insert
+    await supabase.from('invoice_items').delete().eq('invoice_id', id);
+    
+    const itemsWithInvoiceId = items.map((item, index) => ({
+      ...item,
+      invoice_id: id,
+      sort_order: index,
+    }));
+    
+    const { error: itemsError } = await supabase
+      .from('invoice_items')
+      .insert(itemsWithInvoiceId);
+    
+    if (itemsError) throw new Error(itemsError.message);
   }
   
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid invoice ID format");
-  }
-
-  return apiRequest(`/invoices/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify({ invoice: updates, items }),
-  });
+  return data;
 }
 
-export async function deleteInvoice(id: string): Promise<boolean> {
-  if (!id) {
-    throw new Error("Invoice ID is required");
-  }
+export async function deleteInvoice(id: string) {
+  const { error } = await supabase
+    .from('invoices')
+    .delete()
+    .eq('id', id);
   
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid invoice ID format");
-  }
-
-  await apiRequest(`/invoices/${id}`, {
-    method: 'DELETE',
-  });
-  
+  if (error) throw new Error(error.message);
   return true;
 }
 
-export async function updateInvoiceStatus(id: string, status: string): Promise<Invoice> {
-  if (!id) {
-    throw new Error("Invoice ID is required");
-  }
+export async function updateInvoiceStatus(id: string, status: string) {
+  const { data, error } = await supabase
+    .from('invoices')
+    .update({ status, last_status_update: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
   
-  if (!isValidUUID(id)) {
-    throw new Error("Invalid invoice ID format");
-  }
-  
-  const allowedStatuses = ['draft', 'sent', 'paid', 'overdue', 'cancelled'];
-  if (!allowedStatuses.includes(status)) {
-    throw new Error(`Invalid status. Must be one of: ${allowedStatuses.join(', ')}`);
-  }
-
-  return apiRequest(`/invoices/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status }),
-  });
+  if (error) throw new Error(error.message);
+  return data;
 }
