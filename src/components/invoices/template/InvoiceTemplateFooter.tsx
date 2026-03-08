@@ -83,12 +83,6 @@ const InvoiceTemplateFooter = ({
 
   return (
     <div className={`border-t border-border ${compact ? 'mt-4 pt-3' : 'mt-8 pt-6'}`}>
-      {notes && (
-        <div className={compact ? 'mb-3' : 'mb-6'}>
-          <h4 className={`font-semibold text-foreground ${compact ? 'text-xs mb-1' : 'text-base mb-2'}`}>Notes & Terms:</h4>
-          <p className={`text-foreground/80 leading-relaxed ${compact ? 'text-xs' : 'text-sm'}`}>{notes}</p>
-        </div>
-      )}
       
       <div className={`grid grid-cols-1 md:grid-cols-2 ${compact ? 'gap-3 mb-3' : 'gap-6 mb-6'}`}>
         <div>
