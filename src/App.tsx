@@ -33,9 +33,11 @@ const queryClient = new QueryClient({
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="flex flex-col items-center gap-3">
-      <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-      <span className="text-sm text-muted-foreground">Loading…</span>
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-9 w-9 rounded-lg bg-primary/20 flex items-center justify-center animate-pulse">
+        <span className="text-primary font-bold text-sm">S</span>
+      </div>
+      <span className="text-sm text-muted-foreground font-medium">Loading…</span>
     </div>
   </div>
 );
@@ -45,7 +47,7 @@ const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
 );
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />

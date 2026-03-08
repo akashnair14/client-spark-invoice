@@ -30,27 +30,35 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ clients, invoices }) 
   };
 
   return (
-    <Card className="shadow-sm border-0">
+    <Card className="border-border/40">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold">Invoice Overview</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={isMobile ? 200 : 240}>
+        <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
           <BarChart data={data} onClick={handleBarClick}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: isMobile ? 10 : 12 }} />
-            <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} width={isMobile ? 40 : 60} />
-            <RechartsTooltip />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.5} />
+            <XAxis dataKey="name" tick={{ fontSize: isMobile ? 10 : 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: isMobile ? 10 : 12, fill: 'hsl(var(--muted-foreground))' }} width={isMobile ? 40 : 60} axisLine={false} tickLine={false} />
+            <RechartsTooltip
+              contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
+                fontSize: '13px',
+                boxShadow: '0 4px 12px -2px hsl(var(--foreground) / 0.08)',
+              }}
+            />
             <Bar dataKey="Amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
         {!isMobile && data.length > 0 && (
-          <div className="flex flex-wrap justify-end mt-2 gap-1.5">
+          <div className="flex flex-wrap justify-end mt-3 gap-1.5">
             {data.slice(0, 5).map((d, index) => (
               <button
                 key={`${d.clientId}-${index}`}
                 onClick={() => d.clientId && navigate(`/clients/${d.clientId}`)}
-                className="text-xs px-2.5 py-1 border border-border rounded-md hover:bg-muted transition text-muted-foreground hover:text-foreground"
+                className="text-xs px-2.5 py-1 border border-border/60 rounded-md hover:bg-accent transition-all text-muted-foreground hover:text-foreground font-medium"
               >
                 {d.name}
               </button>
