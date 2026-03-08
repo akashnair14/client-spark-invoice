@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, UserPlus, Mail, Lock, Loader2, Check } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Mail, Lock, Loader2, Check, X } from "lucide-react";
 
 interface RegisterFormProps {
   email: string;
@@ -67,7 +67,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 }) => {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
   const passwordsMatch = password && confirm && password === confirm;
-  const passwordStrength = password.length >= 8 ? "strong" : password.length >= 6 ? "medium" : "weak";
+
+  const hasMinLength = password.length >= 6;
+  const hasMaxLength = password.length <= 10;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+  const passedRules = [hasMinLength, hasMaxLength, hasUppercase, hasNumber, hasSpecial].filter(Boolean).length;
+  const passwordStrength = passedRules >= 5 ? "strong" : passedRules >= 3 ? "medium" : "weak";
+  const strengthColor = passwordStrength === "strong" ? "text-green-500" : passwordStrength === "medium" ? "text-amber-400" : "text-red-400";
+  const strengthBarColor = passwordStrength === "strong" ? "bg-green-500" : passwordStrength === "medium" ? "bg-amber-400" : "bg-red-400";
   
   return (
     <motion.form
@@ -127,89 +137,107 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           >
             <Lock className="w-full h-full" />
           </motion.div>
-          <Input
-            placeholder="Password (min. 6 characters)"
-            type={showPass ? "text" : "password"}
-            autoComplete="new-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            onFocus={() => setFocusedField("password")}
-            onBlur={() => setFocusedField(null)}
-            disabled={loading}
-            required
-            minLength={6}
-            className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
-          />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-            tabIndex={0}
-            aria-label={showPass ? "Hide password" : "Show password"}
-            onClick={() => setShowPass(v => !v)}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={showPass ? "hide" : "show"}
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
-              >
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </motion.div>
-            </AnimatePresence>
-          </motion.button>
-          
-          {/* Password Strength Bar */}
-          <AnimatePresence>
-            {password && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 space-y-1"
-              >
-                <div className="flex gap-1">
-                  {[1, 2, 3].map((level) => (
-                    <motion.div
-                      key={level}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ delay: level * 0.1 }}
-                      className="h-1 flex-1 rounded-full bg-muted overflow-hidden"
-                    >
-                      <motion.div
-                        initial={{ width: "0%" }}
-                        animate={{
-                          width: passwordStrength === "strong" || (passwordStrength === "medium" && level <= 2) || (passwordStrength === "weak" && level === 1) ? "100%" : "0%"
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className={`h-full ${
-                          passwordStrength === "strong" ? "bg-green-500" :
-                          passwordStrength === "medium" ? "bg-yellow-500" :
-                          "bg-red-500"
-                        }`}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-xs text-muted-foreground"
+           <Input
+              placeholder="Password (6–10 characters)"
+              type={showPass ? "text" : "password"}
+              autoComplete="new-password"
+              value={password}
+              onChange={e => { if (e.target.value.length <= 10) setPassword(e.target.value); }}
+              onFocus={() => setFocusedField("password")}
+              onBlur={() => setFocusedField(null)}
+              disabled={loading}
+              required
+              minLength={6}
+              maxLength={10}
+              className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
+            />
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+              tabIndex={0}
+              aria-label={showPass ? "Hide password" : "Show password"}
+              onClick={() => setShowPass(v => !v)}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={showPass ? "hide" : "show"}
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  Password strength: <span className={
-                    passwordStrength === "strong" ? "text-green-500" :
-                    passwordStrength === "medium" ? "text-yellow-500" :
-                    "text-red-500"
-                  }>{passwordStrength}</span>
-                </motion.p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
+            
+            {/* Password Strength & Validation */}
+            <AnimatePresence>
+              {password && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-3 space-y-2.5 overflow-hidden"
+                >
+                  {/* Strength bar */}
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <motion.div
+                        key={level}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: level * 0.05 }}
+                        className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden"
+                      >
+                        <motion.div
+                          initial={{ width: "0%" }}
+                          animate={{ width: passedRules >= level ? "100%" : "0%" }}
+                          transition={{ duration: 0.3 }}
+                          className={`h-full rounded-full ${strengthBarColor}`}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs font-semibold ${strengthColor}`}>
+                      {passwordStrength === "strong" ? "Strong" : passwordStrength === "medium" ? "Medium" : "Weak"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{password.length}/10</span>
+                  </div>
+
+                  {/* Validation checklist */}
+                  <div className="grid grid-cols-1 gap-1">
+                    {[
+                      { label: "6–10 characters", met: hasMinLength && hasMaxLength },
+                      { label: "One uppercase letter", met: hasUppercase },
+                      { label: "One number", met: hasNumber },
+                      { label: "One special character", met: hasSpecial },
+                    ].map((rule) => (
+                      <motion.div
+                        key={rule.label}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-2"
+                      >
+                        {rule.met ? (
+                          <Check className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                        ) : (
+                          <X className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                        )}
+                        <span className={`text-xs ${rule.met ? "text-green-500" : "text-muted-foreground/70"}`}>
+                          {rule.label}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
         {/* Confirm Password Input */}
         <motion.div
