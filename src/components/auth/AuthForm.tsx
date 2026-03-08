@@ -2,14 +2,19 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus, Sparkles } from "lucide-react";
+import { LogIn, UserPlus, Sparkles, Zap, Shield, BarChart3 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ConfirmEmailDialog from "./ConfirmEmailDialog";
+
+const features = [
+  { icon: Zap, title: "Lightning Fast", desc: "Generate professional invoices in seconds" },
+  { icon: Shield, title: "Secure & Reliable", desc: "Bank-grade encryption for your data" },
+  { icon: BarChart3, title: "Smart Analytics", desc: "Track payments and revenue at a glance" },
+];
 
 const AuthForm: React.FC = () => {
   const { user, login, signup, logout, resetPassword } = useAuth();
@@ -134,7 +139,7 @@ const AuthForm: React.FC = () => {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         className="min-h-screen flex flex-col items-center justify-center">
-        <Card className="max-w-lg w-full p-8 glass shadow-elevated-lg rounded-2xl">
+        <div className="max-w-lg w-full p-8 glass shadow-elevated-lg rounded-2xl">
           <div className="flex flex-col items-center justify-center mb-5">
             <UserPlus className="w-10 h-10 text-primary mb-2" />
             <div className="text-xl font-semibold text-foreground text-center">
@@ -144,13 +149,13 @@ const AuthForm: React.FC = () => {
           <Button onClick={async () => { await logout(); navigate("/"); }} variant="secondary" className="w-full mt-4">
             Sign out
           </Button>
-        </Card>
+        </div>
       </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent px-4 py-12 w-full max-w-full overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-transparent px-4 py-8 w-full">
       <ConfirmEmailDialog
         open={showConfirmPopup}
         onOpenChange={setShowConfirmPopup}
@@ -161,98 +166,217 @@ const AuthForm: React.FC = () => {
         email={email}
       />
 
-      {/* Logo */}
-      <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }} className="mb-10 flex flex-col items-center space-y-5">
-        <div className="relative">
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 flex items-center justify-center shadow-glow-lg"
-          >
-            <Sparkles className="text-primary-foreground w-10 h-10" />
-          </motion.div>
-        </div>
-        <div className="text-center space-y-2">
-          <h1 className="font-bold text-4xl md:text-5xl text-foreground tracking-tight">
-            Spark<span className="text-primary">Invoice</span>
-          </h1>
-          <AnimatePresence mode="wait">
-            <motion.h2 key={tab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }} className="font-display font-semibold text-2xl text-foreground">
-              {tab === "login" ? "Welcome Back" : "Create Account"}
-            </motion.h2>
-          </AnimatePresence>
-          <p className="text-muted-foreground text-sm max-w-md font-medium">
-            {tab === "login" ? "Sign in to manage your invoices" : "Start creating professional invoices"}
-          </p>
-        </div>
-      </motion.div>
+      {/* Wide horizontal card — 75% on desktop */}
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[90%] lg:max-w-[75%] xl:max-w-[70%] mx-auto"
+      >
+        <div className="rounded-3xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-elevated-lg overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[560px]">
 
-      {/* Card */}
-      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }} className="w-full max-w-md mx-auto">
-        <Card className="p-6 sm:p-8 glass shadow-elevated-lg rounded-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-[60px]" />
-          
-          {/* Tabs */}
-          <div className="relative mb-8 z-10">
-            <div className="flex gap-1 p-1.5 bg-surface-2 rounded-xl border border-border/40">
-              {(["login", "register"] as const).map((t) => (
-                <motion.button key={t} whileTap={{ scale: 0.98 }}
-                  className={`relative flex-1 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300 ${
-                    tab === t ? "text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  onClick={() => handleTabSwitch(t)} type="button" disabled={submitting}
-                  aria-selected={tab === t} role="tab"
+            {/* Left Panel — Branding (hidden on mobile) */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="hidden lg:flex lg:col-span-2 flex-col justify-between p-10 xl:p-12 relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"
+            >
+              {/* Decorative elements */}
+              <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
+              <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-primary/8 rounded-full blur-[60px]" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.05)_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+
+              <div className="relative z-10 space-y-8">
+                {/* Logo */}
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="flex items-center gap-3"
                 >
-                  <AnimatePresence>
-                    {tab === t && (
-                      <motion.span layoutId="activeTab" className="absolute inset-0 bg-primary rounded-lg -z-10"
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }} />
-                    )}
-                  </AnimatePresence>
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {t === "login" ? <><LogIn className="w-4 h-4" /> Login</> : <><UserPlus className="w-4 h-4" /> Register</>}
-                  </span>
-                </motion.button>
-              ))}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-glow">
+                    <Sparkles className="text-primary-foreground w-6 h-6" />
+                  </div>
+                  <h1 className="font-bold text-2xl text-foreground tracking-tight">
+                    Spark<span className="text-primary">Invoice</span>
+                  </h1>
+                </motion.div>
+
+                {/* Tagline */}
+                <div className="space-y-3 pt-4">
+                  <h2 className="font-display text-3xl xl:text-4xl font-bold text-foreground leading-tight tracking-tight">
+                    Professional invoicing,{" "}
+                    <span className="text-primary">simplified.</span>
+                  </h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+                    Create, manage, and track invoices effortlessly. Built for freelancers, agencies, and growing businesses.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature list */}
+              <div className="relative z-10 space-y-5 pt-6">
+                {features.map((f, i) => (
+                  <motion.div
+                    key={f.title}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + i * 0.12 }}
+                    className="flex items-start gap-3 group"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <f.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{f.title}</p>
+                      <p className="text-xs text-muted-foreground">{f.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <p className="relative z-10 text-xs text-muted-foreground/40 pt-6">
+                © {new Date().getFullYear()} SparkInvoice. All rights reserved.
+              </p>
+            </motion.div>
+
+            {/* Right Panel — Form */}
+            <div className="lg:col-span-3 flex flex-col justify-center p-6 sm:p-10 xl:p-14">
+              {/* Mobile logo */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="lg:hidden flex items-center gap-3 mb-8"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-glow">
+                  <Sparkles className="text-primary-foreground w-5 h-5" />
+                </div>
+                <h1 className="font-bold text-xl text-foreground tracking-tight">
+                  Spark<span className="text-primary">Invoice</span>
+                </h1>
+              </motion.div>
+
+              {/* Header */}
+              <div className="mb-8 space-y-1.5">
+                <AnimatePresence mode="wait">
+                  <motion.h2
+                    key={tab}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.3 }}
+                    className="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight"
+                  >
+                    {tab === "login" ? "Welcome back" : "Get started"}
+                  </motion.h2>
+                </AnimatePresence>
+                <p className="text-muted-foreground text-sm">
+                  {tab === "login"
+                    ? "Sign in to your account to continue"
+                    : "Create a free account to start invoicing"}
+                </p>
+              </div>
+
+              {/* Tabs */}
+              <div className="mb-6">
+                <div className="flex gap-1 p-1 bg-surface-2 rounded-xl border border-border/30 w-full sm:w-auto sm:inline-flex">
+                  {(["login", "register"] as const).map((t) => (
+                    <motion.button
+                      key={t}
+                      whileTap={{ scale: 0.97 }}
+                      className={`relative flex-1 sm:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 ${
+                        tab === t
+                          ? "text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      onClick={() => handleTabSwitch(t)}
+                      type="button"
+                      disabled={submitting}
+                      aria-selected={tab === t}
+                      role="tab"
+                    >
+                      <AnimatePresence>
+                        {tab === t && (
+                          <motion.span
+                            layoutId="activeTab"
+                            className="absolute inset-0 bg-primary rounded-lg -z-10"
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                          />
+                        )}
+                      </AnimatePresence>
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {t === "login" ? (
+                          <>
+                            <LogIn className="w-4 h-4" /> Sign In
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="w-4 h-4" /> Register
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Form */}
+              <div className="max-w-md">
+                <AnimatePresence mode="wait">
+                  {tab === "login" ? (
+                    <LoginForm
+                      key="login"
+                      email={email}
+                      password={password}
+                      showPass={showPass}
+                      setEmail={setEmail}
+                      setPassword={setPassword}
+                      setShowPass={setShowPass}
+                      loading={submitting}
+                      error={error}
+                      onSubmit={handleSubmit}
+                      onForgotPassword={handleForgotPassword}
+                      onResendEmail={() => setShowConfirmPopup(true)}
+                    />
+                  ) : (
+                    <RegisterForm
+                      key="register"
+                      email={email}
+                      password={password}
+                      confirm={confirm}
+                      showPass={showPass}
+                      showConfirm={showConfirm}
+                      setEmail={setEmail}
+                      setPassword={setPassword}
+                      setConfirm={setConfirm}
+                      setShowPass={setShowPass}
+                      setShowConfirm={setShowConfirm}
+                      loading={submitting}
+                      error={error}
+                      onSubmit={handleSubmit}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Switch link */}
+              <div className="mt-6 text-sm">
+                <span className="text-muted-foreground">
+                  {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
+                </span>
+                <button
+                  className="font-semibold text-primary hover:underline underline-offset-4"
+                  type="button"
+                  onClick={() => handleTabSwitch(tab === "login" ? "register" : "login")}
+                >
+                  {tab === "login" ? "Sign up" : "Sign in"}
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Forms */}
-          <AnimatePresence mode="wait">
-            {tab === "login" ? (
-              <LoginForm key="login" email={email} password={password} showPass={showPass}
-                setEmail={setEmail} setPassword={setPassword} setShowPass={setShowPass}
-                loading={submitting} error={error} onSubmit={handleSubmit}
-                onForgotPassword={handleForgotPassword}
-                onResendEmail={() => setShowConfirmPopup(true)} />
-            ) : (
-              <RegisterForm key="register" email={email} password={password} confirm={confirm}
-                showPass={showPass} showConfirm={showConfirm}
-                setEmail={setEmail} setPassword={setPassword} setConfirm={setConfirm}
-                setShowPass={setShowPass} setShowConfirm={setShowConfirm}
-                loading={submitting} error={error} onSubmit={handleSubmit} />
-            )}
-          </AnimatePresence>
-
-          {/* Switch */}
-          <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">
-              {tab === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
-            </span>
-            <button className="font-semibold text-primary hover:underline" type="button"
-              onClick={() => handleTabSwitch(tab === "login" ? "register" : "login")}>
-              {tab === "login" ? "Sign up" : "Sign in"}
-            </button>
-          </div>
-        </Card>
+        </div>
       </motion.div>
-
-      <p className="text-xs text-muted-foreground/50 mt-8 text-center font-medium">
-        Secure authentication powered by <span className="font-bold text-primary/70">SparkInvoice</span>
-      </p>
     </div>
   );
 };
