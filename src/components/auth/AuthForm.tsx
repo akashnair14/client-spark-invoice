@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus, Sparkles, Zap, Shield, BarChart3 } from "lucide-react";
+import { LogIn, UserPlus, Sparkles, Zap, Shield, BarChart3, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { lovable } from "@/integrations/lovable/index";
 
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
