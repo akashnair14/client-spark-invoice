@@ -254,11 +254,11 @@ const AuthForm: React.FC = () => {
           </div>
 
           {/* ─── RIGHT: Form Panel ─── */}
-          <div className="flex flex-col h-full relative">
+          <div className="flex flex-col h-full relative min-h-0">
             {/* Separator line on desktop */}
             <div className="hidden lg:block absolute left-0 top-8 bottom-8 w-px bg-white/[0.06]" />
 
-            <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-12 xl:px-16 py-8 overflow-y-auto scrollbar-hide">
+            <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-12 xl:px-16 py-6 overflow-y-auto scrollbar-hide min-h-0">
               {/* Mobile logo */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
