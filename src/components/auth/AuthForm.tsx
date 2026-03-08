@@ -150,7 +150,7 @@ const AuthForm: React.FC = () => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-[1200px] relative"
-        style={{ height: "min(80vh, 720px)" }}
+        style={{ height: "min(88vh, 750px)" }}
       >
         {/* Outer glow */}
         <div
@@ -169,7 +169,7 @@ const AuthForm: React.FC = () => {
           }}
         >
           {/* ─── LEFT: Branding Panel ─── */}
-          <div className="hidden lg:flex flex-col justify-between p-10 xl:p-14 relative overflow-hidden min-h-0 min-h-0">
+          <div className="hidden lg:flex flex-col justify-between p-8 xl:p-10 relative overflow-visible min-h-0">
             {/* Background accent */}
             <div className="absolute inset-0 pointer-events-none">
               <div
@@ -229,23 +229,23 @@ const AuthForm: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div className="relative z-10 space-y-4">
+            <div className="relative z-10 space-y-2">
               {features.map((f, i) => (
                 <motion.div
                   key={f.title}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-                  className="flex items-center gap-4 group"
+                  className="flex items-center gap-2.5 group"
                 >
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                     style={{ background: "rgba(255,138,0,0.1)", border: "1px solid rgba(255,138,0,0.15)" }}
                   >
-                    <f.icon className="w-5 h-5 text-[#FF8A00]" />
+                    <f.icon className="w-4 h-4 text-[#FF8A00]" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-white/80">{f.title}</div>
+                    <div className="text-sm font-medium text-white/80">{f.title}</div>
                     <div className="text-xs text-white/35">{f.desc}</div>
                   </div>
                 </motion.div>
@@ -254,11 +254,11 @@ const AuthForm: React.FC = () => {
           </div>
 
           {/* ─── RIGHT: Form Panel ─── */}
-          <div className="flex flex-col h-full relative">
+          <div className="flex flex-col h-full relative min-h-0">
             {/* Separator line on desktop */}
             <div className="hidden lg:block absolute left-0 top-8 bottom-8 w-px bg-white/[0.06]" />
 
-            <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-12 xl:px-16 py-8 overflow-y-auto scrollbar-hide">
+            <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-12 xl:px-16 py-6 overflow-y-auto scrollbar-hide min-h-0">
               {/* Mobile logo */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
