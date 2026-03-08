@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getClients } from '@/api/clients';
 import { getInvoices } from '@/api/invoices';
-import { useToast } from '@/hooks/use-toast';
 import { mapDbClient, mapDbInvoice } from '@/utils/transformers';
 import type { Client, Invoice } from '@/types';
 
@@ -14,49 +13,34 @@ interface DashboardData {
 }
 
 /**
- * Custom hook to fetch and manage dashboard data
+ * Custom hook to fetch and manage dashboard data using React Query
  */
 export const useDashboardData = (): DashboardData => {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const clientsQuery = useQuery({
+    queryKey: ['clients'],
+    queryFn: getClients,
+    select: (data) => data.map(mapDbClient),
+  });
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const [clientsData, invoicesData] = await Promise.all([
-        getClients(),
-        getInvoices()
-      ]);
+  const invoicesQuery = useQuery({
+    queryKey: ['invoices'],
+    queryFn: getInvoices,
+    select: (data) => data.map(mapDbInvoice),
+  });
 
-      setClients(clientsData.map(mapDbClient));
-      setInvoices(invoicesData.map(mapDbInvoice));
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to fetch dashboard data';
-      setError(errorMessage);
-      toast({
-        title: 'Error loading dashboard',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
+  const loading = clientsQuery.isLoading || invoicesQuery.isLoading;
+  const error = clientsQuery.error?.message || invoicesQuery.error?.message || null;
+
+  const refetch = () => {
+    clientsQuery.refetch();
+    invoicesQuery.refetch();
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   return {
-    clients,
-    invoices,
+    clients: clientsQuery.data ?? [],
+    invoices: invoicesQuery.data ?? [],
     loading,
     error,
-    refetch: fetchData,
+    refetch,
   };
 };
