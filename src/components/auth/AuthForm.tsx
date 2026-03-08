@@ -254,7 +254,7 @@ const AuthForm: React.FC = () => {
           </div>
 
           {/* ─── RIGHT: Form Panel ─── */}
-          <div className="flex flex-col h-full relative min-h-0 overflow-hidden">
+          <div className="flex flex-col h-full relative min-h-0">
             {/* Separator line on desktop */}
             <div className="hidden lg:block absolute left-0 top-8 bottom-8 w-px bg-white/[0.06]" />
 
