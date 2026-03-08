@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import InvoicePreview from "@/components/invoices/InvoicePreview";
 import { Client, Invoice } from "@/types";
-import { format, parseISO } from "date-fns";
+import { getInvoice } from "@/api/invoices";
+import { getClient } from "@/api/clients";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
