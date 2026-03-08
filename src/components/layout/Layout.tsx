@@ -1,4 +1,3 @@
-
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/AppSidebar";
@@ -15,16 +14,14 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col min-h-screen w-full">
+      <div className="flex flex-col h-screen w-full overflow-hidden">
         <Navbar />
         <div className="flex flex-1 min-h-0 w-full">
-          {/* Desktop sidebar only */}
           {!isMobile && <AppSidebar />}
-          <main className="main-content flex-1 min-w-0 p-3 md:p-6 lg:p-8 overflow-x-auto">
+          <main className="main-content flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-3 md:p-6 lg:p-8">
             {children}
           </main>
         </div>
-        {/* Mobile bottom nav */}
         {isMobile && <MobileBottomNav />}
       </div>
     </SidebarProvider>
