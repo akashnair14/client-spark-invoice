@@ -140,15 +140,15 @@ const InvoiceDetails = () => {
   const getStatusBadgeClass = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
-        return "bg-green-100 text-green-800";
+        return "bg-success/15 text-success";
       case 'pending':
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/15 text-warning";
       case 'sent':
-        return "bg-blue-100 text-blue-800";
+        return "bg-info/15 text-info";
       case 'overdue':
-        return "bg-red-100 text-red-800";
+        return "bg-destructive/15 text-destructive";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground";
     }
   };
   
