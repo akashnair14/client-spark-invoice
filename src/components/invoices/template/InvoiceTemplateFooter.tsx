@@ -106,8 +106,8 @@ const InvoiceTemplateFooter = ({
         </div>
         <div className="md:text-right">
           <h4 className="text-sm font-semibold mb-2 text-foreground">Authorized Signature</h4>
-          <div className="h-16 border-b border-slate-400 dark:border-slate-500 mb-2"></div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">For {companyDetails.name}</p>
+          <div className="h-16 border-b border-foreground/40 mb-2"></div>
+          <p className="text-xs text-foreground/70">For {companyDetails.name}</p>
         </div>
       </div>
       
