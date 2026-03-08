@@ -51,7 +51,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
     return (
       <div 
         ref={ref} 
-        className={`invoice-template-wrapper bg-white ${!isPDF ? 'p-6 md:p-8' : ''}`}
+        className={`invoice-template-wrapper bg-white force-light-text ${!isPDF ? 'p-6 md:p-8' : ''}`}
         style={{
           maxWidth: isPDF ? '210mm' : undefined,
           maxHeight: isPDF ? '297mm' : undefined,
