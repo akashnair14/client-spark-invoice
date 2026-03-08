@@ -169,61 +169,67 @@ const Invoices = () => {
     }).format(amount);
   };
 
-  const handleStatusUpdate = (invoiceId: string, newStatus: Invoice["status"]) => {
-    const updatedInvoices = invoices.map((invoice) =>
-      invoice.id === invoiceId 
-        ? { ...invoice, status: newStatus, lastStatusUpdate: new Date().toISOString() }
-        : invoice
-    );
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-    
-    toast({
-      title: "Status Updated",
-      description: `Invoice ${invoices.find(i => i.id === invoiceId)?.invoiceNumber} marked as ${newStatus}.`,
-    });
+  const handleStatusUpdate = async (invoiceId: string, newStatus: Invoice["status"]) => {
+    try {
+      await apiUpdateInvoiceStatus(invoiceId, newStatus);
+      const updatedInvoices = invoices.map((invoice) =>
+        invoice.id === invoiceId 
+          ? { ...invoice, status: newStatus, lastStatusUpdate: new Date().toISOString() }
+          : invoice
+      );
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      toast({
+        title: "Status Updated",
+        description: `Invoice ${invoices.find(i => i.id === invoiceId)?.invoiceNumber} marked as ${newStatus}.`,
+      });
+    } catch (err: any) {
+      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleBulkStatusUpdate = (invoiceIds: string[], status: Invoice['status']) => {
-    const updatedInvoices = invoices.map((invoice) =>
-      invoiceIds.includes(invoice.id)
-        ? { ...invoice, status, lastStatusUpdate: new Date().toISOString() }
-        : invoice
-    );
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices([]);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+  const handleBulkStatusUpdate = async (invoiceIds: string[], status: Invoice['status']) => {
+    try {
+      await Promise.all(invoiceIds.map(id => apiUpdateInvoiceStatus(id, status)));
+      const updatedInvoices = invoices.map((invoice) =>
+        invoiceIds.includes(invoice.id)
+          ? { ...invoice, status, lastStatusUpdate: new Date().toISOString() }
+          : invoice
+      );
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices([]);
+    } catch (err: any) {
+      toast({ title: "Update Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleDeleteInvoice = (invoiceId: string) => {
-    const updatedInvoices = invoices.filter((invoice) => invoice.id !== invoiceId);
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices(selectedInvoices.filter(id => id !== invoiceId));
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-    
-    toast({
-      title: "Invoice Deleted",
-      description: "Invoice has been deleted successfully.",
-    });
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    try {
+      await apiDeleteInvoice(invoiceId);
+      const updatedInvoices = invoices.filter((invoice) => invoice.id !== invoiceId);
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices(selectedInvoices.filter(id => id !== invoiceId));
+      toast({
+        title: "Invoice Deleted",
+        description: "Invoice has been deleted successfully.",
+      });
+    } catch (err: any) {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+    }
   };
 
-  const handleBulkDelete = (invoiceIds: string[]) => {
-    const updatedInvoices = invoices.filter((invoice) => !invoiceIds.includes(invoice.id));
-    setInvoices(updatedInvoices);
-    setFilteredInvoices(updatedInvoices);
-    setSelectedInvoices([]);
-    
-    // Update localStorage
-    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+  const handleBulkDelete = async (invoiceIds: string[]) => {
+    try {
+      await Promise.all(invoiceIds.map(id => apiDeleteInvoice(id)));
+      const updatedInvoices = invoices.filter((invoice) => !invoiceIds.includes(invoice.id));
+      setInvoices(updatedInvoices);
+      setFilteredInvoices(updatedInvoices);
+      setSelectedInvoices([]);
+    } catch (err: any) {
+      toast({ title: "Delete Failed", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleSelectInvoice = (invoiceId: string, checked: boolean) => {
