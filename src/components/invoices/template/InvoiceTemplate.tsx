@@ -57,6 +57,9 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
               @page {
                 size: A4;
                 margin: 10mm;
+                /* Remove browser default header and footer (date, URL, title, page number) */
+                margin-top: 0;
+                margin-bottom: 0;
               }
               body { margin: 0 !important; }
               .print\\:hidden { display: none !important; }
