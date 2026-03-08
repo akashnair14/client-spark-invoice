@@ -18,13 +18,15 @@ interface LoginFormProps {
   onResendEmail: () => void;
 }
 
+const formVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.08 } },
+  exit: { opacity: 0, x: 20, transition: { duration: 0.25 } },
+};
+
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.6 + i * 0.1, duration: 0.5, ease: "easeOut" as const },
-  }),
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -35,15 +37,16 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <motion.form
+      variants={formVariants}
       initial="hidden"
       animate="visible"
-      exit={{ opacity: 0, y: -15, transition: { duration: 0.25 } }}
+      exit="exit"
       onSubmit={onSubmit}
       autoComplete="on"
-      className="space-y-5 w-full"
+      className="space-y-4 w-full"
     >
       {/* Email */}
-      <motion.div variants={itemVariants} custom={0} className="space-y-2">
+      <motion.div variants={itemVariants} className="space-y-1.5">
         <label className="text-xs font-medium uppercase tracking-wider text-white/50">Email</label>
         <div className="relative">
           <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "email" ? "text-[#FF8A00]" : "text-white/30"}`} />
@@ -58,14 +61,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
             required
             type="email"
             spellCheck={false}
-            className="pl-10 h-[52px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
+            className="pl-10 h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
             style={focusedField === "email" ? { boxShadow: "0 0 20px rgba(255,138,0,0.08)" } : {}}
           />
         </div>
       </motion.div>
 
       {/* Password */}
-      <motion.div variants={itemVariants} custom={1} className="space-y-2">
+      <motion.div variants={itemVariants} className="space-y-1.5">
         <label className="text-xs font-medium uppercase tracking-wider text-white/50">Password</label>
         <div className="relative">
           <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "password" ? "text-[#FF8A00]" : "text-white/30"}`} />
@@ -80,7 +83,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             disabled={loading}
             required
             minLength={6}
-            className="pl-10 pr-11 h-[52px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
+            className="pl-10 pr-11 h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
             style={focusedField === "password" ? { boxShadow: "0 0 20px rgba(255,138,0,0.08)" } : {}}
           />
           <button
@@ -100,7 +103,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         {error && (
           <motion.div
             initial={{ opacity: 0, height: 0, scale: 0.95 }}
-            animate={{ opacity: 1, height: "auto", scale: 1, x: [0, -6, 6, -6, 6, 0] }}
+            animate={{ opacity: 1, height: "auto", scale: 1, x: [0, -5, 5, -5, 5, 0] }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.4 }}
             className="text-red-400 text-sm p-3 bg-red-500/10 border border-red-500/20 rounded-xl overflow-hidden"
@@ -110,8 +113,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Forgot password */}
-      <motion.div variants={itemVariants} custom={2} className="flex justify-between items-center">
+      {/* Forgot / Resend */}
+      <motion.div variants={itemVariants} className="flex justify-between items-center">
         <button type="button" className="text-xs text-white/40 hover:text-[#FF8A00] transition-colors" onClick={onForgotPassword}>
           Forgot password?
         </button>
@@ -121,15 +124,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
       </motion.div>
 
       {/* Submit */}
-      <motion.div variants={itemVariants} custom={3}>
-        <motion.div whileHover={{ scale: loading ? 1 : 1.02, y: loading ? 0 : -2 }} whileTap={{ scale: loading ? 1 : 0.97 }}>
+      <motion.div variants={itemVariants}>
+        <motion.div whileHover={{ scale: loading ? 1 : 1.015, y: loading ? 0 : -1 }} whileTap={{ scale: loading ? 1 : 0.97 }}>
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-[52px] font-semibold text-base rounded-xl text-white relative overflow-hidden border-0"
+            className="w-full h-12 font-semibold text-base rounded-xl text-white relative overflow-hidden border-0"
             style={{
               background: "linear-gradient(135deg, #FF8A00 0%, #FFB347 100%)",
-              boxShadow: "0 8px 32px rgba(255,138,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+              boxShadow: "0 8px 28px rgba(255,138,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1)",
             }}
           >
             {loading && (
