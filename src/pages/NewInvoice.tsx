@@ -40,6 +40,8 @@ const NewInvoice = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (initialized) return;
