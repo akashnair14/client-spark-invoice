@@ -8,9 +8,21 @@ import ClientInfoCard from "@/components/clients/ClientInfoCard";
 import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
 import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
 import { getInvoices } from "@/api/invoices";
+import { mapDbClient, clientToDbFields } from "@/utils/transformers";
+import { Skeleton } from "@/components/ui/skeleton";
 import PageSEO from "@/components/seo/PageSEO";
-
-
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -19,11 +31,12 @@ const ClientDetails = () => {
 
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [clientInvoices, setClientInvoices] = useState<any[]>([]); // Future: Use getInvoicesByClient API
+  const [clientInvoices, setClientInvoices] = useState<any[]>([]);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [currentYearInvoices, setCurrentYearInvoices] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
   const [selectedYear, setSelectedYear] = useState<string>("All");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const PAGE_SIZE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -37,31 +50,9 @@ const ClientDetails = () => {
 
     getClient(id)
       .then(async (data) => {
-        setClient({
-          id: data.id,
-          companyName: data.company_name,
-          contactName: data.contact_name ?? "",
-          gstNumber: data.gst_number ?? "",
-          phoneNumber: data.phone_number ?? "",
-          phone: data.phone_number ?? "",
-          email: data.email ?? "",
-          bankAccountNumber: data.bank_account_number ?? "",
-          bankDetails: data.bank_details ?? "",
-          address: data.address ?? "",
-          city: data.city ?? "",
-          state: data.state ?? "",
-          postalCode: data.postal_code ?? "",
-          website: data.website ?? "",
-          tags: data.tags ?? [],
-          status: data.status as any,
-          lastInvoiceDate: data.last_invoice_date ?? undefined,
-          totalInvoiced: data.total_invoiced ?? undefined,
-          pendingInvoices: data.pending_invoices ?? undefined,
-          fyInvoices: data.fy_invoices ?? undefined,
-        });
+        setClient(mapDbClient(data));
         setLoading(false);
 
-        // Load client invoices from database
         const allInvoices = await getInvoices();
         const clientInvs = allInvoices
           .filter((inv: any) => inv.client_id === id)
@@ -79,7 +70,6 @@ const ClientDetails = () => {
           }));
         setClientInvoices(clientInvs);
 
-        // Compute current FY invoices
         const today = new Date();
         const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
         const startDate = new Date(`${currentYear}-04-01`);
@@ -90,7 +80,7 @@ const ClientDetails = () => {
         });
         setCurrentYearInvoices(fyInvs);
       })
-      .catch((err) => {
+      .catch(() => {
         setLoading(false);
         setClient(null);
       });
@@ -131,8 +121,18 @@ const ClientDetails = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center h-[60vh]">
-          <h2 className="text-xl font-semibold">Loading client details…</h2>
+        <div className="space-y-6 p-1">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 w-10 rounded" />
+            <div>
+              <Skeleton className="h-7 w-48 mb-2" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Skeleton className="h-64 rounded-xl" />
+            <Skeleton className="h-64 rounded-xl md:col-span-2" />
+          </div>
         </div>
       </Layout>
     );
@@ -144,43 +144,19 @@ const ClientDetails = () => {
         <div className="flex flex-col items-center justify-center h-[60vh]">
           <h2 className="text-xl font-semibold">Client not found</h2>
           <p className="text-muted-foreground mt-2">The client you're looking for doesn't exist.</p>
-          <button
-            className="mt-4 bg-muted px-4 py-2 rounded border"
-            onClick={() => navigate('/clients')}
-          >
-            &larr; Back to Clients
-          </button>
+          <Button variant="outline" className="mt-4" onClick={() => navigate('/clients')}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Clients
+          </Button>
         </div>
       </Layout>
     );
   }
 
-  // Handlers
   const handleEditClient = async (updatedClient: Omit<Client, "id">) => {
     if (!id) return;
-    // Send updates to backend
-    const updates = {
-      company_name: updatedClient.companyName,
-      contact_name: updatedClient.contactName,
-      gst_number: updatedClient.gstNumber,
-      phone_number: updatedClient.phoneNumber,
-      bank_account_number: updatedClient.bankAccountNumber,
-      bank_details: updatedClient.bankDetails,
-      address: updatedClient.address,
-      city: updatedClient.city,
-      state: updatedClient.state,
-      postal_code: updatedClient.postalCode,
-      website: updatedClient.website,
-      tags: updatedClient.tags,
-      status: updatedClient.status,
-      email: updatedClient.email,
-    };
     try {
-      await updateClient(id, updates);
-      setClient({
-        ...client,
-        ...updatedClient
-      });
+      await updateClient(id, clientToDbFields(updatedClient));
+      setClient({ ...client, ...updatedClient });
       setIsEditClientOpen(false);
       toast({
         title: "Client Updated",
@@ -195,7 +171,7 @@ const ClientDetails = () => {
     }
   };
 
-  const handleDeleteClient = async () => {
+  const confirmDeleteClient = async () => {
     try {
       if (id) await apiDeleteClient(id);
       toast({
@@ -209,6 +185,8 @@ const ClientDetails = () => {
         description: error.message,
         variant: "destructive"
       });
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
@@ -223,56 +201,66 @@ const ClientDetails = () => {
         description={`Profile and invoices for ${client.companyName}`}
         canonicalUrl={window.location.origin + "/clients/" + client.id}
       />
-      <div className="animate-fade-in">
-        <div className="page-header flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <button
-            className="mr-4 p-2 rounded border"
-            onClick={() => navigate('/clients')}
-          >
-            &larr;
-          </button>
+      <div className="animate-fade-in space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => navigate('/clients')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <div>
-            <h1 className="page-title">{client.companyName}</h1>
-            <p className="page-description text-sm text-muted-foreground">
-              Client profile and details
-            </p>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">{client.companyName}</h1>
+            <p className="text-sm text-muted-foreground">Client profile and details</p>
           </div>
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <ClientInfoCard
-          client={client}
-          currentYearInvoicesCount={currentYearInvoices.length}
-          onCreateInvoice={handleCreateInvoice}
-          onEdit={() => setIsEditClientOpen(true)}
-          onDelete={handleDeleteClient}
-        />
-        <ClientInvoicesCard
-          client={client}
-          invoices={clientInvoices}
-          filteredInvoices={filteredInvoices}
-          paginatedInvoices={paginatedInvoices}
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          resetFilters={resetFilters}
-          onCreateInvoice={handleCreateInvoice}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          PAGE_SIZE={PAGE_SIZE}
-        />
-      </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <ClientInfoCard
+            client={client}
+            currentYearInvoicesCount={currentYearInvoices.length}
+            onCreateInvoice={handleCreateInvoice}
+            onEdit={() => setIsEditClientOpen(true)}
+            onDelete={() => setShowDeleteDialog(true)}
+          />
+          <ClientInvoicesCard
+            client={client}
+            invoices={clientInvoices}
+            filteredInvoices={filteredInvoices}
+            paginatedInvoices={paginatedInvoices}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            resetFilters={resetFilters}
+            onCreateInvoice={handleCreateInvoice}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+            PAGE_SIZE={PAGE_SIZE}
+          />
+        </div>
 
-      <ClientForm
-        open={isEditClientOpen}
-        onClose={() => setIsEditClientOpen(false)}
-        onSubmit={handleEditClient}
-        initialData={client}
-      />
+        <ClientForm
+          open={isEditClientOpen}
+          onClose={() => setIsEditClientOpen(false)}
+          onSubmit={handleEditClient}
+          initialData={client}
+        />
+
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Client</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete <span className="font-semibold">{client.companyName}</span>? This will also affect associated invoices.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteClient} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 const Clients = lazy(() => import("./pages/Clients"));
 const NewClient = lazy(() => import("./pages/NewClient"));
@@ -39,6 +40,10 @@ const LoadingFallback = () => (
   </div>
 );
 
+const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>{children}</ProtectedRoute>
+);
+
 const App = () => (
   <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
     <QueryClientProvider client={queryClient}>
@@ -51,16 +56,16 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/clients/new" element={<NewClient />} />
-                <Route path="/clients/:id" element={<ClientDetails />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/invoices/new" element={<NewInvoice />} />
-                <Route path="/invoices/:id" element={<InvoiceDetails />} />
-                <Route path="/manage-invoice-status" element={<ManageInvoiceStatusPage />} />
-                <Route path="/templates" element={<Templates />} />
-                <Route path="/templates/designer" element={<TemplateDesigner />} />
+                <Route path="/dashboard" element={<ProtectedPage><Dashboard /></ProtectedPage>} />
+                <Route path="/clients" element={<ProtectedPage><Clients /></ProtectedPage>} />
+                <Route path="/clients/new" element={<ProtectedPage><NewClient /></ProtectedPage>} />
+                <Route path="/clients/:id" element={<ProtectedPage><ClientDetails /></ProtectedPage>} />
+                <Route path="/invoices" element={<ProtectedPage><Invoices /></ProtectedPage>} />
+                <Route path="/invoices/new" element={<ProtectedPage><NewInvoice /></ProtectedPage>} />
+                <Route path="/invoices/:id" element={<ProtectedPage><InvoiceDetails /></ProtectedPage>} />
+                <Route path="/manage-invoice-status" element={<ProtectedPage><ManageInvoiceStatusPage /></ProtectedPage>} />
+                <Route path="/templates" element={<ProtectedPage><Templates /></ProtectedPage>} />
+                <Route path="/templates/designer" element={<ProtectedPage><TemplateDesigner /></ProtectedPage>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
