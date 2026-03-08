@@ -37,6 +37,7 @@ import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
 import { getClients } from "@/api/clients";
 import { getInvoices as fetchInvoices, deleteInvoice as apiDeleteInvoice, updateInvoiceStatus as apiUpdateInvoiceStatus } from "@/api/invoices";
+import PageSEO from "@/components/seo/PageSEO";
 
 const Invoices = () => {
   const { toast } = useToast();
