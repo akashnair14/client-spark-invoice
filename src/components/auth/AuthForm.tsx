@@ -169,7 +169,7 @@ const AuthForm: React.FC = () => {
           }}
         >
           {/* ─── LEFT: Branding Panel ─── */}
-          <div className="hidden lg:flex flex-col justify-between p-10 xl:p-14 relative overflow-hidden min-h-0 min-h-0">
+          <div className="hidden lg:flex flex-col justify-between p-8 xl:p-10 relative overflow-hidden">
             {/* Background accent */}
             <div className="absolute inset-0 pointer-events-none">
               <div
