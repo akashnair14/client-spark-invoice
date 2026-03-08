@@ -1,11 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
-export interface PaginationParams {
-  page?: number;
-  pageSize?: number;
-}
-
 export interface PaginatedResult<T> {
   data: T[];
   count: number;
@@ -14,8 +9,19 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
-export async function getClients(params?: PaginationParams) {
-  const { page = 1, pageSize = 50 } = params || {};
+/** Fetch all clients (no pagination) */
+export async function getClients() {
+  const { data, error } = await supabase
+    .from('clients')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+/** Fetch clients with server-side pagination */
+export async function getClientsPaginated(page = 1, pageSize = 50) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -26,19 +32,13 @@ export async function getClients(params?: PaginationParams) {
     .range(from, to);
 
   if (error) throw new Error(error.message);
-  return params
-    ? { data: data || [], count: count || 0, page, pageSize, totalPages: Math.ceil((count || 0) / pageSize) } as PaginatedResult<typeof data[0]>
-    : (data || []);
-}
-
-export async function getAllClients() {
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) throw new Error(error.message);
-  return data || [];
+  return {
+    data: data || [],
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: Math.ceil((count || 0) / pageSize),
+  } satisfies PaginatedResult<(typeof data)[0]>;
 }
 
 export async function getClient(id: string) {

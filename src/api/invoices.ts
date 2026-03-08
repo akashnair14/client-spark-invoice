@@ -1,11 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
-export interface PaginationParams {
-  page?: number;
-  pageSize?: number;
-}
-
 export interface PaginatedResult<T> {
   data: T[];
   count: number;
@@ -14,8 +9,19 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
-export async function getInvoices(params?: PaginationParams) {
-  const { page = 1, pageSize = 50 } = params || {};
+/** Fetch all invoices (no pagination) */
+export async function getInvoices() {
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*, clients(company_name), invoice_items(*)')
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+/** Fetch invoices with server-side pagination */
+export async function getInvoicesPaginated(page = 1, pageSize = 50) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -26,19 +32,13 @@ export async function getInvoices(params?: PaginationParams) {
     .range(from, to);
 
   if (error) throw new Error(error.message);
-  return params
-    ? { data: data || [], count: count || 0, page, pageSize, totalPages: Math.ceil((count || 0) / pageSize) } as PaginatedResult<typeof data[0]>
-    : (data || []);
-}
-
-export async function getAllInvoices() {
-  const { data, error } = await supabase
-    .from('invoices')
-    .select('*, clients(company_name), invoice_items(*)')
-    .order('created_at', { ascending: false });
-
-  if (error) throw new Error(error.message);
-  return data || [];
+  return {
+    data: data || [],
+    count: count || 0,
+    page,
+    pageSize,
+    totalPages: Math.ceil((count || 0) / pageSize),
+  } satisfies PaginatedResult<(typeof data)[0]>;
 }
 
 export async function getInvoice(id: string) {
