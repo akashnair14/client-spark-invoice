@@ -92,7 +92,7 @@ const InvoiceTemplateFooter = ({
       {notes && (
         <div className="mb-6">
           <h4 className="text-base font-semibold mb-2 text-foreground">Notes & Terms:</h4>
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{notes}</p>
+          <p className="text-sm text-foreground/80 leading-relaxed">{notes}</p>
         </div>
       )}
       
