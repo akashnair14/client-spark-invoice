@@ -15,7 +15,7 @@ const RecentClients: React.FC<Props> = ({ clients }) => {
     <Card className="animate-enter">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-700" />
+          <Users className="w-5 h-5 text-primary" />
           Recent Clients
         </CardTitle>
       </CardHeader>
