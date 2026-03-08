@@ -169,7 +169,7 @@ const AuthForm: React.FC = () => {
           }}
         >
           {/* ─── LEFT: Branding Panel ─── */}
-          <div className="hidden lg:flex flex-col justify-between p-10 xl:p-14 relative overflow-hidden min-h-0">
+          <div className="hidden lg:flex flex-col justify-between p-10 xl:p-14 relative overflow-hidden min-h-0 min-h-0">
             {/* Background accent */}
             <div className="absolute inset-0 pointer-events-none">
               <div
@@ -242,7 +242,7 @@ const AuthForm: React.FC = () => {
                     className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                     style={{ background: "rgba(255,138,0,0.1)", border: "1px solid rgba(255,138,0,0.15)" }}
                   >
-                    <f.icon className="w-4.5 h-4.5 text-[#FF8A00]" />
+                    <f.icon class5 h-4.5 h-4.5 text-[#FF8A00]" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-white/80">{f.title}</div>
