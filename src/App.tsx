@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import PremiumLoader from "@/components/ui/PremiumLoader";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
