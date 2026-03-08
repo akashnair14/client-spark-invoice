@@ -10,7 +10,6 @@ import {
   updateInvoiceTemplate, 
   getInvoiceTemplate 
 } from "@/api/invoiceTemplates";
-import { getAuthToken } from "@/config/api";
 
 const TemplateDesigner = () => {
   const navigate = useNavigate();
