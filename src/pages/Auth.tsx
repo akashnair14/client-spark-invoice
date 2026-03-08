@@ -47,7 +47,7 @@ const Auth = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="h-full w-full overflow-y-auto overflow-x-hidden relative z-10 scrollbar-hide"
+          className="h-full w-full overflow-hidden relative z-10"
         >
           <AuthForm />
         </motion.div>
