@@ -280,15 +280,14 @@ const AuthForm: React.FC = () => {
 
               {/* Tabs */}
               <div className="mb-6">
-                <div className="flex gap-1 p-1 bg-surface-2 rounded-xl border border-border/30 w-full sm:w-auto sm:inline-flex">
+                <div className="flex gap-1 p-1 bg-muted rounded-xl border border-border/30 w-full sm:w-auto sm:inline-flex">
                   {(["login", "register"] as const).map((t) => (
-                    <motion.button
+                    <button
                       key={t}
-                      whileTap={{ scale: 0.97 }}
-                      className={`relative flex-1 sm:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 ${
+                      className={`relative flex-1 sm:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                         tab === t
-                          ? "text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10"
                       }`}
                       onClick={() => handleTabSwitch(t)}
                       type="button"
@@ -296,16 +295,7 @@ const AuthForm: React.FC = () => {
                       aria-selected={tab === t}
                       role="tab"
                     >
-                      <AnimatePresence>
-                        {tab === t && (
-                          <motion.span
-                            layoutId="activeTab"
-                            className="absolute inset-0 bg-primary rounded-lg -z-10"
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                          />
-                        )}
-                      </AnimatePresence>
-                      <span className="relative z-10 flex items-center justify-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         {t === "login" ? (
                           <>
                             <LogIn className="w-4 h-4" /> Sign In
@@ -316,7 +306,7 @@ const AuthForm: React.FC = () => {
                           </>
                         )}
                       </span>
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
               </div>
