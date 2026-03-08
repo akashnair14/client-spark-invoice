@@ -36,7 +36,7 @@ const ClientDetails = () => {
     setLoading(true);
 
     getClient(id)
-      .then((data) => {
+      .then(async (data) => {
         setClient({
           id: data.id,
           companyName: data.company_name,
