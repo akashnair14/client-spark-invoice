@@ -173,7 +173,7 @@ const AuthForm: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent px-4 py-8 w-full">
+    <div className="h-screen flex items-center justify-center bg-transparent px-4 w-full overflow-hidden">
       <ConfirmEmailDialog
         open={showConfirmPopup}
         onOpenChange={setShowConfirmPopup}
