@@ -244,53 +244,55 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         {/* Confirm Password Input */}
         <motion.div
           variants={itemVariants}
-          className="relative group"
+          className="group"
         >
-          <motion.div
-            animate={{
-              scale: focusedField === "confirm" ? 1.1 : 1,
-            }}
-            transition={{ duration: 0.2 }}
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-              focusedField === "confirm" ? "text-primary" : "text-muted-foreground/50"
-            }`}
-          >
-            <Lock className="w-full h-full" />
-          </motion.div>
-          <Input
-            placeholder="Confirm password"
-            type={showConfirm ? "text" : "password"}
-            autoComplete="new-password"
-            value={confirm}
-            onChange={e => setConfirm(e.target.value)}
-            onFocus={() => setFocusedField("confirm")}
-            onBlur={() => setFocusedField(null)}
-            disabled={loading}
-            required
-            minLength={6}
-            className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
-          />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-            tabIndex={0}
-            aria-label={showConfirm ? "Hide password" : "Show password"}
-            onClick={() => setShowConfirm(v => !v)}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={showConfirm ? "hide" : "show"}
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
-              >
-                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </motion.div>
-            </AnimatePresence>
-          </motion.button>
+          <div className="relative">
+            <motion.div
+              animate={{
+                scale: focusedField === "confirm" ? 1.1 : 1,
+              }}
+              transition={{ duration: 0.2 }}
+              className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                focusedField === "confirm" ? "text-primary" : "text-muted-foreground/50"
+              }`}
+            >
+              <Lock className="w-full h-full" />
+            </motion.div>
+            <Input
+              placeholder="Confirm password"
+              type={showConfirm ? "text" : "password"}
+              autoComplete="new-password"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              onFocus={() => setFocusedField("confirm")}
+              onBlur={() => setFocusedField(null)}
+              disabled={loading}
+              required
+              minLength={6}
+              className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
+            />
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+              tabIndex={0}
+              aria-label={showConfirm ? "Hide password" : "Show password"}
+              onClick={() => setShowConfirm(v => !v)}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={showConfirm ? "hide" : "show"}
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
+          </div>
           
           {/* Password Match Indicator */}
           <AnimatePresence>
