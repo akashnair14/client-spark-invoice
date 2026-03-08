@@ -7,7 +7,10 @@ import { useToast } from "@/components/ui/use-toast";
 import ClientInfoCard from "@/components/clients/ClientInfoCard";
 import ClientInvoicesCard from "@/components/clients/ClientInvoicesCard";
 import { getClient, updateClient, deleteClient as apiDeleteClient } from "@/api/clients";
+import { getInvoices } from "@/api/invoices";
 import PageSEO from "@/components/seo/PageSEO";
+
+
 
 const ClientDetails = () => {
   const { id } = useParams();
@@ -33,7 +36,7 @@ const ClientDetails = () => {
     setLoading(true);
 
     getClient(id)
-      .then((data) => {
+      .then(async (data) => {
         setClient({
           id: data.id,
           companyName: data.company_name,
@@ -58,15 +61,34 @@ const ClientDetails = () => {
         });
         setLoading(false);
 
-        // Future: Load client invoices from database
-        setClientInvoices([]); // Will be replaced with: getInvoicesByClient(id)
+        // Load client invoices from database
+        const allInvoices = await getInvoices();
+        const clientInvs = allInvoices
+          .filter((inv: any) => inv.client_id === id)
+          .map((inv: any) => ({
+            id: inv.id,
+            invoiceNumber: inv.invoice_number,
+            clientId: inv.client_id,
+            date: inv.date,
+            dueDate: inv.due_date,
+            status: inv.status,
+            subtotal: Number(inv.subtotal),
+            gstAmount: Number(inv.gst_amount),
+            total: Number(inv.total),
+            amount: Number(inv.total),
+          }));
+        setClientInvoices(clientInvs);
 
-        // Compute current FY
+        // Compute current FY invoices
         const today = new Date();
         const currentYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
         const startDate = new Date(`${currentYear}-04-01`);
         const endDate = new Date(`${currentYear + 1}-03-31`);
-        setCurrentYearInvoices([]);
+        const fyInvs = clientInvs.filter((inv: any) => {
+          const d = new Date(inv.date);
+          return d >= startDate && d <= endDate;
+        });
+        setCurrentYearInvoices(fyInvs);
       })
       .catch((err) => {
         setLoading(false);
