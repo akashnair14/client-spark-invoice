@@ -15,6 +15,7 @@ import InvoicePreview from "@/components/invoices/InvoicePreview";
 import { Client, Invoice } from "@/types";
 import { getInvoice } from "@/api/invoices";
 import { getClient } from "@/api/clients";
+import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
