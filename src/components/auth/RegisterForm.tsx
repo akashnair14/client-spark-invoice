@@ -296,20 +296,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <AnimatePresence>
             {confirm && (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="absolute -right-8 top-1/2 -translate-y-1/2"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 overflow-hidden"
               >
-                {passwordsMatch ? (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  >
-                    <Check className="w-5 h-5 text-green-500" />
-                  </motion.div>
-                ) : null}
+                <div className="flex items-center gap-2">
+                  {passwordsMatch ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                      <span className="text-xs text-green-500">Passwords match</span>
+                    </>
+                  ) : (
+                    <>
+                      <X className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <span className="text-xs text-red-400">Passwords do not match</span>
+                    </>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
