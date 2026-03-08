@@ -18,249 +18,136 @@ interface LoginFormProps {
   onResendEmail: () => void;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    }
-  },
-  exit: {
-    opacity: 0,
-    y: -20,
-    transition: { duration: 0.3 }
-  }
-};
-
 const itemVariants = {
-  hidden: { opacity: 0, x: -20, y: 10 },
-  visible: {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
     opacity: 1,
-    x: 0,
     y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 24
-    }
-  }
+    transition: { delay: 0.6 + i * 0.1, duration: 0.5, ease: "easeOut" as const },
+  }),
 };
 
 const LoginForm: React.FC<LoginFormProps> = ({
-  email,
-  password,
-  showPass,
-  setEmail,
-  setPassword,
-  setShowPass,
-  loading,
-  error,
-  onSubmit,
-  onForgotPassword,
-  onResendEmail
+  email, password, showPass, setEmail, setPassword, setShowPass,
+  loading, error, onSubmit, onForgotPassword, onResendEmail,
 }) => {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
-  
+
   return (
     <motion.form
-      variants={containerVariants}
       initial="hidden"
       animate="visible"
-      exit="exit"
+      exit={{ opacity: 0, y: -15, transition: { duration: 0.25 } }}
       onSubmit={onSubmit}
       autoComplete="on"
       className="space-y-5 w-full"
     >
-      <div className="space-y-4">
-        {/* Email Input with animated focus */}
-        <motion.div
-          variants={itemVariants}
-          className="relative group"
-        >
-          <motion.div
-            animate={{
-              scale: focusedField === "email" ? 1.1 : 1,
-            }}
-            transition={{ duration: 0.2 }}
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-              focusedField === "email" ? "text-primary" : "text-muted-foreground/50"
-            }`}
-          >
-            <Mail className="w-full h-full" />
-          </motion.div>
+      {/* Email */}
+      <motion.div variants={itemVariants} custom={0} className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-white/50">Email</label>
+        <div className="relative">
+          <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "email" ? "text-[#FF8A00]" : "text-white/30"}`} />
           <Input
-            placeholder="Email address"
+            placeholder="you@company.com"
             autoComplete="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             disabled={loading}
             required
             type="email"
             spellCheck={false}
-            className="pl-10 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
+            className="pl-10 h-[52px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
+            style={focusedField === "email" ? { boxShadow: "0 0 20px rgba(255,138,0,0.08)" } : {}}
           />
-        </motion.div>
-        
-        {/* Password Input with animated focus */}
-        <motion.div
-          variants={itemVariants}
-          className="relative group"
-        >
-          <motion.div
-            animate={{
-              scale: focusedField === "password" ? 1.1 : 1,
-            }}
-            transition={{ duration: 0.2 }}
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-              focusedField === "password" ? "text-primary" : "text-muted-foreground/50"
-            }`}
-          >
-            <Lock className="w-full h-full" />
-          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Password */}
+      <motion.div variants={itemVariants} custom={1} className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-white/50">Password</label>
+        <div className="relative">
+          <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${focusedField === "password" ? "text-[#FF8A00]" : "text-white/30"}`} />
           <Input
-            placeholder="Password"
+            placeholder="••••••••"
             type={showPass ? "text" : "password"}
             autoComplete="current-password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             onFocus={() => setFocusedField("password")}
             onBlur={() => setFocusedField(null)}
             disabled={loading}
             required
             minLength={6}
-            className="pl-10 pr-11 h-12 bg-background/60 border-border/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary transition-all rounded-xl placeholder:text-muted-foreground/60 hover:bg-background/80 hover:border-border shadow-sm"
+            className="pl-10 pr-11 h-[52px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF8A00]/50 focus-visible:border-[#FF8A00]/40 transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.12]"
+            style={focusedField === "password" ? { boxShadow: "0 0 20px rgba(255,138,0,0.08)" } : {}}
           />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1"
+            onClick={() => setShowPass((v) => !v)}
             tabIndex={0}
             aria-label={showPass ? "Hide password" : "Show password"}
-            onClick={() => setShowPass(v => !v)}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={showPass ? "hide" : "show"}
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
-              >
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </motion.div>
-            </AnimatePresence>
-          </motion.button>
-        </motion.div>
-      </div>
+            {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+      </motion.div>
 
-      {/* Animated Error Message */}
-      <AnimatePresence mode="wait">
+      {/* Error */}
+      <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, height: 0 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              height: "auto",
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 30
-              }
-            }}
-            exit={{ 
-              opacity: 0, 
-              scale: 0.95, 
-              height: 0,
-              transition: { duration: 0.2 }
-            }}
-            className="text-destructive text-sm p-3 bg-destructive/10 border border-destructive/20 rounded-lg overflow-hidden"
+            initial={{ opacity: 0, height: 0, scale: 0.95 }}
+            animate={{ opacity: 1, height: "auto", scale: 1, x: [0, -6, 6, -6, 6, 0] }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-red-400 text-sm p-3 bg-red-500/10 border border-red-500/20 rounded-xl overflow-hidden"
           >
-            <motion.div
-              initial={{ x: -5 }}
-              animate={{ x: [0, -5, 5, -5, 5, 0] }}
-              transition={{ duration: 0.5 }}
-            >
-              {error}
-            </motion.div>
+            {error}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Animated Submit Button */}
-      <motion.div variants={itemVariants}>
-        <motion.div
-          whileHover={{ 
-            scale: loading ? 1 : 1.02,
-            transition: { type: "spring", stiffness: 400, damping: 10 }
-          }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-        >
+      {/* Forgot password */}
+      <motion.div variants={itemVariants} custom={2} className="flex justify-between items-center">
+        <button type="button" className="text-xs text-white/40 hover:text-[#FF8A00] transition-colors" onClick={onForgotPassword}>
+          Forgot password?
+        </button>
+        <button type="button" className="text-xs text-white/40 hover:text-[#FF8A00] transition-colors" onClick={onResendEmail}>
+          Resend verification
+        </button>
+      </motion.div>
+
+      {/* Submit */}
+      <motion.div variants={itemVariants} custom={3}>
+        <motion.div whileHover={{ scale: loading ? 1 : 1.02, y: loading ? 0 : -2 }} whileTap={{ scale: loading ? 1 : 0.97 }}>
           <Button
             type="submit"
-            className="w-full h-12 font-semibold text-base bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 rounded-xl relative overflow-hidden group"
             disabled={loading}
+            className="w-full h-[52px] font-semibold text-base rounded-xl text-white relative overflow-hidden border-0"
+            style={{
+              background: "linear-gradient(135deg, #FF8A00 0%, #FFB347 100%)",
+              boxShadow: "0 8px 32px rgba(255,138,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+            }}
           >
             {loading && (
               <motion.div
-                className="absolute inset-0 bg-primary/20"
-                animate={{ x: ["-100%", "100%"] }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               />
             )}
-            <span className="relative z-10 flex items-center justify-center">
+            <span className="relative z-10 flex items-center justify-center gap-2">
               {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  <span>Signing in...</span>
-                </>
+                <><Loader2 className="w-5 h-5 animate-spin" /> Signing in...</>
               ) : (
-                <>
-                  <LogIn className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1" />
-                  Sign In
-                </>
+                <><LogIn className="w-5 h-5" /> Sign In</>
               )}
             </span>
           </Button>
         </motion.div>
-      </motion.div>
-
-      {/* Animated Links */}
-      <motion.div
-        variants={itemVariants}
-        className="flex justify-between items-center text-xs pt-1"
-      >
-        <motion.button
-          whileHover={{ 
-            scale: 1.05, 
-            x: 2,
-            transition: { type: "spring", stiffness: 400, damping: 10 }
-          }}
-          whileTap={{ scale: 0.95 }}
-          type="button"
-          className="text-muted-foreground hover:text-primary transition-colors underline-offset-4 hover:underline"
-          onClick={onForgotPassword}
-        >
-          Forgot password?
-        </motion.button>
-        <motion.button
-          whileHover={{ 
-            scale: 1.05, 
-            x: -2,
-            transition: { type: "spring", stiffness: 400, damping: 10 }
-          }}
-          whileTap={{ scale: 0.95 }}
-          type="button"
-          className="text-muted-foreground hover:text-primary transition-colors underline-offset-4 hover:underline"
-          onClick={onResendEmail}
-        >
-          Resend verification
-        </motion.button>
       </motion.div>
     </motion.form>
   );
