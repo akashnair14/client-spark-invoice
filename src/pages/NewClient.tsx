@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Client } from "@/types";
 import { createClient } from "@/api/clients";
-import { getCurrentUserId } from "@/utils/authUtils";
 import PageSEO from "@/components/seo/PageSEO";
 
 // Utility function to convert Client form values to snake_case for .NET Core backend
