@@ -35,6 +35,23 @@ const AuthForm: React.FC = () => {
 
   const [lastRegisteredEmail, setLastRegisteredEmail] = useState("");
   const [lastRegisteredPassword, setLastRegisteredPassword] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result?.error) {
+        toast({ title: "Google Sign In Failed", description: String(result.error), variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Google sign in failed", variant: "destructive" });
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleTabSwitch = (target: "login" | "register") => {
     setTab(target);
