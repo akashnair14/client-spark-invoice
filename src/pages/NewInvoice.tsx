@@ -37,8 +37,10 @@ const NewInvoice = () => {
   const [clientsLoading, setClientsLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    if (initialized) return;
     setClientsLoading(true);
     getClients()
       .then((data) => {
@@ -66,6 +68,7 @@ const NewInvoice = () => {
         });
         setClients(data.map(mapClient));
         setClientsLoading(false);
+        setInitialized(true);
 
         // Handle edit mode from URL params or location state
         const editId = searchParams.get("edit");
@@ -74,22 +77,22 @@ const NewInvoice = () => {
         const viewMode = location.state?.viewMode;
 
         if (editId && editInvoice && editClient) {
+          const isView = viewMode || false;
           setIsEditMode(true);
-          setIsViewMode(viewMode || false);
+          setIsViewMode(isView);
           setSelectedClient(editClient);
           setInvoiceData(editInvoice);
           calculateInvoiceTotals(editInvoice.items);
           
-          if (viewMode) {
+          if (isView) {
             setActiveTab("preview");
           }
           
           toast({
-            title: isViewMode ? "Invoice Loaded" : "Edit Mode",
-            description: `Invoice ${editInvoice.invoiceNumber} ${isViewMode ? 'loaded for viewing' : 'loaded for editing'}.`,
+            title: isView ? "Invoice Loaded" : "Edit Mode",
+            description: `Invoice ${editInvoice.invoiceNumber} ${isView ? 'loaded for viewing' : 'loaded for editing'}.`,
           });
         } else if (editId) {
-          // Try to load from localStorage if not in location state
           const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
           const invoiceToEdit = storedInvoices.find((inv: any) => inv.id === editId);
           
@@ -115,7 +118,6 @@ const NewInvoice = () => {
             navigate('/invoices');
           }
         } else {
-          // auto-select client if clientId param is present (for new invoices)
           const params = new URLSearchParams(location.search);
           const clientId = params.get("clientId");
           if (clientId) {
@@ -132,7 +134,7 @@ const NewInvoice = () => {
           variant: "destructive",
         });
       });
-  }, [location, setSelectedClient, searchParams, navigate, toast, setInvoiceData, calculateInvoiceTotals, setActiveTab]);
+  }, [initialized]);
 
   const handleInvoiceSubmit = (formData: any) => {
     const client = clients.find((c) => c.id === formData.clientId);
