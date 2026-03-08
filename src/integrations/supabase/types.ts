@@ -284,7 +284,19 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          company_address: string | null
+          company_bank_account: string | null
+          company_bank_ifsc: string | null
+          company_bank_name: string | null
+          company_city: string | null
+          company_email: string | null
+          company_gst_number: string | null
+          company_logo_url: string | null
           company_name: string | null
+          company_phone: string | null
+          company_postal_code: string | null
+          company_state: string | null
+          company_website: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -293,7 +305,19 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          company_address?: string | null
+          company_bank_account?: string | null
+          company_bank_ifsc?: string | null
+          company_bank_name?: string | null
+          company_city?: string | null
+          company_email?: string | null
+          company_gst_number?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
+          company_phone?: string | null
+          company_postal_code?: string | null
+          company_state?: string | null
+          company_website?: string | null
           created_at?: string
           full_name?: string | null
           id: string
@@ -302,7 +326,19 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          company_address?: string | null
+          company_bank_account?: string | null
+          company_bank_ifsc?: string | null
+          company_bank_name?: string | null
+          company_city?: string | null
+          company_email?: string | null
+          company_gst_number?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
+          company_phone?: string | null
+          company_postal_code?: string | null
+          company_state?: string | null
+          company_website?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
