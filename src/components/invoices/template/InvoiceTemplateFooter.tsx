@@ -92,28 +92,28 @@ const InvoiceTemplateFooter = ({
       {notes && (
         <div className="mb-6">
           <h4 className="text-base font-semibold mb-2 text-foreground">Notes & Terms:</h4>
-          <p className="text-sm text-muted-foreground leading-relaxed">{notes}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{notes}</p>
         </div>
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
           <h4 className="text-sm font-semibold mb-2 text-foreground">Payment Instructions:</h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Please make payment within the due date. Late payments may incur additional charges.
             For any queries, contact us at {companyDetails.email}
           </p>
         </div>
         <div className="md:text-right">
           <h4 className="text-sm font-semibold mb-2 text-foreground">Authorized Signature</h4>
-          <div className="h-16 border-b border-muted-foreground/50 mb-2"></div>
-          <p className="text-xs text-muted-foreground">For {companyDetails.name}</p>
+          <div className="h-16 border-b border-slate-400 dark:border-slate-500 mb-2"></div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">For {companyDetails.name}</p>
         </div>
       </div>
       
-      <div className="text-center text-xs text-muted-foreground border-t border-border pt-4">
+      <div className="text-center text-xs text-slate-500 dark:text-slate-400 border-t border-border pt-4">
         <p>This is a computer generated invoice and does not require physical signature.</p>
-        <p className="mt-1 font-medium">Thank you for your business!</p>
+        <p className="mt-1 font-semibold text-slate-600 dark:text-slate-300">Thank you for your business!</p>
       </div>
     </div>
   );

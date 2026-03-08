@@ -71,30 +71,30 @@ const InvoiceTemplateTotals = ({
       <div className="w-full max-w-sm">
         <div className="bg-muted/30 border rounded-lg overflow-hidden">
           <div className="space-y-0">
-            <div className="flex justify-between py-2 px-4 border-b border-border">
-              <span className="text-sm">Subtotal:</span>
-              <span className="text-sm font-medium">₹{subtotal.toFixed(2)}</span>
+            <div className="flex justify-between py-2.5 px-4 border-b border-border">
+              <span className="text-sm text-slate-600 dark:text-slate-300">Subtotal:</span>
+              <span className="text-sm font-semibold text-foreground">₹{subtotal.toFixed(2)}</span>
             </div>
             {cgstAmount > 0 && (
-              <div className="flex justify-between py-2 px-4 border-b border-border">
-                <span className="text-sm">CGST:</span>
-                <span className="text-sm font-medium">₹{cgstAmount.toFixed(2)}</span>
+              <div className="flex justify-between py-2.5 px-4 border-b border-border">
+                <span className="text-sm text-slate-600 dark:text-slate-300">CGST:</span>
+                <span className="text-sm font-semibold text-foreground">₹{cgstAmount.toFixed(2)}</span>
               </div>
             )}
             {sgstAmount > 0 && (
-              <div className="flex justify-between py-2 px-4 border-b border-border">
-                <span className="text-sm">SGST:</span>
-                <span className="text-sm font-medium">₹{sgstAmount.toFixed(2)}</span>
+              <div className="flex justify-between py-2.5 px-4 border-b border-border">
+                <span className="text-sm text-slate-600 dark:text-slate-300">SGST:</span>
+                <span className="text-sm font-semibold text-foreground">₹{sgstAmount.toFixed(2)}</span>
               </div>
             )}
             {roundoff !== 0 && (
-              <div className="flex justify-between py-2 px-4 border-b border-border">
-                <span className="text-sm">Round Off:</span>
-                <span className="text-sm font-medium">₹{roundoff.toFixed(2)}</span>
+              <div className="flex justify-between py-2.5 px-4 border-b border-border">
+                <span className="text-sm text-slate-600 dark:text-slate-300">Round Off:</span>
+                <span className="text-sm font-semibold text-foreground">₹{roundoff.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between py-3 px-4 bg-primary text-primary-foreground">
-              <span className="font-semibold">Total:</span>
+              <span className="font-bold">Total:</span>
               <span className="font-bold text-lg">₹{total.toFixed(2)}</span>
             </div>
           </div>
