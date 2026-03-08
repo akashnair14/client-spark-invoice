@@ -25,7 +25,7 @@ const itemVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.6 + i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+    transition: { delay: 0.6 + i * 0.1, duration: 0.5, ease: "easeOut" as const },
   }),
 };
 
