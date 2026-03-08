@@ -439,8 +439,7 @@ const Invoices = () => {
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={allSelected}
-                    indeterminate={someSelected}
+                    checked={allSelected ? true : someSelected ? "indeterminate" : false}
                     onCheckedChange={(checked) => {
                       if (checked) {
                         setSelectedInvoices(currentInvoices.map(i => i.id));
@@ -448,6 +447,7 @@ const Invoices = () => {
                         setSelectedInvoices([]);
                       }
                     }}
+                    aria-label="Select all invoices"
                   />
                 </TableHead>
                 <TableHead>Invoice #</TableHead>

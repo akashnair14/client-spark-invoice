@@ -1,4 +1,4 @@
-// Type definitions for .NET Core API
+// Type definitions for API
 
 export interface User {
   id: string;
@@ -98,9 +98,7 @@ export interface InvoiceTemplate {
 
 export type CreateClient = Omit<Client, 'id' | 'created_at' | 'updated_at'>;
 export type UpdateClient = Partial<CreateClient>;
-
 export type CreateInvoice = Omit<Invoice, 'id' | 'created_at' | 'updated_at' | 'owner_id'>;
 export type UpdateInvoice = Partial<CreateInvoice>;
-
 export type CreateInvoiceTemplate = Omit<InvoiceTemplate, 'id' | 'created_at' | 'updated_at' | 'owner_id'>;
 export type UpdateInvoiceTemplate = Partial<CreateInvoiceTemplate>;
