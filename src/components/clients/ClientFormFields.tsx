@@ -23,9 +23,9 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
         name="companyName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Company Name</FormLabel>
+            <FormLabel>Company Name <span className="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input placeholder="e.g. Acme Corp" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,7 +38,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>GST Number</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input placeholder="e.g. 22AAAAA0000A1Z5" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -51,7 +51,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>Phone Number</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input type="tel" inputMode="numeric" placeholder="e.g. 9876543210" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -64,7 +64,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="email" {...field} />
+              <Input type="email" placeholder="e.g. client@example.com" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -77,7 +77,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>Bank Account Number</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input inputMode="numeric" placeholder="e.g. 123456789012" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -90,7 +90,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem>
             <FormLabel>Bank Details</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input placeholder="e.g. HDFC Bank, IFSC: HDFC0001234" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -103,7 +103,7 @@ const ClientFormFields = ({ form }: ClientFormFieldsProps) => {
           <FormItem className="col-span-1 md:col-span-2">
             <FormLabel>Address</FormLabel>
             <FormControl>
-              <Textarea {...field} rows={3} />
+              <Textarea placeholder="Full address..." {...field} rows={3} />
             </FormControl>
             <FormMessage />
           </FormItem>
