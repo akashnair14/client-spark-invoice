@@ -5,23 +5,23 @@ import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import RecentClients from "@/components/dashboard/RecentClients";
 import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Users, Calendar, Bell, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, FileText, Users, Bell, RefreshCw, TrendingUp, TrendingDown, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import type { Client, Invoice } from "@/types";
 import PageSEO from "@/components/seo/PageSEO";
+import { cn } from "@/lib/utils";
 
-// Utility functions
 const getTopClients = (clients: Client[], invoices: Invoice[], n = 3) => {
-  const totals: Record<string, { name: string, sum: number }> = {};
-  invoices.forEach(inv => {
+  const totals: Record<string, { name: string; sum: number }> = {};
+  invoices.forEach((inv) => {
     if (!totals[inv.clientId]) {
-      const client = clients.find(c => c.id === inv.clientId);
-      totals[inv.clientId] = {
-        name: client?.companyName || inv.clientName,
-        sum: 0
-      };
+      const client = clients.find((c) => c.id === inv.clientId);
+      totals[inv.clientId] = { name: client?.companyName || inv.clientName, sum: 0 };
     }
     totals[inv.clientId].sum += inv.amount;
   });
@@ -31,72 +31,15 @@ const getTopClients = (clients: Client[], invoices: Invoice[], n = 3) => {
     .map(([cid, v]) => ({ clientId: cid, ...v }));
 };
 
-// Generate recent activity from actual data
-const generateRecentActivity = (clients: Client[], invoices: Invoice[]) => {
-  const activity = [];
-  
-  // Recent invoices
-  const recentInvoices = invoices
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
-  
-  recentInvoices.forEach(inv => {
-    activity.push({
-      time: "Recent",
-      message: `${inv.status === 'paid' ? 'Payment received' : 'Generated invoice'} for ${inv.clientName}`,
-    });
-  });
-  
-  // Recent clients
-  const recentClients = clients.slice(0, 2);
-  recentClients.forEach(client => {
-    activity.push({
-      time: "Recent",
-      message: `Client ${client.companyName} added`,
-    });
-  });
-  
-  return activity.slice(0, 4);
-};
-
-// Generate smart notifications from data
 const generateNotifications = (invoices: Invoice[]) => {
-  const notifications = [];
-  
-  // Overdue invoices
-  const overdueCount = invoices.filter(inv => inv.status === 'overdue').length;
-  if (overdueCount > 0) {
-    notifications.push({
-      id: 1,
-      text: `${overdueCount} invoice${overdueCount > 1 ? 's are' : ' is'} overdue`,
-      icon: <Bell className="w-4 h-4 text-red-500" />,
-      time: "Now"
-    });
-  }
-  
-  // Draft invoices
-  const draftCount = invoices.filter(inv => inv.status === 'draft').length;
-  if (draftCount > 0) {
-    notifications.push({
-      id: 2,
-      text: `${draftCount} draft invoice${draftCount > 1 ? 's need' : ' needs'} to be sent`,
-      icon: <FileText className="w-4 h-4 text-amber-500" />,
-      time: "Now"
-    });
-  }
-  
-  // Recent activity
-  const recentPaid = invoices.filter(inv => inv.status === 'paid').length;
-  if (recentPaid > 0) {
-    notifications.push({
-      id: 3,
-      text: `${recentPaid} payment${recentPaid > 1 ? 's' : ''} received this month`,
-      icon: <Users className="w-4 h-4 text-green-500" />,
-      time: "This month"
-    });
-  }
-  
-  return notifications.slice(0, 3);
+  const notifications: { id: number; text: string; type: "destructive" | "warning" | "success" }[] = [];
+  const overdueCount = invoices.filter((inv) => inv.status === "overdue").length;
+  if (overdueCount > 0) notifications.push({ id: 1, text: `${overdueCount} overdue invoice${overdueCount > 1 ? "s" : ""}`, type: "destructive" });
+  const draftCount = invoices.filter((inv) => inv.status === "draft").length;
+  if (draftCount > 0) notifications.push({ id: 2, text: `${draftCount} draft${draftCount > 1 ? "s" : ""} pending`, type: "warning" });
+  const paidCount = invoices.filter((inv) => inv.status === "paid").length;
+  if (paidCount > 0) notifications.push({ id: 3, text: `${paidCount} paid`, type: "success" });
+  return notifications;
 };
 
 const Dashboard: React.FC = () => {
@@ -104,7 +47,6 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { clients, invoices, loading, error, refetch } = useDashboardData();
 
-  // Filter data based on search
   const filteredClients = useMemo(() => {
     if (!search.trim()) return clients;
     return clients.filter(
@@ -113,7 +55,7 @@ const Dashboard: React.FC = () => {
         c.email?.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, clients]);
-  
+
   const filteredInvoices = useMemo(() => {
     if (!search.trim()) return invoices;
     return invoices.filter(
@@ -123,16 +65,12 @@ const Dashboard: React.FC = () => {
     );
   }, [search, invoices]);
 
-  // Computed data
   const topClients = useMemo(() => getTopClients(filteredClients, filteredInvoices), [filteredClients, filteredInvoices]);
-  const recentActivity = useMemo(() => generateRecentActivity(filteredClients, filteredInvoices), [filteredClients, filteredInvoices]);
   const notifications = useMemo(() => generateNotifications(filteredInvoices), [filteredInvoices]);
 
-  // Summary amounts by status
-  const paidAmount = filteredInvoices.reduce((sum, inv) => inv.status === "paid" ? sum + inv.amount : sum, 0);
-  const pendingAmount = filteredInvoices.reduce((sum, inv) => inv.status === "pending" ? sum + inv.amount : sum, 0);
-  const overdueAmount = filteredInvoices.reduce((sum, inv) => inv.status === "overdue" ? sum + inv.amount : sum, 0);
-
+  const paidAmount = filteredInvoices.reduce((sum, inv) => (inv.status === "paid" ? sum + inv.amount : sum), 0);
+  const pendingAmount = filteredInvoices.reduce((sum, inv) => (inv.status === "pending" ? sum + inv.amount : sum), 0);
+  const overdueAmount = filteredInvoices.reduce((sum, inv) => (inv.status === "overdue" ? sum + inv.amount : sum), 0);
   const hasData = filteredClients.length > 0 || filteredInvoices.length > 0;
 
   return (
@@ -142,293 +80,260 @@ const Dashboard: React.FC = () => {
         description="View key metrics, recent activity, clients and invoices."
         canonicalUrl={window.location.origin + "/dashboard"}
       />
-      <div className="pb-8">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-2">
+      <div className="pb-4 space-y-4 md:space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 dark:text-blue-100">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
               Dashboard
             </h1>
-            <p className="text-muted-foreground">
-              Welcome back! Here’s an overview of your business performance.
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Your business at a glance
             </p>
           </div>
-          {/* Quick Actions */}
-          <div className="flex gap-2 mt-2 md:mt-0">
-            <Button variant="default" className="flex gap-2" onClick={() => navigate("/invoices/new")}>
-              <Plus className="w-4 h-4" /> New Invoice
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => navigate("/invoices/new")} className="gap-1.5 shadow-sm">
+              <Plus className="w-4 h-4" /> Invoice
             </Button>
-            <Button variant="secondary" className="flex gap-2" onClick={() => navigate("/clients/new")}>
-              <Plus className="w-4 h-4" /> Add Client
+            <Button size="sm" variant="secondary" onClick={() => navigate("/clients/new")} className="gap-1.5">
+              <Plus className="w-4 h-4" /> Client
             </Button>
-            <Button variant="outline" size="sm" onClick={refetch} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <Button size="icon" variant="ghost" onClick={refetch} disabled={loading} className="h-8 w-8">
+              <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
             </Button>
           </div>
         </div>
 
-        {/* Smart Notifications */}
+        {/* Notifications */}
         {!loading && notifications.length > 0 && (
-          <div className="mb-6">
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-yellow-500 animate-pulse" />
-                <span className="font-medium text-yellow-900 dark:text-yellow-200">
-                  Notifications
-                </span>
-              </div>
-              <ul className="flex flex-wrap gap-3 ml-3">
-                {notifications.map((note) => (
-                  <li key={note.id} className="flex items-center gap-2 bg-white dark:bg-[#23232b] border border-yellow-100 dark:border-yellow-700 rounded px-3 py-1 text-xs">
-                    {note.icon}
-                    <span>{note.text}</span>
-                    <span className="ml-2 text-muted-foreground">{note.time}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            {notifications.map((n) => (
+              <Badge
+                key={n.id}
+                variant={n.type === "destructive" ? "destructive" : n.type === "warning" ? "secondary" : "default"}
+                className={cn(
+                  "text-xs py-1 px-2.5 gap-1",
+                  n.type === "success" && "bg-success/15 text-success border-success/30 hover:bg-success/20",
+                  n.type === "warning" && "bg-warning/15 text-warning border-warning/30 hover:bg-warning/20",
+                  n.type === "destructive" && "bg-destructive/15 text-destructive border-destructive/30 hover:bg-destructive/20"
+                )}
+              >
+                <Bell className="w-3 h-3" />
+                {n.text}
+              </Badge>
+            ))}
           </div>
         )}
 
-        {/* Loading and Error States */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-          </div>
-        )}
-        
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-            <p className="text-red-800">Error: {error}</p>
-            <Button variant="outline" size="sm" onClick={refetch} className="mt-2">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Retry
-            </Button>
+          <Card className="border-destructive/50 bg-destructive/5">
+            <CardContent className="p-4 flex items-center justify-between">
+              <p className="text-sm text-destructive">Error: {error}</p>
+              <Button variant="outline" size="sm" onClick={refetch}><RefreshCw className="w-3 h-3 mr-1" />Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Loading */}
+        {loading && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
           </div>
         )}
 
-        {/* Search bar */}
+        {/* Search */}
         {!loading && (
-          <div className="mb-6 w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-            <input
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
               type="search"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="🔎 Search clients, invoices…"
-              className="w-full md:w-1/3 border px-3 py-2 rounded-md outline-none bg-background"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search clients, invoices…"
+              className="pl-9 pr-8 h-9 bg-card"
             />
-            <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
-              {search && (
-                <span className="text-xs text-gray-500">Showing results for "{search}"</span>
-              )}
-              <button
-                onClick={() => setSearch("")}
-                className="text-xs px-2 py-1 rounded bg-muted hover:bg-primary/20"
-                style={{ display: search ? "inline-block" : "none" }}
-              >
-                Clear
+            {search && (
+              <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
               </button>
+            )}
+          </div>
+        )}
+
+        {!loading && !hasData && (
+          <div className="flex flex-col items-center py-16">
+            <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mb-4">
+              <FileText className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h2 className="text-lg font-semibold mb-1">No data yet</h2>
+            <p className="text-sm text-muted-foreground mb-4">Start by adding a client or creating an invoice.</p>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => navigate("/clients/new")}><Users className="w-4 h-4 mr-1" /> Add Client</Button>
+              <Button size="sm" variant="secondary" onClick={() => navigate("/invoices/new")}><FileText className="w-4 h-4 mr-1" /> New Invoice</Button>
             </div>
           </div>
         )}
 
-        {/* 
-          --- NEW: RECENT CLIENTS & RECENT INVOICES --- 
-        */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Recent Clients */}
-          <div className="bg-white dark:bg-muted border rounded-lg shadow flex flex-col">
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Recent Clients</h2>
+        {!loading && hasData && (
+          <>
+            {/* Stats Grid - 2 cols on mobile, 4 on desktop */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <DashboardStats clients={filteredClients} invoices={filteredInvoices} />
             </div>
-            <div className="p-4">
-              {filteredClients.length === 0 ? (
-                <div className="text-muted-foreground text-center">No clients found.</div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-muted-foreground">
-                      <th className="text-left py-2">Company</th>
-                      <th className="text-left py-2">Email</th>
-                      <th className="text-left py-2">Phone</th>
-                      <th className="text-center py-2">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {filteredClients.slice(0, 5).map((client) => (
-                    <tr key={client.id} className="hover:bg-accent/30 transition">
-                      <td className="py-2 font-semibold">{client.companyName}</td>
-                      <td className="py-2">{client.email}</td>
-                      <td className="py-2">{client.phone}</td>
-                      <td className="py-2 text-center">
-                        <button
-                          className="text-blue-700 font-bold underline hover:text-blue-900 rounded px-2 py-1"
-                          onClick={() => navigate(`/clients/${client.id}`)}
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-          {/* Recent Invoices */}
-          <div className="bg-white dark:bg-muted border rounded-lg shadow flex flex-col">
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Recent Invoices</h2>
-            </div>
-            <div className="p-4">
-              {filteredInvoices.length === 0 ? (
-                <div className="text-muted-foreground text-center">No invoices found.</div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-muted-foreground">
-                      <th className="py-2">#</th>
-                      <th className="py-2">Client</th>
-                      <th className="py-2">Amount</th>
-                      <th className="py-2">Status</th>
-                      <th className="py-2 text-center">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {filteredInvoices.slice(0, 5).map((inv) => (
-                    <tr key={inv.id} className="hover:bg-accent/30 transition">
-                      <td className="py-2 font-medium">{inv.id}</td>
-                      <td className="py-2">
-                        <button
-                          className="text-blue-700 underline hover:text-blue-900"
-                          onClick={() => inv.clientId && navigate(`/clients/${inv.clientId}`)}
-                        >
-                          {inv.clientName}
-                        </button>
-                      </td>
-                      <td className="py-2">₹{inv.amount.toLocaleString("en-IN")}</td>
-                      <td className="py-2">
-                        <span className={
-                          inv.status === "paid" ? "bg-green-100 text-green-800 px-2 py-1 rounded"
-                            : inv.status === "pending" ? "bg-yellow-100 text-yellow-800 px-2 py-1 rounded"
-                              : "bg-red-100 text-red-800 px-2 py-1 rounded"
-                        }>
-                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="py-2 text-center">
-                        <button
-                          className="text-blue-700 font-bold underline hover:text-blue-900 rounded px-2 py-1"
-                          onClick={() => navigate(`/invoices/${inv.id}`)}
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-        </div>
 
-        {!loading && (
-          !hasData ? (
-            <div className="flex flex-col items-center mt-16 mb-24">
-              <img
-                src="https://svgur.com/i/oD5.svg"
-                alt="No data"
-                className="w-40 h-40 mb-6 opacity-70"
-              />
-              <h2 className="text-xl font-semibold mb-2 dark:text-blue-100">No data to display</h2>
-              <p className="mb-4 text-muted-foreground">Start by adding a client or creating an invoice.</p>
-              <div className="flex gap-3">
-                <Button variant="default" onClick={() => navigate("/clients/new")}>
-                  <Users className="w-4 h-4 mr-1" /> Add Client
-                </Button>
-                <Button variant="secondary" onClick={() => navigate("/invoices/new")}>
-                  <FileText className="w-4 h-4 mr-1" /> New Invoice
-                </Button>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-3 gap-3">
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-success/10 to-success/5">
+                <CardContent className="p-3 md:p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <TrendingUp className="h-3.5 w-3.5 text-success" />
+                    <span className="text-xs font-medium text-success">Paid</span>
+                  </div>
+                  <p className="text-base md:text-lg font-bold text-foreground">₹{paidAmount.toLocaleString("en-IN")}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-warning/10 to-warning/5">
+                <CardContent className="p-3 md:p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Bell className="h-3.5 w-3.5 text-warning" />
+                    <span className="text-xs font-medium text-warning">Pending</span>
+                  </div>
+                  <p className="text-base md:text-lg font-bold text-foreground">₹{pendingAmount.toLocaleString("en-IN")}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-destructive/10 to-destructive/5">
+                <CardContent className="p-3 md:p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <TrendingDown className="h-3.5 w-3.5 text-destructive" />
+                    <span className="text-xs font-medium text-destructive">Overdue</span>
+                  </div>
+                  <p className="text-base md:text-lg font-bold text-foreground">₹{overdueAmount.toLocaleString("en-IN")}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent data - cards on mobile, table on desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Recent Clients */}
+              <Card className="shadow-sm border-0">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                  <CardTitle className="text-base font-semibold">Recent Clients</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate("/clients")}>View All</Button>
+                </CardHeader>
+                <CardContent className="pt-0 space-y-2">
+                  {filteredClients.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No clients found.</p>
+                  ) : (
+                    filteredClients.slice(0, 5).map((client) => (
+                      <div
+                        key={client.id}
+                        className="flex items-center justify-between p-2.5 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/clients/${client.id}`)}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-bold text-primary">
+                              {client.companyName?.charAt(0) || "?"}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{client.companyName}</p>
+                            <p className="text-xs text-muted-foreground truncate">{client.email || client.phone || "—"}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs text-primary font-medium flex-shrink-0 ml-2">View →</span>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recent Invoices */}
+              <Card className="shadow-sm border-0">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                  <CardTitle className="text-base font-semibold">Recent Invoices</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate("/invoices")}>View All</Button>
+                </CardHeader>
+                <CardContent className="pt-0 space-y-2">
+                  {filteredInvoices.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No invoices found.</p>
+                  ) : (
+                    filteredInvoices.slice(0, 5).map((inv) => (
+                      <div
+                        key={inv.id}
+                        className="flex items-center justify-between p-2.5 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/invoices/${inv.id}`)}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{inv.clientName}</p>
+                          <p className="text-xs text-muted-foreground">{inv.invoiceNumber || inv.id?.slice(0, 8)}</p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                          <span className="text-sm font-semibold">₹{inv.amount?.toLocaleString("en-IN")}</span>
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              "text-[10px] px-1.5 py-0",
+                              inv.status === "paid" && "bg-success/15 text-success",
+                              inv.status === "pending" && "bg-warning/15 text-warning",
+                              inv.status === "overdue" && "bg-destructive/15 text-destructive",
+                              inv.status === "draft" && "bg-muted text-muted-foreground",
+                              inv.status === "sent" && "bg-info/15 text-info"
+                            )}
+                          >
+                            {inv.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Top clients */}
+            {topClients.length > 0 && (
+              <Card className="shadow-sm border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold">Top Clients by Revenue</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    {topClients.map((c, i) => {
+                      const maxSum = topClients[0]?.sum || 1;
+                      const pct = Math.round((c.sum / maxSum) * 100);
+                      return (
+                        <div
+                          key={c.clientId}
+                          className="cursor-pointer hover:bg-accent/30 rounded-lg p-2 transition-colors"
+                          onClick={() => navigate(`/clients/${c.clientId}`)}
+                        >
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium">{i + 1}. {c.name}</span>
+                            <span className="font-semibold text-primary">₹{c.sum?.toLocaleString("en-IN")}</span>
+                          </div>
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary/60 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <div className="xl:col-span-2">
+                <DashboardCharts clients={filteredClients} invoices={filteredInvoices} />
+              </div>
+              <div>
+                <RecentClients clients={filteredClients} />
               </div>
             </div>
-          )
-            : (
-              <>
-                {/* Summary cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-                  <DashboardStats clients={filteredClients} invoices={filteredInvoices} />
-                  {/* Add summary cards */}
-                  <div className="bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-900 rounded-md flex flex-col items-center py-6">
-                    <div className="text-lg font-bold text-green-700 dark:text-green-200">₹{paidAmount.toLocaleString("en-IN")}</div>
-                    <div className="font-medium text-green-800 dark:text-green-100">Total Paid</div>
-                  </div>
-                  <div className="bg-yellow-50 border border-yellow-200 dark:bg-yellow-700/10 dark:border-yellow-800 rounded-md flex flex-col items-center py-6">
-                    <div className="text-lg font-bold text-amber-700 dark:text-yellow-200">₹{pendingAmount.toLocaleString("en-IN")}</div>
-                    <div className="font-medium text-amber-800 dark:text-yellow-100">Pending</div>
-                  </div>
-                  <div className="bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-900 rounded-md flex flex-col items-center py-6">
-                    <div className="text-lg font-bold text-red-700 dark:text-red-200">₹{overdueAmount.toLocaleString("en-IN")}</div>
-                    <div className="font-medium text-red-800 dark:text-red-100">Overdue</div>
-                  </div>
-                </div>
-
-                {/* Top clients/activity row */}
-                <div className="mb-6">
-                  <div className="bg-white dark:bg-muted rounded-md shadow p-4 border flex flex-col md:flex-row gap-8 items-start">
-                    <div className="flex-1 min-w-[220px]">
-                      <h2 className="text-lg font-semibold mb-2 text-blue-800">Top Clients</h2>
-                      <ol>
-                        {topClients.map((c, i) => (
-                          <li
-                            key={c.clientId}
-                            className="flex justify-between gap-3 border-b py-2 text-sm cursor-pointer hover:bg-accent/40"
-                            onClick={() => c.clientId && navigate(`/clients/${c.clientId}`)}
-                          >
-                            <div>
-                              <span className="font-medium">{i + 1}.</span>{" "}
-                              {c.name}
-                            </div>
-                            <span className="font-semibold text-blue-700">
-                              ₹{c.sum?.toLocaleString("en-IN")}
-                            </span>
-                          </li>
-                        ))}
-                        {topClients.length === 0 && (
-                          <li className="text-muted-foreground text-sm py-2">No clients yet</li>
-                        )}
-                      </ol>
-                    </div>
-                    {/* Activity log */}
-                    <div className="flex-1 min-w-[220px] border-l pl-6">
-                      <h2 className="text-lg font-semibold mb-2 text-blue-800">Recent Activity</h2>
-                      <ul>
-                        {recentActivity.length > 0 ? recentActivity.map((a, idx) => (
-                          <li key={idx} className="flex justify-between text-sm text-muted-foreground pb-1">
-                            <span>{a.message}</span>
-                            <span className="text-xs text-blue-500">{a.time}</span>
-                          </li>
-                        )) : (
-                          <li className="text-sm text-muted-foreground">No recent activity</li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Main grid */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                  <div className="xl:col-span-2 space-y-8">
-                    <DashboardCharts clients={filteredClients} invoices={filteredInvoices} />
-                    <RecentInvoices invoices={filteredInvoices} />
-                  </div>
-                  <div>
-                    <RecentClients clients={filteredClients} />
-                  </div>
-                </div>
-              </>
-            )
+          </>
         )}
       </div>
     </Layout>

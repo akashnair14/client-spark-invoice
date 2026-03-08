@@ -5,48 +5,86 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 210 20% 98%;
+    --foreground: 220 20% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 220 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 220 20% 10%;
+    --primary: 230 75% 57%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 220 20% 18%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 230 75% 95%;
+    --accent-foreground: 230 75% 40%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 230 75% 57%;
+    --radius: 0.75rem;
+
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 14%;
+    --info: 200 80% 50%;
+    --info-foreground: 0 0% 100%;
+
+    --sidebar-background: 230 25% 14%;
+    --sidebar-foreground: 220 14% 90%;
+    --sidebar-primary: 230 75% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 22%;
+    --sidebar-accent-foreground: 220 14% 90%;
+    --sidebar-border: 230 20% 20%;
+    --sidebar-ring: 230 75% 57%;
+
+    --gradient-start: 230 75% 57%;
+    --gradient-end: 270 60% 60%;
   }
  
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 225 16% 8%;
+    --foreground: 0 0% 95%;
+    --card: 225 16% 11%;
+    --card-foreground: 0 0% 95%;
+    --popover: 225 16% 11%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 230 75% 65%;
+    --primary-foreground: 225 16% 8%;
+    --secondary: 225 14% 16%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 225 14% 16%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 230 30% 20%;
+    --accent-foreground: 230 75% 75%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 14% 18%;
+    --input: 225 14% 18%;
+    --ring: 230 75% 65%;
+
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 200 80% 55%;
+    --info-foreground: 0 0% 100%;
+
+    --sidebar-background: 225 20% 6%;
+    --sidebar-foreground: 220 14% 80%;
+    --sidebar-primary: 230 75% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 14%;
+    --sidebar-accent-foreground: 220 14% 90%;
+    --sidebar-border: 225 14% 14%;
+    --sidebar-ring: 230 75% 65%;
+
+    --gradient-start: 230 75% 65%;
+    --gradient-end: 270 60% 55%;
   }
 }
 
@@ -55,43 +93,19 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  /* Prevent overflow on auth page */
   html, body {
     overflow-x: hidden;
   }
 }
 
-/* App-specific styles */
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-container {
-  padding: 1.5rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  line-height: 2.25rem;
-  color: hsl(var(--foreground));
-}
-
-.page-description {
-  color: hsl(var(--muted-foreground));
-  margin-top: 0.25rem;
+/* Mobile bottom nav spacing */
+@media (max-width: 767px) {
+  .main-content {
+    padding-bottom: 5rem;
+  }
 }
 
 /* Print styles */
@@ -99,41 +113,33 @@
   body * {
     visibility: hidden;
   }
-  
   .invoice-content *,
   .invoice-content {
     visibility: visible;
   }
-  
   .invoice-content {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
   }
-  
-  .print:hidden {
-    display: none !important;
-  }
-
-  /* Hide status markers in print version */
+  .print\\:hidden,
   .print-hide,
   .print-hidden {
     display: none !important;
   }
-  
-  /* Hide UI elements not needed in print */
   .page-header,
   button,
   nav,
   .sidebar,
   .tabs-list,
-  .status-indicator {
+  .status-indicator,
+  .mobile-bottom-nav {
     display: none !important;
   }
 }
 
-/* PDF generation specific styles */
+/* PDF generation */
 .pdf-generation {
   background: white;
   padding: 20px;
@@ -141,9 +147,7 @@
   min-height: 297mm;
   margin: 0 auto;
   color: #000;
-  font-family: 'Arial', sans-serif;
 }
-
 @media screen {
   .pdf-generation {
     position: fixed;
@@ -152,72 +156,41 @@
   }
 }
 
-/* Invoice Professional Styling */
+/* Invoice table */
 .invoice-table {
   border-collapse: collapse;
   width: 100%;
 }
-
 .invoice-table th {
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
   padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 600;
   font-size: 0.875rem;
 }
-
 .invoice-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid hsl(var(--border));
 }
 
-.invoice-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  align-items: flex-start;
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
 }
 
-.invoice-logo {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #3b82f6;
-  letter-spacing: -0.5px;
-}
-
-.invoice-company {
-  text-align: right;
-}
-
-.invoice-billing {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.invoice-totals {
-  margin-left: auto;
-  width: 100%;
-  max-width: 300px;
-  margin-top: 1.5rem;
-}
-
-.invoice-total-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-}
-
-.invoice-total-row.final {
-  border-top: 1px solid #e5e7eb;
-  font-weight: 700;
-  padding-top: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-/* Status indicators for invoices */
+/* Status indicators */
 .status-indicator {
   display: inline-block;
   height: 8px;
@@ -225,47 +198,50 @@
   border-radius: 9999px;
   margin-right: 0.5rem;
 }
+.status-draft { background-color: hsl(var(--muted-foreground)); }
+.status-sent { background-color: hsl(var(--info)); }
+.status-paid { background-color: hsl(var(--success)); }
+.status-pending { background-color: hsl(var(--warning)); }
+.status-overdue { background-color: hsl(var(--destructive)); }
 
-.status-draft {
-  background-color: #9ca3af; /* gray */
-}
-
-.status-sent {
-  background-color: #3b82f6; /* blue */
-}
-
-.status-paid {
-  background-color: #10b981; /* green */
-}
-
-.status-pending {
-  background-color: #f59e0b; /* amber */
-}
-
-.status-overdue {
-  background-color: #ef4444; /* red */
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Hide scrollbar but keep functionality */
+/* Scrollbar hide */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+/* Page container utilities */
+.page-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .page-container {
+    padding: 1.5rem;
+  }
+}
+.page-header {
+  margin-bottom: 1.5rem;
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 2rem;
+  color: hsl(var(--foreground));
+}
+@media (min-width: 768px) {
+  .page-title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+.page-description {
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
 }
