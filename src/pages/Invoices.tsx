@@ -36,7 +36,7 @@ import InvoiceBulkActions from "@/components/invoices/InvoiceBulkActions";
 import InvoiceQuickView from "@/components/invoices/InvoiceQuickView";
 import InvoiceExport from "@/components/invoices/InvoiceExport";
 import { getClients } from "@/api/clients";
-import PageSEO from "@/components/seo/PageSEO";
+import { getInvoices as fetchInvoices, deleteInvoice as apiDeleteInvoice, updateInvoiceStatus as apiUpdateInvoiceStatus } from "@/api/invoices";
 
 const Invoices = () => {
   const { toast } = useToast();
