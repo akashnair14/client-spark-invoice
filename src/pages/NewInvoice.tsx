@@ -12,6 +12,8 @@ import InvoicePreviewPlaceholder from "@/components/invoices/form/InvoicePreview
 import { Invoice, Client } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { getClients } from "@/api/clients";
+import { createInvoice, updateInvoice } from "@/api/invoices";
+import { useQueryClient } from "@tanstack/react-query";
 import PageSEO from "@/components/seo/PageSEO";
 
 const NewInvoice = () => {
