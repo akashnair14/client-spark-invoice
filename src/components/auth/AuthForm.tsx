@@ -150,7 +150,7 @@ const AuthForm: React.FC = () => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-[1200px] relative"
-        style={{ height: tab === "register" ? "min(92vh, 820px)" : "min(88vh, 750px)", transition: "height 0.4s ease" }}
+        style={{ height: tab === "register" ? "min(95vh, 880px)" : "min(88vh, 750px)", transition: "height 0.4s ease" }}
       >
         {/* Outer glow */}
         <div
